@@ -1,0 +1,79 @@
+vscode操作
+    Vim [i]:編集モード [Esc]:通常モード [:w]:保存 [:q]:終了 [:q!]:保存なしで終了
+    powershell エスケープシーケンス:` (stash@`{0`})
+
+参考資料
+    git超参考:https://marklodato.github.io/visual-git-guide/index-ja.html#checkout
+    ブランチについて:https://qiita.com/jesus_isao/items/2a0495c973a4c911c2cc
+    upstream,リモート追跡ブランチ:https://qiita.com/uasi/items/69368c17c79e99aaddbf
+    vscode,git,githubのセットアップ&使い方:https://www.youtube.com/watch?v=vMZ0C06soxA
+    gitを試したリモートリポジトリ:https://github.com/asreia/Hub
+    その他ブックマーク参照:抜き取り/git
+
+gitの構造
+    シンボル: (-option):オプション <origin>:リモートへの参照 <HBC>:ヘッドorブランチorコミット(HEAD~, master~3なども) <W>:ワーキング <S>:ステージ <stash>:stash@{n} <F>:ファイル <N>:名前 ():無くてもいい
+    git status:: U:Untracked:まだ追跡してない(git管理下に無い) A:Added:ステージされた M:Modified:変更された D:Deleted:削除された C:Conflict:マージ時ある行が衝突した(3-way-merge?)
+
+    <C>はハッシュIDを持っていて、一番最初の<C>以外の任意の<C>は直前の<C>のハッシュIDを一つ以上持っている(2以上はマージしている)
+    <B>は<C>を(ハッシュIDで?)参照している
+    <H>は<B>か<C>を参照している(<C>を直接参照している場合は分離HEADと言う(注意が必要)))
+    何からも参照されていない<C>は(GCによって?)削除される
+    つまり、リポジトリはプログラミングのリストと同じ構造をしている
+    ローカルリポジトリもリモートリポジトリも同じ構造を持っている
+
+    <B>の種類はだいたい4つに分けられる
+        ローカル上の<B>
+            <B>とは言わないが<H>と言うgitがある時フォーカスしている<B>のようなもの
+            その中の<B>がある<B>を追跡しているある<B>をupstream<B>と言う
+                その中にリモートの<B>を追跡しているリモート追跡ブランチがある(origin/masterなど)(殆どそう)
+        リモート上の<B>
+
+    <W>は直にgit initしてgitの管理下にしたディレクトリを指す
+    <W>に変更があるとgit statusによって変更を検知できる(U,A,M,D,C)
+    <W>の中の変更がある<F>をgit addでステージングして<S>に送る事ができる
+    <S>はgit commitでコメントを付けて(必項){<H>か<H>が参照している<B>}が参照している<C>の次の位置に新しい<C'>を生成して<C'>は<C>のハッシュIDを持ち{<H>か<H>が参照している<B>}は<C'>の参照を持つ様になる
+    ローカル上の{<B>の参照している<C>}と{<B>のupstreamの<B'>の参照している<C>}の間の全ての<C>をgit pushによってリモートリポジトリの<B'>に対応する<rB>の次に全ての<C>を繋げてその最後の<C>の参照を<rB>に持たせる。ローカルリポジトリも<B'>に同じ事をする。
+
+    git mergeなど?の3-way-merge
+        https://ja.stackoverflow.com/questions/52019/git-%E3%81%AE-3-way-merge-%E3%81%A8%E3%81%AF%E5%85%B7%E4%BD%93%E7%9A%84%E3%81%AB%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%A7%E3%81%99%E3%81%8B
+        手書きノート
+
+gitコマンド
+    コマンド集:https://www.wakuwakubank.com/posts/262-git-command/
+    .gitignoreファイルをgit管理下のフォルダ(.gitがあるフォルダ)に入れて中に正規表現?でファイル、ディレクトリ名を改行で列挙するとそれらのものはgit管理外になる?(.gitignore自体はgit管理下になれる)
+
+    git config: -l 設定情報の表示
+    git init: このコマンドを実行したディレクトリがgitによって管理される
+    git status: ↑の管理下のディレクトリ上で実行、現在のブランチ上の状態を見れる
+    git add <F>: ステージ、インデックスされる。エディタも反応する
+    git commit (--amend) (-m "コメント"): <S>にあるファイルを全てコミットする。--amendを付けると最新の<C>を新しい<C>で差し替える(ハッシュIDが変わる)(多分、reset HEAD~してからコミットするのと同じ)
+    git diff (<HBC>,<HBC>): 差分を表示、<HBC>指定なしは<S>から<W>の差、<HBC>１個はその<HBC>から<W>の差、<HBC> <HBC>はその<HBC>から<HBC>の差 (-abc +abc の様に両方におなじ行がある場合は、改行コードがある～ないの差)
+    git rm (-r) <F>: ファイル(-rを指定するとディレクトリ)の削除をステージする。コミットすると削除される。(手動で<W>で削除してコミットしても削除されない)
+    git log (-p) <HBC>: Git Historyのようなコミットログが見られる。-pでdiffのような比較が見られる。
+    git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>and<W> --soft:無し option無し:<S>)
+    git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HAED状態になり注意が必要。-b <N>はブランチを作って乗る
+        resetとcheckoutの違いは、<B>に乗っていれば同時に移動するか。と、<S>と<W>の更新のされ方
+    git branch (-vv) (-D) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
+    git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合は 結果をコミットする。
+        ２つの<HBC>が指定された<HBC>上にある(一直線)の場合fast-foreard(早送り)マージとなり現在の<HBC>が指定された<HBC>に移動するだけ、(多分 git reset --hard <HBC>)
+        そうでない場合(分岐している)は２つの<HBC>とその共通の親のコミット間で3-way-mergeが実行され本当の行単位のマージが行われる(同じ領域の変更がある場合コンフリクトする)
+    git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。addはリモートへの参照を作る。rmはリモートへの参照を削除する
+        origin/masterのようなリモート<B>は乗れない(読み取り専用?)。fetchでローカル側のorigin/masterを更新する
+    git push (-f) (--all (<origin>)) (<origin> (--delete) (<B>)) (-u <origin> <B>): 指定がない場合、現在の<B>のupstream<B>にプッシュする。まだ未公開の場合-uで公開できる。--allで<origin>か現在の<B>のupstreamでありリモート追跡ブランチの<origin>?の全ての<B>をプッシュする。--deleteでリモートリポジトリの<B>を削除できる。-fはコンフリクトが発生しても強制上書きプッシュ。
+    git pull (<origin> (<B>)): リモートの<B>を全てfetchして、現在の<B>のupstream<B>とマージする
+    git fetch: 全てのリモート追跡ブランチがリモートの<B>を全てfetchする
+        pushとpullはupstreamまたは指定されたリモート追跡ブランチに対して行われる。fetchはfetchするだけ
+    stashはスタック(新しいstashがstash@{0}に積まれる)。<W>と<S>を一旦、一時的に別の所?に退避することができる(--indexはステージされていればステージの状態で戻す。付けなければ全て<W>に戻ると思う)
+        git stash (save ("コメント")): <W>と<S>を退避させる
+        git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
+        git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
+        git stash pop (<stash>) (--index): <stash>を戻して削除。指定がなければ直近を戻して削除(スタック風に戻せる)
+        git stash drop (<stash>) (--index): <stash>を削除。指定がなければ直近を削除
+        git stash clear: 全ての<stash>を削除する
+        git stash show (<stash>) (-p): 変更ファイルの一覧を見ることができます。また、-pオプションをつけることで、変更内容の詳細をみることもできます。
+    git cherry-pick (-e) (-n) <BC>(..<BC>): <BC>を指定してその<C>だけを取り込む(マージ?)ことができる。..<BC>を付けるとその範囲を取り込む(不安定?)。-nを付けるとコミットしないで<S>に入った状態になる。-eを付けると<C>のコメントと詳細を書ける。
+        内部の動作が謎。指定した<BC>の直前の<BC>を親とした3-way-mergeだと思ったが違うみたい?
+    git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。
+        -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作はcherry-pickと同じらしい)
+        -i有りは<BC>から現在の<B>までの全ての<C>に特殊な操作をする。その特殊な操作の一つに全ての<C>を一つに纏めることができる(squash)
+    vscodeの同期は現在の<B>をpullしてからpushするので安心?
