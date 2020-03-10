@@ -8,7 +8,10 @@ vscode操作
     upstream,リモート追跡ブランチ:https://qiita.com/uasi/items/69368c17c79e99aaddbf
     vscode,git,githubのセットアップ&使い方:https://www.youtube.com/watch?v=vMZ0C06soxA
     gitを試したリモートリポジトリ:https://github.com/asreia/Hub
+    gitのHEAD^とHEAD~の違い:https://qiita.com/chihiro/items/d551c14cb9764454e0b9
+    pull は本当に fetch + merge なの？:https://qiita.com/Teloo/items/95a860ae276b49edb040
     その他ブックマーク参照:抜き取り/git
+    
 
 gitの構造
     シンボル: (-option):オプション <origin>:リモートへの参照 <HBC>:ヘッドorブランチorコミット(HEAD~, master~3なども) <W>:ワーキング <S>:ステージ <stash>:stash@{n} <F>:ファイル <N>:名前 ():無くてもいい
@@ -23,9 +26,10 @@ gitの構造
 
     <B>の種類はだいたい4つに分けられる
         ローカル上の<B>
-            <B>とは言わないが<H>と言うgitがある時フォーカスしている<B>のようなもの
-            その中の<B>がある<B>を追跡しているある<B>をupstream<B>と言う
-                その中にリモートの<B>を追跡しているリモート追跡ブランチがある(origin/masterなど)(殆どそう)
+            <B>とは言わないが<H>と言う。<H>は<B>または<C>を参照している
+            <B>が<B'>を追跡している場合その<B'>をupstream<B'>と言う
+                <B'>がリモートの<B''>を追跡している場合<B'>をリモート追跡ブランチと言う(origin/masterなど(殆どそう))
+                <B> --(追跡)--> <B'> --(追跡)--> <B''> (この場合<B'>は<B>のupstreamかつ<B''>のリモート追跡ブランチ)
         リモート上の<B>
 
     <W>は直にgit initしてgitの管理下にしたディレクトリを指す
