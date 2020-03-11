@@ -1,5 +1,7 @@
 # Markdownの使い方メモ
 
+**(\\)(---, \<br>), (#, -, 1., >), (*, \*\*, \`, ~~), (```rb, |:--:|, <>, \[`![]()`]())**  
+
 ## リンク
 
 <https://www.asobou.co.jp/blog/bussiness/markdown>
