@@ -45,9 +45,12 @@
 ```
 
 ## .netの実行まで  
-C# -csc-> IL <-ildasm ilasm-> IL(バイナリ) -AOT,JIT-> ネイティブ
-  cmd.exeでコンパイル: csc.exe source.cs System~0.dll System~1.dll.. (C#コンパイラ ソースコード 参照するアセンブリ(dll)..)
-  とすると、dllかexeファイルが生成される。のでdllの循環参照は起こらない?(https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14)
+C# -csc-> IL <-ildasm ilasm-> IL(バイナリ) -AOT,JIT-> ネイティブ  
+  cmd.exeでコンパイル: csc.exe source.cs System~0.dll System~1.dll.. (C#コンパイラ ソースコード 参照するアセンブリ(dll)..)  
+  とすると、dllかexeファイルが生成される。のでdllの循環参照は起こらない?(https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14)  
+    コンパイラ: C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe (そこのdll群はランタイム用??)  
+    参照するアセンブリ(dll): C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1  
+      GAC(グローバル・アセンブリ・キャッシュ): C:\Windows\assembly (↑をキャッシュしたもの??Windows自身がOSで使っている??)  
 windowsローダー → win32(PEヘッダ) → .net(IL(バイナリ))(CLR)  
 
 ## アセンブリの構造  
