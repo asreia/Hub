@@ -74,6 +74,8 @@ gitの構造
             片方が変更して他方が何もしていない場合、変更している方を採用する。
             同じ箇所で異なる変更が行われている場合、自動マージできないのでその部分のコンフリクトを報告する
 
+    <W>と<S>は現在の<HBC>とのdiffを取り差分があれば<M>や<U>などで表示される?(表示されないから空であると言う訳ではない?)
+
 gitコマンド
     コマンド集:https://www.wakuwakubank.com/posts/262-git-command/
     .gitignoreファイルをgit管理下のフォルダ(.gitがあるフォルダ)に入れて中に正規表現?でファイル、ディレクトリ名を改行で列挙するとそれらのものはgit管理外になる?(.gitignore自体はgit管理下になれる)
@@ -97,13 +99,23 @@ gitコマンド
     git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。addはリモートへの参照を作る。rmはリモートへの参照を削除する
         origin/masterのようなリモート<B>は乗れない(読み取り専用?)。fetchでローカル側のorigin/masterを更新する
         git remote add origin <URL>はorigin = <URL>する。つまりorigin(リモート名)は<URL>で、origin/master == リモート名/ブランチ == <URL>/ブランチ 
+            git remote -v は↓と出る
+            origin  https://github.com/asreia/Hub.git (fetch)
+            origin  https://github.com/asreia/Hub.git (push)
     git push (-f) (--all (<origin>)) (<origin> (--delete) (<B>)) (-u <origin> <B>): 指定がない場合、現在の<B>のupstream<B>にプッシュする。まだ未公開の場合-uで公開できる。
-        --allで<origin>か現在の<B>のupstreamでありリモート追跡ブランチの<origin>?の全ての<B>をプッシュする。--deleteでリモートリポジトリの<B>を削除できる。
+        --allで<origin>に対応する全てのローカルの<B>をプッシュします(多分)。--deleteでリモートリポジトリの<B>を削除できる。
         -fはコンフリクトが発生しても強制上書きプッシュ。
     git pull (<origin> (<B>)): リモートの<B>を全てfetchして、現在の<B>のupstream<B>とマージする
     git fetch: 全てのリモート追跡ブランチに対するリモートの<B>をダウンロードしてローカルのリモート追跡ブランチ(origin/~)を更新する
         pushとpullはupstreamまたは指定されたリモート追跡ブランチに対して行われる。fetchはfetchするだけ
+    
+        [master(local)]--->[origin/master]--------->[master(remote)] : push
+        [master(local)]<---[origin/master]<--fetch--[master(remote)] : pull
+        [origin/master]は状態の更新をfetchして貯める、もしくはmasterのコミットを貯める
+
     stashはスタック(新しいstashがstash@{0}に積まれる)。<W>と<S>を一旦、一時的に別の所?に退避することができる(--indexはステージされていればステージの状態で戻す。付けなければ全て<W>に戻ると思う)
+        stashは<Modified>を退避させる。popなどで戻すときに<Modified>があるとマージして上書きされる(errorになる)のでコミットや退避や変更を破棄などして戻す。
+        VScodeの"変更を破棄"はgit stash -> git drop ?
         git stash (save ("コメント")): <W>と<S>を退避させる
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
@@ -116,7 +128,12 @@ gitコマンド
         指定した<BC>と直前の<BC>とのdiffを取り、後は通常の3-way-mergeをしてdiffで変更された部分だけ更新する?
         //いや、単純にHEADと<BC>とその分岐の親の<C>との3-way-mergeだと思う
     git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。
-        -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作はcherry-pickと同じらしい)
+        -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作は連続cherry-pickと同じらしい)
         -i有りは<BC>から現在の<B>までの全ての<C>に特殊な操作をする。その特殊な操作の一つに全ての<C>を一つに纏めることができる(squash)
     vscodeの同期は現在の<B>をpullしてからpushするので安心?
     反応が悪い場合はGit HistoryのRefresh
+
+VScodeのgit(左のバー)とgitコマンドの対応
+    +(変更をステージ): git add -A -- <ファイル名>
+    -(変更のステージング解除): git reset -q HEAD -- <ファイル名>
+    
