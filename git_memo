@@ -95,12 +95,12 @@ gitコマンド
     git rm (-r) <F>: ファイル(-rを指定するとディレクトリ)の削除をステージする。コミットすると削除される。(手動で<W>で削除してコミットしても削除されない)
     git log (-p) <HBC>: Git Historyのようなコミットログが見られる。-pでdiffのような比較が見られる。
     git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>と<W> --soft:無し option無し:<S>)
-    git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HAED状態になり注意が必要。-b <N>はブランチを作って乗る
+    git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HEAD状態になり注意が必要。-b <N>はブランチを作って乗る
         resetとcheckoutの違いは、<B>に乗っていれば同時に移動するか。と、<S>と<W>の更新のされ方(checkoutは<S>と<W>両方更新する)
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
         -uを付けると<N>をupstream<B>にする
     git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合はマージコミットが作られる。
-        ２つの<HBC>が指定された<HBC>上にある(一直線)の場合fast-foreard(早送り)マージとなり現在の<HBC>が指定された<HBC>に移動するだけ、(多分 git reset --hard <HBC>)
+        ２つの<HBC>が指定された<HBC>上にある(一直線)の場合fast-forward(早送り)マージとなり現在の<HBC>が指定された<HBC>に移動するだけ、(多分 git reset --hard <HBC>)
         そうでない場合(分岐している)は２つの<HBC>とその共通の親のコミット間で3-way-mergeが実行され本当の行単位のマージが行われる(同じ領域の変更がある場合コンフリクトする)
     git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。addはリモートへの参照を作る。rmはリモートへの参照を削除する
         origin/masterのようなリモート<B>は乗れない(読み取り専用?)。fetchでローカル側のorigin/masterを更新する
@@ -145,7 +145,7 @@ gitコマンド
 VScodeのgit(左のバー)とgitコマンドの対応
     +(変更をステージ): git add -A -- <ファイル名>
     -(変更のステージング解除): git reset -q HEAD -- <ファイル名>
-    コミット -> コミット: git -c user.useConfigOnly=true commit --quiet --allow-empty-message --file - 
+    コミット -> コミット:      git -c user.useConfigOnly=true commit --quiet --allow-empty-message --file - 
     コミット -> コミット(修正) :git -c user.useConfigOnly=true commit --quiet --allow-empty-message --amend --file - 
     コミット -> 前回のコミットを元に戻す: git reset --soft HEAD~
     コミット、すべてコミット、ステージング済みをコミットの違いが分からん
@@ -153,9 +153,12 @@ VScodeのgit(左のバー)とgitコマンドの対応
     変更 -> 全ての変更をステージ解除: git reset -q HEAD -- .
     変更 -> 全ての変更を破棄: git checkout -q -- <ファイル名>
     プル、プッシュ -> 同期: git pull --tags origin <B(local)> ----> git push origin <B(local)>:<B(remote)>
+    プル、プッシュ -> フェッチ: git fetch
     プル: git pull --tags <origin> <B(local)>
     プッシュ: git push origin <B(local)>:<B(remote)>
     チェックアウト先... -> 新しい分岐の作成: git checkout -q -b <B> --no-track HEAD
     チェックアウト先... -> 新しい分岐の作成元: git checkout -q -b <B(作成)> --no-track <B(元)>
     チェックアウト先... -> <B>: git checkout -q <B> 
+    ブランチ -> ブランチを発行: git push -u origin <B>
+    stashはとりあえずgitコマンドを打って..
 
