@@ -86,7 +86,7 @@ gitコマンド
     git diff (<HBC>,<HBC>): 差分を表示、<HBC>指定なしは<S>から<W>の差、<HBC>１個はその<HBC>から<W>の差、<HBC> <HBC>はその<HBC>から<HBC>の差 (-abc +abc の様に両方におなじ行がある場合は、改行コードがある～ないの差)
     git rm (-r) <F>: ファイル(-rを指定するとディレクトリ)の削除をステージする。コミットすると削除される。(手動で<W>で削除してコミットしても削除されない)
     git log (-p) <HBC>: Git Historyのようなコミットログが見られる。-pでdiffのような比較が見られる。
-    git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>and<W> --soft:無し option無し:<S>)
+    git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>と<W> --soft:無し option無し:<S>)
     git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HAED状態になり注意が必要。-b <N>はブランチを作って乗る
         resetとcheckoutの違いは、<B>に乗っていれば同時に移動するか。と、<S>と<W>の更新のされ方(checkoutは<S>と<W>両方更新する)
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
