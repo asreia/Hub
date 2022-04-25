@@ -118,6 +118,8 @@ gitコマンド
         [master(local)]--->[origin/master]--------->[master(remote)] : push
         [master(local)]<---[origin/master]<--fetch--[master(remote)] : pull
         [origin/master]は状態の更新をfetchして貯める、もしくはmasterのコミットを貯める
+            それと、[origin/master]はpush,pull,fetchの全てで先頭方向に動き かつ 乗れないので後ろに戻ることはない
+                ([origin/master]より後ろのコミットはこのリモート追跡ブランチを破棄する以外消えないと思う(安全バー))
 
     stashはスタック(新しいstashがstash@{0}に積まれる)。<W>と<S>を一旦、一時的に別の所?に退避することができる(--indexはステージされていればステージの状態で戻す。付けなければ全て<W>に戻ると思う)
         stashは<Modified>を退避させる。popなどで戻すときに<Modified>があるとマージして上書きされる(errorになる)のでコミットや退避や変更を破棄などして戻す。
