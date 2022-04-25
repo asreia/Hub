@@ -1,5 +1,11 @@
-vscode操作
-    Vim [i]:編集モード [Esc]:通常モード [:w]:保存 [:q]:終了 [:q!]:保存なしで終了
+
+
+!!!!!!!!!<Modified>のままにしておくとstashのdorpやclearや、変更を破棄か、何かの拍子で<Modified>が変更前に戻って消える可能性があるので危険!!
+
+
+vscode操作 <Modified>のままはstashのdorpやclearや、変更を破棄か、何かの拍子で<Modified>が変更前に戻って消える可能性があるので危険!!
+    Vim [i]:編集モード [Esc]:通常モード [:w]:保存 [:q]:終了 [:q!]:保存なしで終了 //[:q]の":"も入れる 
+    [ZZ]と[:x]:変更があれば保存して終了
     powershell エスケープシーケンス:` (stash@`{0`})
 
 参考資料
@@ -120,8 +126,8 @@ gitコマンド
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
         git stash pop (<stash>) (--index): <stash>を戻して削除。指定がなければ直近を戻して削除(スタック風に戻せる)
-        git stash drop (<stash>) (--index): <stash>を削除。指定がなければ直近を削除
-        git stash clear: 全ての<stash>を削除する
+        git stash drop (<stash>) (--index): <stash>を削除。指定がなければ直近を削除 (<Modified>がstashされたまま消えるので注意!!)
+        git stash clear: 全ての<stash>を削除する (<Modified>がstashされたまま消えるので注意!!)
         git stash show (<stash>) (-p): 変更ファイルの一覧を見ることができます。また、-pオプションをつけることで、変更内容の詳細をみることもできます。
     git cherry-pick (-e) (-n) <BC>(..<BC>): <BC>を指定してその<C>だけを取り込む(マージ?)ことができる。..<BC>を付けるとその範囲を取り込む(不安定?)。-nを付けるとコミットしないで<S>に入った状態になる。-eを付けると<C>のコメントと詳細を書ける。
         内部の動作が謎。指定した<BC>の直前の<BC>を親とした3-way-mergeだと思ったが違うみたい?
