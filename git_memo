@@ -136,4 +136,11 @@ gitコマンド
 VScodeのgit(左のバー)とgitコマンドの対応
     +(変更をステージ): git add -A -- <ファイル名>
     -(変更のステージング解除): git reset -q HEAD -- <ファイル名>
-    : git -c user.useConfigOnly=true commit --quiet --allow-empty-message --file - 
+    コミット -> コミット: git -c user.useConfigOnly=true commit --quiet --allow-empty-message --file - 
+    コミット -> コミット(修正) :git -c user.useConfigOnly=true commit --quiet --allow-empty-message --amend --file - 
+    コミット -> 前回のコミットを元に戻す: git reset --soft HEAD~
+    プル: git pull --tags <origin> <B(local)>
+    プッシュ: git push origin <B(local)>:<B(remote)>
+    チェックアウト先... -> 新しい分岐の作成: git checkout -q -b <B> --no-track HEAD
+    チェックアウト先... -> 新しい分岐の作成元: git checkout -q -b <B(作成)> --no-track <B(元)>
+    チェックアウト先... -> <B>: git checkout -q <B>

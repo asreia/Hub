@@ -1,0 +1,15 @@
+# ECS
+- ArchetypeChunkは隠蔽され内部で自動的に作られ操作されるもの?
+- AddComponentなどのEntityへのComponent操作系でChunkや各Componentの種類に応じた挙動がどうなっているのか
+- EntityのIndexはUnityEngine.ObjectのInstanceIDのようなもの?でWorld?で唯一のIndexが割り振られる?
+
+- ECSの外観
+    Entity: GameObject
+    Component: Componentのフィールド
+    System : Componentのメッセージメソッド
+- ECSの実態
+    Entity: フィールドがindexとversion(64bit)のみの構造体。EntityManagerの引数に渡して操作される。indexはEntityManagerが持つEntities配列テーブルへのindexらしい
+    Component: IComponentData,ISherdComponentDataなどのマーカーインターフェースを継承したComponentのフィールド部しか書いていない構造体
+    System: SystemBaseを継承したクラスでそのクラスのメソッドをオーバーライドして従来のメッセージメソッドの様に書く。そして全部?Job化され並列実行される
+        OnCreateでtypeof(Struct)からComponentTypeを作りそれを元にEntityArchetype構造体→Entity構造体とEntityQueryDescクラス→EntityQuery構造体を作る
+    World: Worldは↑それらを管理する大きな枠組みSystemは直接でEntityとComponentはEntityManagerを通して操作される
