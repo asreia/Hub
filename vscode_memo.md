@@ -312,7 +312,7 @@ C:\Users\asreia\.vscode\extensions
 | `Ctrl + N`  | 新規ファイルを開く |
 | `Ctrl + O`  | ファイルを開く     |
 | `F5`        | デバック開始/続行  |
-
+ 
 ### エディタ系
 
 | キー                           | 動作                                                   |
