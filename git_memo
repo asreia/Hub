@@ -91,7 +91,7 @@ gitコマンド
         resetとcheckoutの違いは、<B>に乗っていれば同時に移動するか。と、<S>と<W>の更新のされ方(checkoutは<S>と<W>両方更新する)
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
         -uを付けると<N>をupstream<B>にする
-    git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合は 結果をコミットする。
+    git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合はマージコミットが作られる。
         ２つの<HBC>が指定された<HBC>上にある(一直線)の場合fast-foreard(早送り)マージとなり現在の<HBC>が指定された<HBC>に移動するだけ、(多分 git reset --hard <HBC>)
         そうでない場合(分岐している)は２つの<HBC>とその共通の親のコミット間で3-way-mergeが実行され本当の行単位のマージが行われる(同じ領域の変更がある場合コンフリクトする)
     git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。addはリモートへの参照を作る。rmはリモートへの参照を削除する
