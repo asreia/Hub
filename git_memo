@@ -143,4 +143,4 @@ VScodeのgit(左のバー)とgitコマンドの対応
     プッシュ: git push origin <B(local)>:<B(remote)>
     チェックアウト先... -> 新しい分岐の作成: git checkout -q -b <B> --no-track HEAD
     チェックアウト先... -> 新しい分岐の作成元: git checkout -q -b <B(作成)> --no-track <B(元)>
-    チェックアウト先... -> <B>: git checkout -q <B>
+    チェックアウト先... -> <B>: git checkout -q <B> 
