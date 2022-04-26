@@ -46,7 +46,7 @@
 
 ## .netの実行まで  
 C# -csc-> IL <-ildasm ilasm-> IL(バイナリ) -AOT,JIT-> ネイティブ  
-  - cmd.exeでコンパイル: csc.exe source.cs System~0.dll System~1.dll.. (C#コンパイラ ソースコード 参照するアセンブリ(dll)..)  
+  - cmd.exeでコンパイル: csc.exe source.cs System_0.dll System_1.dll.. (C#コンパイラ ソースコード 参照するアセンブリ(dll)..)  
     とすると、dllかexeファイルが生成される。のでdllの循環参照は起こらない?(https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14)  
     mscorlib.dll(System.Objectとか基本型が入っている)は指定しなくても参照される(https://qiita.com/gdrom1gb/items/69ed26a72c6c2b9445e3)  
     コンパイラ(csc.exe)のオプション:https://qiita.com/toshirot/items/dcf7809007730d835cfc
