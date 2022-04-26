@@ -96,7 +96,7 @@ gitコマンド
     git log (-p) <HBC>: Git Historyのようなコミットログが見られる。-pでdiffのような比較が見られる。
     git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>と<W> --soft:無し option無し:<S>)
     git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HEAD状態になり注意が必要。-b <N>はブランチを作って乗る
-        resetとcheckoutの違いは、<B>に乗っていれば同時に移動するか。と、<S>と<W>の更新のされ方(checkoutは<S>と<W>両方更新する)
+        resetとcheckoutの違いは、resetは<B>に乗っていれば同時に移動する。あと、<S>と<W>の更新のされ方が違う(checkoutは<S>と<W>両方更新する)
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
         -uを付けると<N>をupstream<B>にする
     git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合はマージコミットが作られる。
