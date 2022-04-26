@@ -124,7 +124,7 @@ gitコマンド
 
     stashはスタック(新しいstashがstash@{0}に積まれる)。<W>と<S>を一旦、一時的に別の所?に退避することができる(--indexはステージされていればステージの状態で戻す。付けなければ全て<W>に戻ると思う)
         stashは<Modified>を退避させる。popなどで戻すときに<Modified>があるとマージして上書きされる(errorになる)のでコミットや退避や変更を破棄などして戻す。
-        VScodeの"変更を破棄"はgit stash -> git drop ?
+        VScodeの"変更を破棄"はgit stash -> git drop ? stashを戻す(pop,apply)操作は差し替えではなくmergeしている?
         git stash (save ("コメント")): <W>と<S>を退避させる
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
