@@ -28,8 +28,8 @@
 .assembly NewObjAndCallInstanceMethod {}
 .method public static void main()
 {
-    .entrypoint
-    .maxstack 3
+    .entrypoint //このプログラムのエントリーポイント。"main"という名前はエントリーポイントにならない。
+    .maxstack 3 //この関数で使うスタックの大きさ。無駄に大きいとメモリを無駄に食う。足りないとエラー
 
     ldstr "16進数へ："
     newobj instance void [mscorlib]System.Text.StringBuilder::.ctor(string)
@@ -43,9 +43,14 @@
     ret
 }
 ```
+ILはスタックマシン、逆ポーランド記法
 
 ## .netの実行まで  
-C# -csc-> IL <-ildasm ilasm-> IL(バイナリ) -AOT,JIT-> ネイティブ  
+                  
+  |IL| ---ilasm.exe--> |   .exe    |
+  |  | <--ildasm.exe-- |   .dll    | ---CLR(AOT or JIT)--> ネイティブ
+  C#  ---csc.exe---->  |IL(バイナリ)|
+
   - cmd.exeでコンパイル: csc.exe source.cs System_0.dll System_1.dll.. (C#コンパイラ ソースコード 参照するアセンブリ(dll)..)  
     とすると、dllかexeファイルが生成される。のでdllの循環参照は起こらない?(https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14)  
     mscorlib.dll(System.Objectとか基本型が入っている)は指定しなくても参照される(https://qiita.com/gdrom1gb/items/69ed26a72c6c2b9445e3)  
@@ -189,10 +194,10 @@ v := value, a:= arg, typeTokはタイプトークンでただの型のこと？
 | `cpblk`                             | …, destaddr, srcaddr, size => … | スタックに送信元、送信先、バイト数(blk)があり、送信元から送信先へバイト数分データをコピーする。                                                             |
 | `cpobj_typeTok`                     | …, dest, src => …,              | dest = (typeTok)src。srcValObjからdestValObjに値をコピーします。                                                                                            |
 | ■例外系================             |                                 |                                                                                                                                                             |
-| @`throw`                            |                                 | 例外をスローします                                                                                                                                          |
+| @`throw`                            |                                 | 例外をスローします           .try{.try{..}catch{..}}finally{..}                                                                                                                               |
+| `rethrow`                           | … => …                          | catch句でキャッチした例外を再スローする。(catch句内のみ使用可能)                                                                                            |
 | `endfilter`                         | …, val => …                     | 例外処理のfilterが何か知らないけどendfinallyと同じ様にfilter句の最後で値(val)を取って使ってfilter句の処理を終わる。                                         |
 | `end❰finally¦fault❱`                | … => …                          | 例外ブロックの❰finally¦fault❱節を終了                                                                                                                       |
-| `rethrow`                           | … => …                          | catch句でキャッチした例外を再スローする。(catch句内のみ使用可能)                                                                                            |
 | @`leave`                            |                                 | コードの保護された領域を終了します。                                                                                                                        |
 | `ckfinite`                          | …, val => …, val                | if(val == NaN){throw("ArithmeticException");}。スタックにF型?があり、値が有限でない場合(無限?)例外を投げる。値がF型でない場合何もしない?                    |
 | ■スタック操作系=========            |                                 |                                                                                                                                                             |
@@ -217,11 +222,11 @@ v := value, a:= arg, typeTokはタイプトークンでただの型のこと？
 
 | ディレクティブ  | 説明                                                                                                                                           |
 | :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| auto            | この型はヒープに生成される?(class)     //←↓違うhttps://www.youtube.com/watch?v=3NMUJdZIdQM&list=PLtjAIRnny3h7KDDpkrsEEnILtEQLwOHiC&index=1                                                                                                      |
+| auto            | この型はヒープに生成される?(class)     //←↓違うhttps://youtu.be/3NMUJdZIdQM?list=PLtjAIRnny3h7KDDpkrsEEnILtEQLwOHiC&t=1185                                                                                                      |
 | sequential      | この型はスタックに生成される?(struct)  //    [StructLayout](https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYAMBYAUAenwAthgAHAZxEIE8B7CYCAOgCMBTfAZgDkBZAKoApOAC0AknACKfAPwAbAJYVgAXgAKAGWAArAILiASlCg0uRAOwBpACI2yAazAUAoi6jjtLqZoDuAeQAJRQBhADI1AEZIgA4AVjxCEnIqQggAMwBjMjJmKHZgfBUIOBp8TIoiAEMwMnxFKGB2MDo6gFt2NrowGnkq+kZ8AGJ2AA8yJUzFYABaPoHgRPxAeoZAS4ZAToZAOwZAVYZAYoZAH4ZAa4ZASYZAcYZ9wH6GQAuEwDAlAAoidiq4ZsALBmAaMnYAAmqoOHk7EAp3KANE0AJSvJaAactAAQJgGV5HYHE7na73QC6DIAYhlBgCsGQAiDGDNoBVBNxgHsGaHwwAyDJp+gxgFYGnBmABldgARwg7Eaiiq8kA5gyAQAY1usqTTGPT/sw9Iw6ETcYADBkAigxLQAmDIA/BkAUQxCkmwuGAJIZqQtxYypcA6IBrBkA6gyAfQYdbrANQqgGSGXm4wDRDHcdXcTXQwYAgoiFYLwUCqHQoZCqmR+TOAkEywANtIA3nhvinvhhIsnU6hMGnIsxDNBgIoOsxxI1mq0WWAAG6KCMUADceEzKcIOpb3wA2lGY3HRcA7vGxQzmPgAFSAB3JAKD/Y/wLPZnKLPPHgEdyWdggC6HZUve+84gPYTDWA30UDe+8joUAA5hfz6waE1vqwGwBfQiAADlAFaugHJNQCyDLigDR6psgCtDIAJQyAF0MvKAMXagAAUYAYBlmoAsomAHb+gCqDBiLrNrgqZdj2ECxkOA5EUakrSpu27RgRJ5eoex6nuel43nez6Pj8L7vvg37/kBoGQYA0gyAJEMgAOUYAgQyAGYMqEYVhuAdoQ3ZUYR/aDv2pEuOMkzTJu3yEIAForiYA0kaAKtKdwAGKKOw8hwP46TpBQBR3PRdC2fZwBgmCvKoYAmgxuoAs4mALYM4nQIoV6ANGRVq4tigD+8rigCdpoAQQy8n+LoBjhqaEDu1HfOpEyHp25mWdZLkOZgm70WeXYFVZNl2Q5AAsm5Mbe8jnvlFnVcVA6ROgm4Pk+HEdrhhCAIxRgD3yhh4mRbigBwZoAXJ6ACFugA3DGBgBFDIAZQyABMMrywYA8QwYuJgAVDKs+yAEAMZCZHKryAFgJMlySsGwdgpvZESphojvui7cvIFFpSmGB7myEAhPIFBHo0DEXlezX3mxz5vthuFPdRL0kSO47TrOXqruuW6/Wm6DfF6wOg+VjFQyxfXsfDsl4/J+FKQsr20mpGl1lpuNDfg/05fIxMJm1hU1a5dylRupOVe1RW1QODUbk1LECx10t3N1vWwwNNO4RgXDfEmeNa+gBN67hJtZpEACcdwAESADwbgAg+1bYJNvrps6fg7Yu6b+49t8FAUN8qjfPkvgA+yPZ3E7g2u2WobsLGzLAOGDh3H7keeybtHRmmqBVP7gfB4T0rh2nrsmzHXzx1GSd3KgOcUCXpfpfd6xR17gPE77mQB0H7Ah/uxMR87jepuXcfAMwgRPGQKeZA3w9EyD3zht3BcLxQg+t2XUCx/Hk9VNP4Zzybr4difuCvkAA==)                                                                                                        |
 | beforefieldinit | フィールドメンバアクセス時よりも前に、静的メンバ変数を0初期化する?(default(T)の状態になる?)(静的コンストラクタを明示的に書くと消える)http://csharper.blog57.fc2.com/blog-category-3.html                    |
 | sealed          | 継承不可                                                                                                                                       |
-| ansi            | 文字列をANSIとしてプラットフォームにマーシャリングします。(ANSIは、マイクロソフトがWindowsで使っている文字コード。)                            |
+| ansi            | 文字列をASCIIとしてプラットフォームにマーシャリングします。(ASCIIはANSIが定める文字コード。http://www.daido-it.ac.jp/~oishi/HT191/ht191.html)                            |
 | hidebysig       | 名前と署名(シグネチャ?)で非表示にします。 ランタイムでは無視されます。(基底クラスのメソッドと同じシグネチャを持つ時、非表示になる?(newがいる)) |
 | specialname     | 主に.ctor()に付いていてCLR以外に特別な名前であることを示す                                                                                     |
 | rtspecialname   | 主に.ctor()に付いていてCLRに特別な名前であることを示す                                                                                         |
