@@ -1,3 +1,7 @@
+    Console.WriteLine((void*)0 == null);
+    Console.WriteLine((int*)0 == null);
+    Console.WriteLine((float**)0 == null);
+    Console.WriteLine((Str*)0 == null);
 https://bit.ly/3bQe6xf
 # C#まとめ
 
