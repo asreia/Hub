@@ -65,7 +65,10 @@ Java 開発者向けチート シート
     - ジェネリック  
         - ジェネリック  
             `＄変性ジェネ=❰<⟪❰,❱,1~⟫❰｡＠❰in ¦out ❱∫Type∫⇒∫Gene∫｡❱>❱`  
+            `＄変性ジェネ=❰<⟦,|1~⟧❰｡＠⟪in ¦out ⟫∫Type∫⇒∫Gene∫｡❱>❱`  
             `＄ジェネ=∫変性ジェネ∫∠❰⸨＠❰in ¦out ❱⸩❱⇒❰⟪⟫❱`  
+            `＄ジェネ＝【∫変性ジェネ∫∠✖⸨＠⟪in ¦out ⟫⸩】` //破壊(と言うより置換?)の記号は`⇒`っぽい記号を探す?トークン単位でない事もある  
+            `＄ジェネ＝【∫変数∫⇒∫変性ジェネ∫∠❰in ❱∩⸨＠❰in ¦out ❱⸩¦¦❰abc❱】¦¦❰A❱`≪⟪⟫≫ 
         - 型制約  
             `＄制約子=❰❰unmanaged¦class¦struct¦∫Type∫⇒∫class∫❱¦Delegate¦Enum¦∫Type∫⇒∫Gene∫¦∫Type∫⇒∫interface∫¦new()❱`  
             `＄型制約=❰⟪❰ ¦⏎[Tab]❱,~⟫❰｡where ∫Type∫⇒∫Gene∫: ⟪❰, ❱,~⟫❰∫制約子∫❱❱｡❱`  
@@ -177,12 +180,12 @@ Java 開発者向けチート シート
                     - メソッド  
                         `＄Struct_method=❰｡｡｡∫Method∫⇒❰｡｡∫Normal_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⇒❰cctor¦ctor❱｡¦｡∫Prodexer∫｡¦｡∫Iterator∫｡¦｡∫Operator∫｡｡❱✖⏎`  
                             `∠❰⸨∫仮/イ/静∫⸩❱⇒❰⟪∫仮/イ/静∫∸❰abstract¦virtual¦override❱⟫❱｡｡｡❱`  
-                    - 構造体 //構造体はILでsealed。//structはゴミが無く、レイアウト可能(unionとか)  
+                    - 構造体 //構造体はILでsealed。//structはゴミが無く、レイアウト可能(unionとか)、コピーとbox化に注意する  
                         `＄Normal_Struct=❰∫Str修飾子∫⇒❰｡＠∫アクセス∫ ＠❰partial❱｡❱ struct ∫name∫｡＠∫ジェネ∫{`  
                             `＄構造体メンバ=❰⟪❰⏎[Tab]❱,~⟫❰✖⏎`  ❰/; 構造体、クラスのアクセスレベルは∫name∫へのアクセスレベル(∫name∫は型の名前なので静的)  
                                 `∫Field_member∫¦✖⏎`       ❰/; コンストラクタは静的メソッドでCls.Cls();が本来でアクセスがクラスのとメンバの両方を満たすこと(普通の静的メソッドも同じ)  
                                 `∫Struct_method∫✖⏎`  //ctorは引数ありでフィールドメンバ全初期化  
-                                `∫Complex_define∫✖⏎`  
+                                `∫Complex_define∫✖⏎`  //✖⏎を⏎に変える?それとも別のにする?改行の意味より広い意味で
                             `❱❱✖⏎`  
                         `}❱`  
                         `＄Normal_Struct_name=∫Normal_Struct∫∠●∫name∫●`  
@@ -190,7 +193,7 @@ Java 開発者向けチート シート
                         `＄Readonly_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪❰⟪≪readonly ≫struct⟫❱✖⏎`  
                             `⟦if⟧⟦this⟧∠❰⸨∫Field_member∫∠❰∫イ/静∫❱⸩❱⇒❰⟪❰＆Null❱⟫❱⟦then⟧⟦this⟧∠❰⸨∫Field_member∫∠∫Type∫⸩❱≪❰⟪≪readonly≫ ∫Type∫⟫❱⟦end⟧✖⏎`  
                             `∠❰⸨∫Struct_method∫∠∫property∫∠＠❰∫アクセス∫ set;❱⸩❱⇒❰⟪❰＆Null❱⟫❱ ❰/;get-onlyだけ許可`  
-                        `＄Readonly_Struct_name=∫Readonly_Struct∫∠●∫name∫●`  
+                        `＄Readonly_Struct_name=∫Readonly_Struct∫∠●∫name∫●`  //●∫ ∫●やめる?nameはnameだし..
                     - ref構造体  
                         `＄Ref_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪＃1❰⟪≪ref ≫struct⟫❱`❰/;＃1:ref構造体はref構造体のメンバかローカルしか置けない(スタックのみ)  
                         `＄Ref_Struct_name=∫Ref_Struct∫∠●∫name∫●`  
@@ -201,7 +204,7 @@ Java 開発者向けチート シート
                     `＄LitStruct=❰new ∫Struct∫()❱`  
                 - タプル  
                     - 型  
-                        `＄Tuple=❰＄recur=❰(｡⟪❰, ❱,2~⟫❰∫Type∫ ＃1＠∫vari∫❱¦¦∫recur∫｡)❱❱`  
+                        `＄Tuple=❰＄recur=❰(｡⟪❰, ❱,2~⟫❰｡❰∫Type∫ ＃1＠∫vari∫❱¦∫recur∫｡❱｡)❱❱`  
                         `❰/;＃1タプル型は型の中に識別子を持てるが、コンパイル時に消失するため属性で保持している`  
                         `❰/;＃1を省略した場合、アクセスは∫vari∫.Item❰1~❱となる`  
                         `❰/;タプルはSystem.ValueTuple＠❰<⟪❰, ❱,1~8⟫∫Type∫>❱最後は↑の記述で8個以上の時の入れ子のための型引数(1,2,..,7,8,..) == (1,2,..,7,(8,..))`  
