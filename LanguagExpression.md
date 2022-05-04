@@ -114,7 +114,7 @@ LOperatorここの説明だけ
 
                 ＄Static_Class_name=∫Static_Class∫∠●∫name∫●`, ∫∫Static_Class_name∫  
                 の、`●`は`∫∫∫`を使うことで`●`の意味にする。  
-                つまり、`∠`の前(抽出元)と後(抽出した部分)は同期している。  
+                つまり、`∠`の前(抽出元)と後(抽出した部分)は同期している。   
 
     - Block operator(ブロック演算子(`＄＝,✖,＠,％,⟦┃～⟧,⊃,∪,∸,⚺,≡`))  
         [表現] `{∫LUnaryOperator∫｡∫LExpress∫}, {∫LExpress∫｡∫LBinaryOperator∫｡∫LExpress∫}`  
