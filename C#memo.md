@@ -193,7 +193,8 @@ Java 開発者向けチート シート
                         `＄Readonly_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪❰⟪≪readonly ≫struct⟫❱✖⏎`  
                             `⟦if⟧⟦this⟧∠❰⸨∫Field_member∫∠❰∫イ/静∫❱⸩❱⇒❰⟪❰＆Null❱⟫❱⟦then⟧⟦this⟧∠❰⸨∫Field_member∫∠∫Type∫⸩❱≪❰⟪≪readonly≫ ∫Type∫⟫❱⟦end⟧✖⏎`  
                             `∠❰⸨∫Struct_method∫∠∫property∫∠＠❰∫アクセス∫ set;❱⸩❱⇒❰⟪❰＆Null❱⟫❱ ❰/;get-onlyだけ許可`  
-                        `＄Readonly_Struct_name=∫Readonly_Struct∫∠●∫name∫●`  //●∫ ∫●やめる?nameはnameだし..
+                        `＄Readonly_Struct_name=∫Readonly_Struct∫∠●∫name∫●`  //●∫ ∫●変えた↓
+                        `【∫Readonly_Struct∫⇒＄Readonly_Struct_name＝⸨∫name∫⸩】`  
                     - ref構造体  
                         `＄Ref_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪＃1❰⟪≪ref ≫struct⟫❱`❰/;＃1:ref構造体はref構造体のメンバかローカルしか置けない(スタックのみ)  
                         `＄Ref_Struct_name=∫Ref_Struct∫∠●∫name∫●`  
