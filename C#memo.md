@@ -71,7 +71,7 @@ Java 開発者向けチート シート
             `＄ジェネ＝【∫変数∫⇒∫変性ジェネ∫∠❰in ❱∩⸨＠❰in ¦out ❱⸩¦¦❰abc❱】¦¦❰A❱`≪⟪⟫≫ 
         - 型制約  
             `＄制約子=❰❰unmanaged¦class¦struct¦∫Type∫⇒∫class∫❱¦Delegate¦Enum¦∫Type∫⇒∫Gene∫¦∫Type∫⇒∫interface∫¦new()❱`  
-            `＄型制約=❰⟪❰ ¦⏎[Tab]❱,~⟫❰｡where ∫Type∫⇒∫Gene∫: ⟪❰, ❱,~⟫❰∫制約子∫❱❱｡❱`  
+            `＄型制約=❰⟪❰ ¦∫LRetInd∫❱,~⟫❰｡where ∫Type∫⇒∫Gene∫: ⟪❰, ❱,~⟫❰∫制約子∫❱❱｡❱`  
     - 型とリテラル  
         - 型  
             `＄Type=❰∫ReferenceType∫¦∫ValueType∫¦∫Generic∫❱`  
@@ -178,20 +178,20 @@ Java 開発者向けチート シート
                     - 修飾子  
                         `＄Str修飾子=❰∫修飾子∫⇒❰｡＠∫アクセス∫ ＠❰readonly❱ ＠❰ref❱ ＠❰partial❱｡❱❱`  
                     - メソッド  
-                        `＄Struct_method=❰｡｡｡∫Method∫⇒❰｡｡∫Normal_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⇒❰cctor¦ctor❱｡¦｡∫Prodexer∫｡¦｡∫Iterator∫｡¦｡∫Operator∫｡｡❱✖⏎`  
+                        `＄Struct_method=❰｡｡｡∫Method∫⇒❰｡｡∫Normal_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⇒❰cctor¦ctor❱｡¦｡∫Prodexer∫｡¦｡∫Iterator∫｡¦｡∫Operator∫｡｡❱⏎`  
                             `∠❰⸨∫仮/イ/静∫⸩❱⇒❰⟪∫仮/イ/静∫∸❰abstract¦virtual¦override❱⟫❱｡｡｡❱`  
                     - 構造体 //構造体はILでsealed。//structはゴミが無く、レイアウト可能(unionとか)、コピーとbox化に注意する  
                         `＄Normal_Struct=❰∫Str修飾子∫⇒❰｡＠∫アクセス∫ ＠❰partial❱｡❱ struct ∫name∫｡＠∫ジェネ∫{`  
-                            `＄構造体メンバ=❰⟪❰⏎[Tab]❱,~⟫❰✖⏎`  ❰/; 構造体、クラスのアクセスレベルは∫name∫へのアクセスレベル(∫name∫は型の名前なので静的)  
-                                `∫Field_member∫¦✖⏎`       ❰/; コンストラクタは静的メソッドでCls.Cls();が本来でアクセスがクラスのとメンバの両方を満たすこと(普通の静的メソッドも同じ)  
-                                `∫Struct_method∫✖⏎`  //ctorは引数ありでフィールドメンバ全初期化  
-                                `∫Complex_define∫✖⏎`  //✖⏎を⏎に変える?それとも別のにする?改行の意味より広い意味で
-                            `❱❱✖⏎`  
+                            `＄構造体メンバ=❰⟪∫LRetInd∫,~⟫❰⏎`  ❰/; 構造体、クラスのアクセスレベルは∫name∫へのアクセスレベル(∫name∫は型の名前なので静的)  
+                                `∫Field_member∫¦⏎`       ❰/; コンストラクタは静的メソッドでCls.Cls();が本来でアクセスがクラスのとメンバの両方を満たすこと(普通の静的メソッドも同じ)  
+                                `∫Struct_method∫⏎`  //ctorは引数ありでフィールドメンバ全初期化  
+                                `∫Complex_define∫⏎`  //⏎を⏎に変える?それとも別のにする?改行の意味より広い意味で
+                            `❱❱⏎`  
                         `}❱`  
                         `＄Normal_Struct_name=∫Normal_Struct∫∠●∫name∫●`  
                     - readonly構造体 //防衛的コピーの回避((temp=str).func();)  
-                        `＄Readonly_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪❰⟪≪readonly ≫struct⟫❱✖⏎`  
-                            `⟦if⟧⟦this⟧∠❰⸨∫Field_member∫∠❰∫イ/静∫❱⸩❱⇒❰⟪❰＆Null❱⟫❱⟦then⟧⟦this⟧∠❰⸨∫Field_member∫∠∫Type∫⸩❱≪❰⟪≪readonly≫ ∫Type∫⟫❱⟦end⟧✖⏎`  
+                        `＄Readonly_Struct=∫Normal_Struct∫∠❰⸨struct⸩❱≪❰⟪≪readonly ≫struct⟫❱⏎`  
+                            `⟦if⟧⟦this⟧∠❰⸨∫Field_member∫∠❰∫イ/静∫❱⸩❱⇒❰⟪❰＆Null❱⟫❱⟦then⟧⟦this⟧∠❰⸨∫Field_member∫∠∫Type∫⸩❱≪❰⟪≪readonly≫ ∫Type∫⟫❱⟦end⟧⏎`  
                             `∠❰⸨∫Struct_method∫∠∫property∫∠＠❰∫アクセス∫ set;❱⸩❱⇒❰⟪❰＆Null❱⟫❱ ❰/;get-onlyだけ許可`  
                         `＄Readonly_Struct_name=∫Readonly_Struct∫∠●∫name∫●`  //●∫ ∫●変えた↓
                         `【∫Readonly_Struct∫⇒＄Readonly_Struct_name＝⸨∫name∫⸩】`  
@@ -219,18 +219,18 @@ Java 開発者向けチート シート
                         `＄Cls修飾子=❰∫修飾子∫⇒❰｡＠∫アクセス∫ ＠❰abstract¦sealed¦static❱ ＠❰partial❱｡❱❱`   
                     - クラス  
                         `＄Normal_Class=❰∫Cls修飾子∫⇒❰｡＠∫アクセス∫ ＠❰partial❱｡❱ class ＄Normal_Class_name=∫name∫｡＠∫ジェネ∫ ＄継承=＠❰｡: ＠❰∫Class∫❱ ⟪~⟫❰, ∫Interface∫❱｡❱{`  
-                            `＄クラスメンバ=❰⟪❰⏎[Tab]❱,~⟫❰✖⏎`  
-                                `∫Field_member∫❰;¦❰｡｡ = ❰｡∫Lit∫¦❰＃静的な∫vari∫＃❱｡❱｡｡❱❱¦✖⏎`  
-                                `∫Method∫∠❰⸨∫アクセス∫∠❰abstract❱⸩❱≪❰⟪≪not❰abstract❱≫⟫❱✖⏎` //∫アクセス∫∠❰abstract❱??  
-                                `∫Complex_define∫✖⏎`  
-                            `❱❱✖⏎`  
+                            `＄クラスメンバ=❰⟪∫LRetInd∫,~⟫❰⏎`  
+                                `∫Field_member∫❰;¦❰｡｡ = ❰｡∫Lit∫¦❰＃静的な∫vari∫＃❱｡❱｡｡❱❱¦⏎`  
+                                `∫Method∫∠❰⸨∫アクセス∫∠❰abstract❱⸩❱≪❰⟪≪not❰abstract❱≫⟫❱⏎` //∫アクセス∫∠❰abstract❱??  
+                                `∫Complex_define∫⏎`  
+                            `❱❱⏎`  
                         `}❱`  
                     - 抽象クラス  
-                        `＄Abstract_Class=∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪abstract ≫class⟫❱∠❰⸨∫アクセス∫∠❰abstract❱⸩❱⇒❰⟪＠❰abstract❱⟫❱✖⏎`  
+                        `＄Abstract_Class=∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪abstract ≫class⟫❱∠❰⸨∫アクセス∫∠❰abstract❱⸩❱⇒❰⟪＠❰abstract❱⟫❱⏎`  
                             ❰/;インスタンス生成できないのでctorやFinalizeが定義できないと思ったが定義できる謎。  
                         `＄Abstract_Class_name=∫Abstract_Class∫∠●∫name∫●`  
                     - staticクラス  
-                        `＄Static_Class=∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪static ≫class⟫❱∠❰●⸨∫クラスメンバ∫∠∫仮/イ/静∫⸩❱⇒❰⟪static⟫❱✖⏎`  
+                        `＄Static_Class=∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪static ≫class⟫❱∠❰●⸨∫クラスメンバ∫∠∫仮/イ/静∫⸩❱⇒❰⟪static⟫❱⏎`  
                             `∠❰⸨∫継承∫⸩❱⇒❰⟪❰＆Null❱⟫❱∠❰⸨∫Method∫∠∫Tructor∫⸩❱⇒❰⟪∫Tructor∫∸❰ctor¦Finalize❱⟫❱`  
                         `＄Static_Class_name=∫Static_Class∫∠●∫name∫●`  
                     - シールドクラス  
@@ -250,10 +250,10 @@ Java 開発者向けチート シート
                     `＄Interface_define=❰∫Normal_Interface∫❱`   
                     - インターフェース //「フィールドを持てない代わりに多重継承できる」  
                         `＄Normal_Interface=❰∫Cls修飾子∫⇒❰｡＠∫アクセス∫ ＠❰partial❱｡❱ interface ∫name∫｡＠∫変性ジェネ∫ ＠❰｡: ⟪❰, ❱,~⟫∫Interface∫｡❱{`  
-                            `＄インターフェースメンバ=❰⟪❰⏎[Tab]❱,~⟫❰✖⏎`  
-                                `∫Field_member∫⇒❰＠∫アクセス∫ ＠❰static¦const❱ ∫Type∫ ∫name∫❱❰;¦❰｡｡ = ❰｡∫Lit∫¦❰＃静的な∫vari∫＃❱｡❱｡｡❱❱¦✖⏎`  
+                            `＄インターフェースメンバ=❰⟪∫LRetInd∫,~⟫❰⏎`  
+                                `∫Field_member∫⇒❰＠∫アクセス∫ ＠❰static¦const❱ ∫Type∫ ∫name∫❱❰;¦❰｡｡ = ❰｡∫Lit∫¦❰＃静的な∫vari∫＃❱｡❱｡｡❱❱¦⏎`  
                                 `∫Method∫⇒∫Interface_method∫`  
-                                `∫Complex_define∫✖⏎`  
+                                `∫Complex_define∫⏎`  
                             `❱`  
                         `}❱`  
                         `＄Interface_name=∫Interface∫∠●∫name∫●`  
@@ -298,7 +298,7 @@ Java 開発者向けチート シート
             - シグネチャ  
                 `＄Signature=❰∫name∫(∫仮引数∫∠❰●⸨∫Type∫⸩●❱)❱`  
             - メンバメソッド  
-                `＄Method=❰∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⇒❰∫cctor∫¦∫ctor∫¦∫Finalize∫❱｡¦✖⏎`  
+                `＄Method=❰∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⇒❰∫cctor∫¦∫ctor∫¦∫Finalize∫❱｡¦⏎`  
                             `｡∫Prodexer∫⇒❰∫Property∫¦∫Indexer∫❱｡¦｡∫Iterator∫｡¦｡∫Extension∫｡¦｡∫Operator∫❱`  
                 - メソッド修飾子  
                     `＄Method修飾子=❰＠∫アクセス∫ ∫仮/イ/静∫⇒＠❰｡abstract¦virtual¦override¦∫イ/静∫⇒＠❰static❱｡❱ ＠❰new❱ ＠❰readonly❱ ＠❰partial❱❱` 
@@ -342,9 +342,9 @@ Java 開発者向けチート シート
                     - プロパティ と インデクサ  
                         `＄Prodexer=❰Property¦Indexer❱`  
                         - プロパティ //＠❰{get;set;}❱  `/*アクセス: n > n.get、get,setのどっちかのみ*/`  
-                            `＄Property=❰＠∫アクセス∫ ＠∫仮/イ/静∫ ＠❰readonly❱ ＃1∫Type∫ ∫name∫❰✖⏎` //＠❰readonly❱は多分structの防衛的コピーの回避  
-                                `{❰＠∫アクセス∫ get;＠❰＠∫アクセス∫ set;❱❱}＠❰= ∫Lit∫;❱¦✖⏎`  
-                                `{＄getset=❰｡｡＠❰｡＠∫アクセス∫ get{return ❰＃＃1の型の値を返す＃❱}｡❱＠❰｡＠∫アクセス∫ set{❰＃value(＃1の型)が使える＃❱}｡❱｡｡❱}✖⏎`  
+                            `＄Property=❰＠∫アクセス∫ ＠∫仮/イ/静∫ ＠❰readonly❱ ＃1∫Type∫ ∫name∫❰⏎` //＠❰readonly❱は多分structの防衛的コピーの回避  
+                                `{❰＠∫アクセス∫ get;＠❰＠∫アクセス∫ set;❱❱}＠❰= ∫Lit∫;❱¦⏎`  
+                                `{＄getset=❰｡｡＠❰｡＠∫アクセス∫ get{return ❰＃＃1の型の値を返す＃❱}｡❱＠❰｡＠∫アクセス∫ set{❰＃value(＃1の型)が使える＃❱}｡❱｡｡❱}⏎`  
                             `❱❱`  
                         - インデクサー  
                             `＄Indexer=❰＠∫アクセス∫ ∫仮/イ/静∫⇒＠❰virtual¦override¦static❱ ＠❰readonly❱ ∫Type∫ this[∫Type∫ ∫index∫] {∫getset∫}❱`  
@@ -366,13 +366,13 @@ Java 開発者向けチート シート
                         - interfaceアクセス  
                             `＄interfaceアクセス=❰｡∫アクセス∫∠❰⸨public⸩❱⇒❰⟪％public⟫❱｡❱`  
                             - インターフェース普通のメソッド  
-                                `＄Interface_normal_method=❰✖⏎`  
-                                    `∫method∫∠❰｡｡＠⸨∫アクセス∫⸩｡＠⸨∫仮/イ/静∫⸩｡＠⸨＠❰readonly❱⸩｡｡❱⇒✖⏎`  
-                                    `❰｡｡｡⟪＠∫interfaceアクセス∫⟫｡⟪＠❰｡∫仮/イ/静/s∫∸❰override❱｡❱⟫｡⟪⟫｡｡｡❱✖⏎`  
+                                `＄Interface_normal_method=❰⏎`  
+                                    `∫method∫∠❰｡｡＠⸨∫アクセス∫⸩｡＠⸨∫仮/イ/静∫⸩｡＠⸨＠❰readonly❱⸩｡｡❱⇒⏎`  
+                                    `❰｡｡｡⟪＠∫interfaceアクセス∫⟫｡⟪＠❰｡∫仮/イ/静/s∫∸❰override❱｡❱⟫｡⟪⟫｡｡｡❱⏎`  
                                     `❰/;実装側のアクセスはpublicのみ可能`  
                                 `❱`  
                             - インターフェース明示的実装  
-                                `＄Interface_explicit_method=❰∫method∫∠❰｡｡＠⸨∫アクセス∫⸩ ＠⸨∫仮/イ/静∫⸩ ＠⸨＠❰readonly❱⸩｡｡❱⇒✖⏎`  
+                                `＄Interface_explicit_method=❰∫method∫∠❰｡｡＠⸨∫アクセス∫⸩ ＠⸨∫仮/イ/静∫⸩ ＠⸨＠❰readonly❱⸩｡｡❱⇒⏎`  
                                     `❰⟪⟫⟪＠❰abstract❱⟫⟪⟫❱❱∠❰●⸨∫name∫⸩❱≪❰⟪≪❰＃定義元のinterface名＃❱.≫∫name∫⟫❱`  
     - ローカル  
         - ローカル変数
@@ -383,7 +383,7 @@ Java 開発者向けチート シート
     - 名前空間  
         `＄path0=❰＃名前空間~∫Complex∫までのパス＃❱`  
         `＄path1=❰＃名前空間のパス＃❱`  
-        `＄=❰＄recur=⟪~⟫❰｡｡✖⏎`  
+        `＄=❰＄recur=⟪~⟫❰｡｡⏎`  
         `⟪❰;⏎❱,~⟫❰｡❰using ∫path1∫❱¦❰using static ∫path0∫❱¦❰using ∫name∫ = ∫path0∫❱¦❰extern alias ∫name∫❱｡❱`  
         `namespace ∫name∫{`  
             `∫recur∫`  
@@ -477,8 +477,8 @@ Java 開発者向けチート シート
                 `＄3項演算子=❰∫式∫⇒❰｡❰＃∫LitBool∫を返す∫式∫＃❱?∫式∫:∫式∫｡❱`  
             - switch//また後で==================case int n when n < 100: return 2;=========================================== 
                 `＄switch文=❰switch(∫式∫){`  
-                    `⟪❰ ¦⏎[Tab]❱,~⟫❰｡｡case ∫式∫:`  
-                        `⟪❰ ¦⏎[Tab]❱,~⟫∫文∫`  
+                    `⟪❰ ¦∫LRetInd∫❱,~⟫❰｡｡case ∫式∫:`  
+                        `⟪❰ ¦∫LRetInd∫❱,~⟫∫文∫`  
                         `❰break;¦∫return文∫¦∫goto文∫❱`  
                 `｡｡❱}❱`  
             - while  
@@ -492,7 +492,7 @@ Java 開発者向けチート シート
                 `＄foreach文=❰(＃1∫foreach変数∫ in ❰＃Enumera❰ble¦tor❱のインスタンス＃❱)❰＃2∫文∫¦{⟪1~⟫∫文∫}❱❱❰/;＃1はreadonly的`  
                     `❰/;＃2∫変数定義∫は含めいない`  
         - 例外処理  
-            `＄Exception_handling=❰＄Recur=❰｡｡✖⏎`  
+            `＄Exception_handling=❰＄Recur=❰｡｡⏎`  
             `try{`  
                 `∫Recur∫`  
             `}`  
