@@ -33,23 +33,42 @@
     .maxstack 3 //この関数で使うスタックの大きさ。無駄に大きいとメモリを無駄に食う。足りないとエラー
 
     ldstr "16進数へ："
+
     //スタックにプッシュされたstring("16進数へ:")を引数にとり、参照型のオブジェクトを生成(newobj)し、そのインスタンス(instance)のコンストラクタ(.ctor)を呼び出し初期化して返す。
     newobj instance void [mscorlib]System.Text.StringBuilder::.ctor(string)
+    
     ldstr "255={0:X}"
     ldc.i4 255
     //スタックにプッシュされたInt32(255)を引数にとり、ボックス化(box)された参照型を返す。
-    box valuetype [mscorlib]System.Int32  //valuetype [mscorlib]System.Int32 は、値型(valuetype)でSystem.Int32(struct)
+    box valuetype [mscorlib]System.Int32  //値型(valuetype)でSystem.Int32(struct)
+
     //call instanceは、インスタンスメソッドであり、第零引数にそのインスタンス(StringBuilder)、第一引数にstring("255={0:X}")、第ニ引数にobject(.i4 255のボックス化)をとり、
-      //
+      //新しいオブジェクト(StringBuilder)を生成して返す。  
     call instance class [mscorlib]System.Text.StringBuilder [mscorlib]System.Text.StringBuilder::AppendFormat(string, object)
+
+    //第零引数にそのインスタンス(StringBuilder)をとり、stringを返す。  
     call instance string [mscorlib]System.Text.StringBuilder::ToString()
+
+    //callのみは静的関数。stringを引数にとり、Consoleに出力する。戻り値は無し。
     call void [mscorlib]System.Console::WriteLine(string)
+
+    // 戻り値がvoidなため、ILスタックが空でなければいけない。戻り値がある場合はその型がちょうど一つある事。
     ret
 }
 ```
-ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(関数)でポップして処理する)  
+|                    |                      |                      |                     |                     |                     |                             |                         |                    |
+| :----------------- | :------------------- | :------------------- | :------------------ | :------------------ | :------------------ | :-------------------------- | :---------------------- | :----------------- |
+|                    |                      |                      |                     | int32(255)          | box_int32(255)      |                             |                         |                    |
+| スタック状態の関係 |                      |                      | string("255={0:X}") | string("255={0:X}") | string("255={0:X}") |                             |                         |                    |
+|                    | string("16進数へ：") | StringBuilder        | StringBuilder       | StringBuilder       | StringBuilder       | StringBuilder               | string                  |                    |
+| ============       | ============         | ============         | ============        | ============        | ============        | ============                | ============            | ============       |
+| 実行命令           | ldstr                | newobj               | ldstr               | ldc.i4              | box                 | call                        | call                    | call               |
+| 実行メソッド       |                      | StringBuilder::.ctor |                     |                     |                     | StringBuilder::AppendFormat | StringBuilder::ToString | Console::WriteLine |
 
-## .netの実行まで  
+
+ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(関数)でポップして処理して結果をプッシュする)  
+
+## コンパイルから.netの実行まで  
 
 ```
   |IL| ---ilasm.exe--> |   .exe    |  
@@ -65,7 +84,7 @@ ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 
   - **mscorlib.dll**(System.Objectとかの基本型)は指定しなくても参照される(https://qiita.com/gdrom1gb/items/69ed26a72c6c2b9445e3)  
   - 参照するアセンブリ(dll): C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1 (参照アセンブリは定義のみで中身空っぽ??)  
   - GAC(グローバル・アセンブリ・キャッシュ): C:\Windows\assembly (↑↑をキャッシュしたもの??Windows自身がOSで使っている??)  
-- {windowsローダー} => {win32(PEヘッダ)} => {.net(IL(バイナリ))(CLR)}  
+- .netの実行: {windowsローダー} => {win32(PEヘッダ)} => {.net(IL(バイナリ))(CLR)}  
 
 ## アセンブリの構造  
 
@@ -152,7 +171,7 @@ v := value, a:= arg, TypeTokenは型
  |    ...     |
  |    ...     |
 ↑|--繰り返し--|
-↑| ILスタック?|ス
+↑| ILスタック?|ス (このスタックはスレッド毎にあると思う)
 ↑| localloc?  |タ
 ↑|ローカル変数 |ッ
 ↑|    引数    |ク    |         |
