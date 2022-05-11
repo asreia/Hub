@@ -33,12 +33,15 @@
     .maxstack 3 //この関数で使うスタックの大きさ。無駄に大きいとメモリを無駄に食う。足りないとエラー
 
     ldstr "16進数へ："
+    //スタックにプッシュされたstring("16進数へ:")を引数にとり、参照型のオブジェクトを生成(newobj)し、そのインスタンス(instance)のコンストラクタ(.ctor)を呼び出し初期化して返す。
     newobj instance void [mscorlib]System.Text.StringBuilder::.ctor(string)
     ldstr "255={0:X}"
     ldc.i4 255
-    box valuetype [mscorlib]System.Int32
-    call instance class [mscorlib]System.Text.StringBuilder 
-        [mscorlib]System.Text.StringBuilder::AppendFormat(string, object)
+    //スタックにプッシュされたInt32(255)を引数にとり、ボックス化(box)された参照型を返す。
+    box valuetype [mscorlib]System.Int32  //valuetype [mscorlib]System.Int32 は、値型(valuetype)でSystem.Int32(struct)
+    //call instanceは、インスタンスメソッドであり、第零引数にそのインスタンス(StringBuilder)、第一引数にstring("255={0:X}")、第ニ引数にobject(.i4 255のボックス化)をとり、
+      //
+    call instance class [mscorlib]System.Text.StringBuilder [mscorlib]System.Text.StringBuilder::AppendFormat(string, object)
     call instance string [mscorlib]System.Text.StringBuilder::ToString()
     call void [mscorlib]System.Console::WriteLine(string)
     ret
@@ -50,8 +53,8 @@ ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 
 
 ```
   |IL| ---ilasm.exe--> |   .exe    |  
-  |  | <--ildasm.exe-- |   .dll    | ---CLR(AOT or JIT)--> ネイティブ  
-  C#  ---csc.exe---->  |IL(バイナリ)|  
+  |__| <--ildasm.exe-- |   .dll    | ---CLR(AOT or JIT)--> ネイティブ  
+  |C#| --csc.exe---->  |IL(バイナリ)|  
 ```
 - コンパイラ  
   - cmd.exeでのコンパイルは、csc.exe source.cs System_0.dll System_1.dll.. (**C#コンパイラ ソースコード 参照するアセンブリ(dll)..**)  
@@ -104,7 +107,7 @@ JITコンパイラによってその関数がネイティブコードにコン�
   - 引数(call)、返り値(ret)、ローカル変数(stloc)、配列の要素(stelem)、フィールド(stfld)、に格納出来ます(**全ての場所に格納**できる)。  
 - ILコードの１行の形式は、  
   - **ラベル: 命令 オペランド**  
-  - 全ての命令は**スタック、ヒープ、演算器、プログラムカウンタ**への命令  
+  - 全ての命令は**スタック、定数、引数、ローカル変数、ヒープ、外部メモリ、演算器、プログラムカウンタ**への命令  
   - 命令は殆ど1バイト + 定数のバイト数 = １行のバイト数  
     - IL命令が32バイト以下かつ反復と例外を含んでいないあと仮想呼び出し、デリゲートでない時、JITコンパイラはその関数は**インライン化**する(関数を展開して埋め込まれる)  
 
@@ -114,6 +117,51 @@ v := value, a:= arg, TypeTokenは型
 `stloc = ldloc` (ldをstに代入(代入の間には**スタックを経由**している))  
 **ldがプッシュ、stがポップ**
 |スタック|引数、変数、localloc|ヒープ|
+
+```
+|      | <----(ldはプッシュ) (stはポップ)---> |静的変数,ヒープ,localloc,ローカル変数,引数,外部メモリ |
+|      | <----ld⟪c¦str¦null⟫--------------- |定数                                               |
+|      | <----ldloc＠❰a❱, stloc------------> |ローカル変数                                        |
+|      | <----ldarg＠❰a❱, starg------------> |引数                                               |
+|      | <----ld⟪obj¦ind⟫, st⟪obj¦ind⟫----> |ポインタ(スタックか外部メモリ?)                      |
+|      | <----ld⟪len¦elem＠❰a❱⟫, stelem----> |配列                                               |
+|  I   | -----newobj, newarr--------------- |O型(ヒープ)                                         |
+|  L   | <----ldfld＠❰a❱, stfld------------> |フィールド(O型(ヒープ))                              |
+|  ス  | <----ldsfld＠❰a❱, stsfld----------> |フィールド(静的変数)                                 |
+|  タ  | =====castclass, isinst============ |キャスト(処理)                                       |
+|  ッ  | <----ld＠❰virt❱ftn----------------- |メソッド(アドレス)                                   |
+|  ク  | -----b⟪r＠❰true❱¦eq⟫, switch------> |分岐(｢プログラムカウンタ)                             |
+|      | -----call＠⟪i¦virt⟫, jmp---------> |コール(｢プログラムカウンタ)                           |
+|      | =====add,sub,mul,div,rem,neg====== |演算(処理(演算器))                                   |
+|      | =====and,or,xor,not=============== |論理演算(処理(演算器))                               |
+|      | =====shl,shr,ceq,conv============= |ビットシフト、比較、型変換(処理(演算器))               |
+|      | -----box,unbox＠❰.any❱------------- |ボックス化{値型(スタック)}<->{O型(ヒープ)}            |
+|      | -----cp⟪blk¦obj⟫------------------ |コピー(スタックか外部メモリ?)                         |
+|      | -----init⟪obj¦blk⟫---------------- |領域初期化                                          |
+|      | =====dup, pop===================== |スタック操作                                         |
+"==..="は、ILスタックからILスタック。 "--..-"は、領域の初期化やコピーとポックス化
+
+
+　~底位アドレス~
+ | プログラム  |  
+ |    定数    |   
+ |  静的変数  |   
+↓|   ヒープ   |
+↓|   ヒープ   |
+↓|   ヒープ   |
+ |    ...     |
+ |    ...     |
+↑|--繰り返し--|
+↑| ILスタック?|ス
+↑| localloc?  |タ
+↑|ローカル変数 |ッ
+↑|    引数    |ク    |         |
+↑|--繰り返し--|      |外部メモリ|
+ ~高位アドレス~      |         |
+
+```
+
+
 | アセンブリ                          | スタック遷移                    | 説明                                                                                                                                                        |
 | :---------------------------------- | :------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **ロード、ストア系 ←ld st→**        |                                 |                                                                                                                                                             |
