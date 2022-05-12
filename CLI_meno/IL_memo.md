@@ -40,7 +40,7 @@
     ldstr "255={0:X}"
     ldc.i4 255
     //スタックにプッシュされたInt32(255)を引数にとり、ボックス化(box)された参照型を返す。
-    box valuetype [mscorlib]System.Int32  //値型(valuetype)でSystem.Int32(struct)
+    box valuetype [mscorlib]System.Int32  //値型(struct)はvaluetype //参照型(O型,class)はclass
 
     //call instanceは、インスタンスメソッドであり、第零引数にそのインスタンス(StringBuilder)、第一引数にstring("255={0:X}")、第ニ引数にobject(.i4 255のボックス化)をとり、
       //新しいオブジェクト(StringBuilder)を生成して返す。  
@@ -161,19 +161,19 @@ v := value, a:= arg, TypeTokenは型
 "==..="は、ILスタックからILスタック。 "--..-"は、領域の初期化やコピーとポックス化
 
 
-　~底位アドレス~
+　~底位アドレス~    (この図は感で書いている)
  | プログラム  |  
  |    定数    |   
  |  静的変数  |   
 ↓|   ヒープ   |
-↓|   ヒープ   |
+↓|   ヒープ   | (マネージドヒープ(GCの管理下にある))
 ↓|   ヒープ   |
  |    ...     |
  |    ...     |
-↑|--繰り返し--|
-↑| ILスタック?|ス (このスタックはスレッド毎にあると思う)
-↑| localloc?  |タ
-↑|ローカル変数 |ッ
+↑|--繰り返し--|    (stackallocは明示的開放不可。関数から戻るときに自動的に破棄。)(stackallocを使うとILでlocallocが呼ばれるのでlocallocとstackallocは同じ))
+↑| localloc?　|ス ((stackalloc int[DateTime.Now.Second])[30]ができて関数実行中動的生成(確保)できているので可変量だと思う)
+↑| ILスタック?|タ (ILスタックは.maxstack n で容量が決められているので固定量)
+↑|ローカル変数 |ッ (この✖❰IL❱スタックはスレッド毎にあると思う)
 ↑|    引数    |ク    |         |
 ↑|--繰り返し--|      |外部メモリ|
  ~高位アドレス~      |         |
@@ -220,10 +220,10 @@ v := value, a:= arg, TypeTokenは型
 | スタック ← トークン(ランタイム表現) |                                 |                                                                                                                                                             |
 | `ldtoken token`                     | … => …, RuntimeHandle           | メタデータトークン(識別子とかキーワードとか？)をランタイム表現(RuntimeHandle)に変換してスタックに積む。(良くわからない)                                     |
 | **分岐系**                          |                                 |                                                                                                                                                             |
-| @`br label`                         | … => …                          | labelへ無条件分岐                                                                                                                                           |
-| @`beq label`                        | …, val1, val2 => …              | val1とval2が等しいならlabelへ分岐                                                                                                                           |
-| @`brtrue label`                     | …, val => …                     | valがゼロ以外ならlabelへ分岐                                                                                                                                |
-| @`switch`                           |                                 | n個の値のいずれかにジャンプします                                                                                                                           |
+| @`br LABEL`                         | … => …                          | LABELへ無条件分岐                                                                                                                                           |
+| @`beq LABEL`                        | …, val1, val2 => …              | val1とval2が等しいならLABELへ分岐                                                                                                                           |
+| @`brtrue LABEL`                     | …, val => …                     | valがゼロ以外ならLABELへ分岐                                                                                                                                |
+| @`switch (LABEL_0, LABEL_1,..)	`    | …, val => …                     | valが0ならLABEL_0、1ならLABEL_1,..へ分岐                                                                                                                    |
 | **コール系**                        |                                 |                                                                                                                                                             |
 | @`call`                             | …, arg0…argN => …, (rV)         | メソッドを呼び出す                                                                                                                                          |
 | `callvirt method`                   | …, obj, arg0…argN => …, (rV)    | class A{virtual T f(){}} class B{override T f(){}}。ポリモーフィズム。vtableでobjに関連付けられたメソッドを呼び出す。                                       |
@@ -240,7 +240,7 @@ v := value, a:= arg, TypeTokenは型
 | @`neg`                              | …, val => …, result             | -val をプッシュ                                                                                                                                             |
 | ビット演算                          |                                 |                                                                                                                                                             |
 | @`and`                              | …, val1 val2 => …, result       | val1 & val2 をプッシュ                                                                                                                                      |
-| @`or`                               | …, val1 val2 => …, result       | val1 | val2 をプッシュ                                                                                                                                                      | val2 をプッシュ |
+| @`or`                               | …, val1 val2 => …, result       | val1 \| val2 をプッシュ                                                                                                                                     |
 | @`xor`                              | …, val1 val2 => …, result       | val1 ^ val2 をプッシュ                                                                                                                                      |
 | @`not`                              | …, val => …, result             | ~val をプッシュ                                                                                                                                             |
 | シフト演算                          |                                 |                                                                                                                                                             |
@@ -248,7 +248,9 @@ v := value, a:= arg, TypeTokenは型
 | @`shr`                              | …, val, sh_Amount => …, result  | valをsh_Amount分、右に符号シフトしてプッシュ                                                                                                                |
 | @`shr.un`                           | …, val, sh_Amount => …, result  | valをsh_Amount分、右にゼロシフトしてプッシュ                                                                                                                |
 | 比較演算                            |                                 |                                                                                                                                                             |
-| @`ceq`                              | …, val1 val2 => …, result       | val1とval2が等しいなら1を、そうでないなら0をプッシュ                                                                                                        |
+| @`ceq`                              | …, val1 val2 => …, result       | val1 == val2 をプッシュ                                                                                                                                     |
+| @`clt`                              | …, val1 val2 => …, result       | val1 <  val2 をプッシュ                                                                                                                                     |
+| @`cgt`                              | …, val1 val2 => …, result       | val1 >  val2 をプッシュ                                                                                                                                     |
 | 型変換                              |                                 |                                                                                                                                                             |
 | @`conv.i`                           | …, val => …, result             | valをnative int型に変換してnative int型としてプッシュ                                                                                                       |
 | @`conv.u`                           | …, val => …, result             | valをnative unsigned int型に変換してnative int型としてプッシュ                                                                                              |
@@ -266,8 +268,9 @@ v := value, a:= arg, TypeTokenは型
 | `isinst TypeToken`                  | …, obj => …, ❰res(∫TT∫)¦null❱   | TypeToken res = obj as TypeToken。 は、❰obj❱が❰TypeToken❱のインスタンスかテストし、nullかそのインスタンスを返す。                                           |
 | **生成系**                          |                                 |                                                                                                                                                             |
 | @`newarr`                           |                                 | etype型の要素を持つ新しい配列を作成します                                                                                                                   |
-| @`newobj ctor`                      | …, arg0…argN => …, obj          | スタックに引数があり、その引数を使ってctor(コンストラクタ)を呼び出し初期化されてない生成されたオブジェクト(O型)を初期化します。                             |
+| @`newobj .ctor`                     | …, arg0,..argN => …, obj        | .ctor(arg0,..argN) をプッシュ (ヒープ領域にそのインスタンス用のメモリ領域を確保しO型を生成)                                                                 |
 | `localloc`                          | size => addr                    | スタックにsizeがあり、sizeバイト分の領域をローカルメモリプール?(ローカルヒープ?)から確保しその先頭アドレスをスタックに積む。                                |
+|                                     |                                 | (stackalloc int[DateTime.Now.Second])[30] できるので動的生成できている                                                                                      |
 | **初期化系**                        |                                 |                                                                                                                                                             |
 | `initobj TypeToken`                 | …, addr => …                    | スタックにアドレスがあり、TypeTokenが値型の場合そのアドレスをその値型で初期化する。TypeTokenが参照型の場合はnullが入る。                                    |
 | `initblk`                           | …, addr, val, size => …         | スタックにアドレス、値(unsigned int8)、バイト数があり、そのアドレスにその値でバイト数分初期化する。(値をレプリケートする？)                                 |
@@ -279,7 +282,7 @@ v := value, a:= arg, TypeTokenは型
 | `rethrow`                           | … => …                          | catch句でキャッチした例外を再スローする。(catch句内のみ使用可能)                                                                                            |
 | `endfilter`                         | …, val => …                     | 例外処理のfilterが何か知らないけどendfinallyと同じ様にfilter句の最後で値(val)を取って使ってfilter句の処理を終わる。                                         |
 | `end❰finally¦fault❱`                | … => …                          | 例外ブロックの❰finally¦fault❱節を終了                                                                                                                       |
-| @`leave`                            |                                 | コードの保護された領域を終了します。                                                                                                                        |
+| @`leave`                            | …, =>                           | コードの保護された領域を終了します。                                                                                                                        |
 | `ckfinite`                          | …, val => …, val                | if(val == NaN){throw("ArithmeticException");}。スタックにF型?があり、値が有限でない場合(無限?)例外を投げる。値がF型でない場合何もしない?                    |
 | **スタック操作系**                  |                                 |                                                                                                                                                             |
 | `dup`                               | …, val => …, val, val           | スタックの一番上の値を複製します。                                                                                                                          |
