@@ -1,9 +1,9 @@
 
 
 !!!!!!!!!<Modified>のままにしておくとstashのdorpやclearや、変更を破棄か、何かの拍子で<Modified>が変更前に戻って消える可能性があるので危険!!
+プッシュした直後に--amendしてプッシュしてコンフリクトを起こした場合、VSCodeのUI上ではMERGE_HEADをうまくコミットできなくなる
+    (fatal: You have not concluded your merge. (MERGE_HEAD exists))ので、git commit -m "マージ終わって.."でコミットするか、git reset --mergeする
 
-
-vscode操作 <Modified>のままはstashのdorpやclearや、変更を破棄か、何かの拍子で<Modified>が変更前に戻って消える可能性があるので危険!!
     Vim [i]:編集モード [Esc]:通常モード [:w]:保存 [:q]:終了 [:q!]:保存なしで終了 //[:q]の":"も入れる 
     [ZZ]と[:x]:変更があれば保存して終了
     powershell エスケープシーケンス:` (stash@`{0`})
