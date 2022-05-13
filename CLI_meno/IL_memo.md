@@ -23,7 +23,7 @@
       - ↓はCLIの実装部分、各プラットフォームにインストールされるもの  
       - CBL: 開発者が書いたコードを各プラットフォームで動くようにした**ライブラリ**(ILとネイティブ？)
       - VES: 開発者のILとCBLを使ってこのプラットフォーム用の**ネイティブコードを生成**する
-        - これを実行時、関数ごとにやるのが**JITコンパイラ**、プログラム起動前にやるのが**AOTコンパイラ**
+        - これを実行時、メソッドごとにやるのが**JITコンパイラ**、プログラム起動前にやるのが**AOTコンパイラ**
 
 ## [ILコードの例](http://www5b.biglobe.ne.jp/~yone-ken/VBNET/IL/il08_NewObj.html)  
 ```
@@ -31,42 +31,43 @@
 .method public static void main()
 {
     .entrypoint //このプログラムのエントリーポイント。"main"という名前はエントリーポイントにならない。
-    .maxstack 3 //この関数で使うスタックの大きさ。無駄に大きいとメモリを無駄に食う。足りないとエラー
+    .maxstack 3 //このメソッドで使うILスタックの大きさ。無駄に大きいとメモリを無駄に食う。足りないとエラー
 
     ldstr "16進数へ："
 
-    //スタックにプッシュされたstring("16進数へ:")を引数にとり、参照型のオブジェクトを生成(newobj)し、そのインスタンス(instance)のコンストラクタ(.ctor)を呼び出し初期化して返す。
+    //ILスタックにプッシュされたstring("16進数へ:")を引数にとり、参照型のオブジェクトを生成(newobj)し、そのインスタンス(instance)のコンストラクタ(.ctor)を呼び出し初期化して返す。
     newobj instance void [mscorlib]System.Text.StringBuilder::.ctor(string)
     
     ldstr "255={0:X}"
     ldc.i4 255
-    //スタックにプッシュされたInt32(255)を引数にとり、ボックス化(box)された参照型を返す。
+    //ILスタックにプッシュされたInt32(255)を引数にとり、ボックス化(box)された参照型を返す。
     box valuetype [mscorlib]System.Int32  //値型(struct)はvaluetype //参照型(O型,class)はclass
 
-    //call instanceは、インスタンスメソッドであり、第零引数にそのインスタンス(StringBuilder)、第一引数にstring("255={0:X}")、第ニ引数にobject(.i4 255のボックス化)をとり、
+    //instanceは、インスタンスメソッドであり、第零引数にそのインスタンス(StringBuilder)、第一引数にstring("255={0:X}")、第ニ引数にobject(.i4 255のボックス化)をとり、
       //新しいオブジェクト(StringBuilder)を生成して返す。  
     call instance class [mscorlib]System.Text.StringBuilder [mscorlib]System.Text.StringBuilder::AppendFormat(string, object)
+    //命令:❰call❱ メソッド:❰｡｡instance 戻り値:❰class [mscorlib]System.Text.StringBuilder❱ メソッド名:❰[mscorlib]System.Text.StringBuilder::AppendFormat❱引数:❰(string, object)❱｡｡❱
 
     //第零引数にそのインスタンス(StringBuilder)をとり、stringを返す。  
     call instance string [mscorlib]System.Text.StringBuilder::ToString()
 
-    //callのみは静的関数。stringを引数にとり、Consoleに出力する。戻り値は無し。
+    //callのみは静的メソッド。stringを引数にとり、Consoleに出力する。戻り値は無し。
     call void [mscorlib]System.Console::WriteLine(string)
 
     // 戻り値がvoidなため、ILスタックが空でなければいけない。戻り値がある場合はその型がちょうど一つある事。
     ret
 }
 ```
-|                    |                          |                      |                         |                         |                         |                             |                         |                    |
-| :----------------- | :----------------------- | :------------------- | :---------------------- | :---------------------- | :---------------------- | :-------------------------- | :---------------------- | :----------------- |
-|                    |                          |                      |                         | int32<br>(255)          | box_int32<br>(255)      |                             |                         |                    |
-| スタック状態の関係 |                          |                      | string<br>("255={0:X}") | string<br>("255={0:X}") | string<br>("255={0:X}") |                             |                         |                    |
-|                    | string<br>("16進数へ：") | StringBuilder        | StringBuilder           | StringBuilder           | StringBuilder           | StringBuilder               | string                  |                    |
-| ============       | ==========               | ============         | =========               | =========               | =========               | ===================         | ==============          | ============       |
-| 実行命令           | ldstr                    | newobj               | ldstr                   | ldc.i4                  | box                     | call                        | call                    | call               |
-| 実行メソッド       |                          | StringBuilder::.ctor |                         |                         |                         | StringBuilder::AppendFormat | StringBuilder::ToString | Console::WriteLine |
+|                      |                          |                      |                         |                         |                         |                             |                         |                    |
+| :------------------- | :----------------------- | :------------------- | :---------------------- | :---------------------- | :---------------------- | :-------------------------- | :---------------------- | :----------------- |
+|                      |                          |                      |                         | int32<br>(255)          | box_int32<br>(255)      |                             |                         |                    |
+| ILスタック状態の関係 |                          |                      | string<br>("255={0:X}") | string<br>("255={0:X}") | string<br>("255={0:X}") |                             |                         |                    |
+|                      | string<br>("16進数へ：") | StringBuilder        | StringBuilder           | StringBuilder           | StringBuilder           | StringBuilder               | string                  |                    |
+| ============         | ==========               | ============         | =========               | =========               | =========               | ===================         | ==============          | ============       |
+| 実行命令             | ldstr                    | newobj               | ldstr                   | ldc.i4                  | box                     | call                        | call                    | call               |
+| 実行メソッド         |                          | StringBuilder::.ctor |                         |                         |                         | StringBuilder::AppendFormat | StringBuilder::ToString | Console::WriteLine |
 
-ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(関数)でポップして処理して結果をプッシュする)  
+ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - *} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(メソッド)でポップして処理して結果をプッシュする)  
 
 ## コンパイルから.netの実行まで  
 
@@ -97,39 +98,39 @@ CLI(BCLとVES)は実行環境によって色々ある
   - マニフェスト: このアセンブリの基本情報  
 - CLRデータ  
   - 型メタデータ: 型情報  
-  - ILコード: 複数の関数が定義されてる  
+  - ILコード: 複数のメソッドが定義されてる  
   - マネージ・リソース: 文字列や画像などのデータ  
 
 ## JITコンパイラ
 
-ある関数を初めて実行する時、その関数を実行するための型を**型メタデータ**から読まれて検証され  
-JITコンパイラによってその関数がネイティブコードにコンパイルされる  
-その後、再びその関数を呼ぶ時は**既にコンパイルされたネイティブコードを実行**する。  
+あるメソッドを初めて実行する時、そのメソッドを実行するための型を**型メタデータ**から読まれて検証され  
+JITコンパイラによってそのメソッドがネイティブコードにコンパイルされる  
+その後、再びそのメソッドを呼ぶ時は**既にコンパイルされたネイティブコードを実行**する。  
 そのため、起動時は重い  
 ネイティブ実行中は、**GC, 例外, 実行権限**の恩恵を受ける。  
 
-## ILの構造  
+## ILの型  
 
-"."から始まる文字列はディレクティブと言い、アセンブラがプログラムの構造を認識するために用いられるもの  
-- スタックには**int⟪32¦64⟫, native int, F型, O型, ポインタ型(native unsigned int, &)**しか区別できない  
-  - スタックとスタック以外に入出力する場合は暗黙的な型変換が入る(0拡張、符号拡張、切り捨て、0方向への切り捨て)  
+"."から始まる文字列はディレクティブと言い、アセンブラがプログラムの構造(式木?)を認識するために用いられるもの  
+- ILスタックには**int⟪32¦64⟫, native int, F型, O型, ポインタ型(native unsigned int, &)**しか区別できない  
+  - ILスタックとILスタック以外に入出力する場合は暗黙的な型変換が入る(0拡張、符号拡張、切り捨て、0方向への切り捨て)  
 - マネージポインタ(C#のref?)は、  
   - 何らかの構造のフィールドに存在しない  
   - 静的変数(静的領域?)に存在しない  
-  - スタック、引数、ローカル変数に存在できる(**メソッドの中でしか存在できない**)  
+  - ILスタック、引数、ローカル変数に存在できる(**メソッドの中でしか存在できない**)  
   - マネージポインタはマネージポインタを指さない(**それ以外は何でも指せる**)  
   - **nullにならない**  
 - O型(C#の参照型?)は、  
   - ⟪class¦valueTypeのボックス化表現(つまりclass)⟫  
   - isinst命令で動的な型(System.TypedReferenceではない)をobjから調べれるので動的な型の情報をもっている？  
   - あるCILオブジェクト命令（特にnewobjおよびnewarr）によって作成されます。  
-  - 引数(call)、返り値(ret)、ローカル変数(stloc)、配列の要素(stelem)、フィールド(stfld)、に格納出来ます(**全ての場所に格納**できる)。  
+  - 引数(call)、戻り値(ret)、ローカル変数(stloc)、配列の要素(stelem)、フィールド(stfld)、に格納出来ます(**全ての場所に格納**できる)。  
 - ILコードの１行の形式は、  
   - **ラベル: 命令 オペランド**  
-  - 全ての命令は**スタック、定数、引数、ローカル変数、ヒープ、外部メモリ、演算器、プログラムカウンタ**への命令  
+  - 全ての命令は**ILスタック、定数、引数、ローカル変数、ヒープ、外部メモリ、演算器、プログラムカウンタ**への命令  
   - 命令は殆ど1バイト + 定数のバイト数 = １行のバイト数  
-    - IL命令が32バイト以下かつ反復と例外を含んでいないあと仮想呼び出し、デリゲートでない時、JITコンパイラはその関数は**インライン化**する(関数を展開して埋め込まれる)  
-- C#のプリミティブ型とILが認識する型の対応表  
+    - IL命令が32バイト以下かつ反復と例外を含んでいないあと仮想呼び出し、デリゲートでない時、JITコンパイラはそのメソッドは**インライン化**する(メソッドを展開して埋め込まれる)  
+- C#の型とILが認識する型の対応表  
   | C#キーワード           | ILの型 (ILの命令)        | C#型定義                | 型の種類      | 詳細                                                                          |
   | :--------------------- | :----------------------- | :---------------------- | :------------ | :---------------------------------------------------------------------------- |
   | object                 | object                   | System.Object           | 参照型(class) | 値型をこれ(object)にキャスト変換するとボクシングが発生する                    |
@@ -156,10 +157,39 @@ JITコンパイラによってその関数がネイティブコードにコン�
   | delegate void F()      | class F                  | F                       | 参照型(class) | [System.Runtime]System.MulticastDelegateを継承                                |
   | enum E{}               | valuetype E              | E                       | 値型(struct)  | [System.Runtime]System.Enumを継承 ([..]はアセンブリ名(System.Runtime.dll))    |
   |                        |                          |                         |               |                                                                               |
-## ILの命令
 
 v := value, a:= arg, TypeTokenは型
 
+## ILのメモリマップ
+```
+C#-----------------
+[Stack] -> |      |     //StackはMainから関数スタックが積まれる
+[Stack] -> | Heep |     //HeepはStackとStaticから参照される。参照されなくなるとGCの対象になる
+[Stack] -> |      | メソッドスタック(多分マネージドポインタ(引数、ローカル変数、ILスタック、localloc?)),ヒープからヒープもある
+[Static]-> |      |
+C#外----------------
+[extern]    //externはC#の管理外のメモリ領域だと思う
+
+　~底位アドレス~    (この図は感で書いている)
+ | プログラム  |  
+ |    定数    |   
+ |  静的変数  |   
+↓|   ヒープ   |
+↓|   ヒープ   | {マネージドヒープ(GCの管理下にある)} =================ILスタックとヒープの図====================
+↓|   ヒープ   |
+ |    ...     |
+ |    ...     |メ {"--繰り返し--"で繰り返されるスタックをメソッドスタックと呼ぶことにする。ILが使うスタックをILスタックと呼ぶことにする}
+↑|--繰り返し-- |ソ {stackallocは明示的開放不可。メソッドから戻るときに自動的に破棄。}{stackallocを使うとILでlocallocが呼ばれるのでlocallocとstackallocは同じ}
+↑|⟦～⟧localloc?|ッ{(stackalloc int[DateTime.Now.Second])[30]ができてメソッド実行中動的生成(確保)できているので可変量だと思う}
+↑| ILスタック  |ド {ILスタックは.maxstack n で容量が決められているので固定量}
+↑|ローカル変数 |ス {このメソッドスタックはスレッド毎にあると思う}
+↑|    引数    |タ      |         |
+↑|--繰り返し--|ッ      |外部メモリ|
+ ~高位アドレス~ク      |         |
+
+```
+
+## ILの命令
 ```
 |      | <----(ldはプッシュ) (stはポップ)---> |静的変数,ヒープ,localloc,ローカル変数,引数,外部メモリ |
 |      | <----ld⟪c¦str¦null⟫--------------- |定数                                               |
@@ -177,153 +207,144 @@ v := value, a:= arg, TypeTokenは型
 |      | =====add,sub,mul,div,rem,neg====== |演算(処理(演算器))                                   |
 |      | =====and,or,xor,not=============== |論理演算(処理(演算器))                               |
 |      | =====shl,shr,ceq,conv============= |ビットシフト、比較、型変換(処理(演算器))               |
-|      | -----box,unbox＠❰.any❱------------- |ボックス化{値型(スタック)}<->{O型(ヒープ)}            |
+|      | -----box,unbox＠❰.any❱------------- |ボックス化{値型(メソッドスタック)}<->{O型(ヒープ)}            |
 |      | -----cp⟪blk¦obj⟫------------------ |コピー(スタックか外部メモリ?)                         |
 |      | -----init⟪obj¦blk⟫---------------- |領域初期化                                          |
-|      | =====dup, pop===================== |スタック操作                                         |
+|      | =====dup, pop===================== |ILスタック操作                                         |
 "==..="は、ILスタックからILスタック。 "--..-"は、領域の初期化やコピーとポックス化
 ILスタックは何かを計算したりコピーしたり制御信号を送信したりするための一時的なデータの保管場所(アキュームレータの様な)
     ⟦=>┃～⟧❰｡⟦=>┃1～⟧❰プッシュ❱ => 処理(ポップ、計算、コピー、制御信号)｡❱ 
 
-　~底位アドレス~    (この図は感で書いている)
- | プログラム  |  
- |    定数    |   
- |  静的変数  |   
-↓|   ヒープ   |
-↓|   ヒープ   | (マネージドヒープ(GCの管理下にある))
-↓|   ヒープ   |
- |    ...     |
- |    ...     |
-↑|--繰り返し--|    (stackallocは明示的開放不可。関数から戻るときに自動的に破棄。)(stackallocを使うとILでlocallocが呼ばれるのでlocallocとstackallocは同じ))
-↑| localloc?　|ス ((stackalloc int[DateTime.Now.Second])[30]ができて関数実行中動的生成(確保)できているので可変量だと思う)
-↑| ILスタック?|タ (ILスタックは.maxstack n で容量が決められているので固定量)
-↑|ローカル変数 |ッ (この✖❰IL❱スタックはスレッド毎にあると思う)
-↑|    引数    |ク    |         |
-↑|--繰り返し--|      |外部メモリ|
- ~高位アドレス~      |         |
-
 ```
+…, value1, value2 → …, result  (プッシュされるのは高々一つ(0個または1個)である。)  
+スタック遷移図は、→の左側と右側に分かれ、左側が命令実行前の状態、右側が命令実行後の状態を表します。   
+→の左側は、add命令実行前には、少なくとも2つの要素がスタックに積み上げられている必要があることを表します。   
+→の右側は、add命令実行後の実行後のスタックの状態が、2つの要素を消費して、結果としてresultの値に変わることを意味します。 そして、  
+この定義では、スタックの最上段の値(一番最後にpushされた値)をvalue2と呼んでいます。   
+最上段の次の段の値(value2の前にpushされた値)をvalue1と呼んでいます。  
+前回のスタックの説明では値を縦に積むイメージで説明しましたが、 スタック遷移図では、スタックを横置きしたイメージで、  
+→を挟んだ左側、右側のそれぞれの右端がスタックの上部を意味します。  
 
-プッシュとは、ILスタックにプッシュすること。ポップとは、ILスタックからポップすること。(`stloc = ldloc` (ldをstに代入(代入の間には**スタックを経由**している)))
-| アセンブリ                          | スタック遷移                    | 説明                                                                                                                                                        |
-| :---------------------------------- | :------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ロード、ストア系 ←ld st→**        |                                 |                                                                                                                                                             |
-| スタック ← 定数                     |                                 |                                                                                                                                                             |
-| @`ldnull`                           | … => …, null                    | nullをプッシュ                                                                                                                                              |
-| @`ldstr string`                     | … => …, string                  | stringをプッシュ                                                                                                                                            |
-| @`ldc.i4 num`                       | … => …, num                     | .i4型のnumをプッシュ                                                                                                                                        |
-| スタック ⇔ 引数                     |                                 |                                                                                                                                                             |
-| @`ldarg.argNum`                     | … => …, val                     | argNumをプッシュ                                                                                                                                            |
-| `ldarga.argNum`                     | … => …, addr                    | &argNumをプッシュ                                                                                                                                           |
-| @`starg.argNum`                     | …, val => …                     | valをポップし、argNum = valをする                                                                                                                           |
-| スタック ⇔ ローカル変数             |                                 |                                                                                                                                                             |
-| @`ldloc.locNum`                     | … => …, val                     | locNumをプッシュ                                                                                                                                            |
-| `ldloca.locNum`                     | … => …, addr                    | &locNumのアドレスをプッシュ                                                                                                                                 |
-| @`stloc.locNum`                     | …, val => …                     | valをポップし、locNum = valをする                                                                                                                           |
-| スタック ⇔ 参照先                   |                                 |                                                                                                                                                             |
-| `ldobj type`                        | …, addr => …, val               | addrをポップし、(type)(*addr)をプッシュ                                                                                                                     |
-| `stobj type`                        | …, addr, val => …               | addr,valをポップし、*addr = (type)valをする                                                                                                                 |
-| `ldind.i4`                          | …, addr => …, val               | addrをポップし、(int)(*addr)をプッシュ                                                                                                                      |
-| `stind.i4`                          | …, addr, val => …               | addr,valをポップし、*addr = (int)valをする                                                                                                                  |
-| スタック ⇔ 配列                     |                                 |                                                                                                                                                             |
-| @`ldlen`                            | …, array => length              | arrayをポップし、array.Length をプッシュ                                                                                                                    |
-| @`ldelem`                           | …, array, index => …, val       | array,indexをポップし、array[index] をプッシュ                                                                                                              |
-| `ldelema`                           | …, array, index => …, addr      | array,indexをポップし、&(array[index]) をプッシュ                                                                                                           |
-| @`stelem`                           | …, array, index, val => …       | array,index,valをポップし、array[index] = val をする                                                                                                        |
-| スタック ⇔ フィールド               |                                 | typeは無かったがSharpLabに出てた。fieldは、型名::フィールド名の形式                                                                                         |
-| `ldfld type field`                  | …, obj => …, val                | objをポップし、(type)obj.fieldをプッシュ (obj:=⟪O型¦値型⟫)(*(&obj+field)している?)                                                                          |
-| `ldflda type field`                 | …, obj => …, addr               | objをポップし、&((type)obj.field)をプッシュ                                                                                                                 |
-| `stfld type field`                  | …, obj, val => …                | obj,valをポップし、obj.field = (type)valをする                                                                                                              |
-| スタック ⇔ フィールド(静的)         |                                 |                                                                                                                                                             |
-| `ldsfld type field`                 | …, => …, val                    | field(型.field)をプッシュ                                                                                                                                   |
-| `ldsflda type field`                | …, => …, addr                   | &field(&型.field)をプッシュ                                                                                                                                 |
-| `stsfld type field`                 | …, val => …                     | valをポップし、field(型.field) = valをする                                                                                                                  |
-| スタック ← メソッド(アドレス)       |                                 |                                                                                                                                                             |
-| `ldftn method`                      | … => …, ftn                     | methodからそのメソッドへのポインタ(ftn(アンマネージポインタ))をスタックに積む。ftnはcalli命令で呼び出せる。                                                 |
-| `ldvirtftn method`                  | …, obj => …, ftn                | スタックにインスタンスオブジェクト(obj)があり、そのobjのmethod(仮想メソッド)へのポインタ(ftn)をスタックに積む。ftnはcalli命令で呼び出せる。                 |
-| スタック ← トークン(ランタイム表現) |                                 |                                                                                                                                                             |
-| `ldtoken token`                     | … => …, RuntimeHandle           | メタデータトークン(識別子とかキーワードとか？)をランタイム表現(RuntimeHandle)に変換してスタックに積む。(良くわからない)                                     |
-| **分岐系**                          |                                 |                                                                                                                                                             |
-| @`br LABEL`                         | … => …                          | LABELへ無条件分岐                                                                                                                                           |
-| @`beq LABEL`                        | …, val1, val2 => …              | val1,val2をポップし、val1 == val2ならLABELへ分岐                                                                                                            |
-| @`brtrue LABEL`                     | …, val => …                     | valをポップし、val != 0ならLABELへ分岐                                                                                                                      |
-| @`switch (LABEL_0, LABEL_1,..)	`    | …, val => …                     | valをポップし、val == 0ならLABEL_0、val == 1ならLABEL_1、..へ分岐                                                                                           |
-| **コール系**                        |                                 |                                                                                                                                                             |
-| @`call`                             | …, arg0…argN => …, (rV)         | メソッドを呼び出す                                                                                                                                          |
-| `callvirt method`                   | …, obj, arg0…argN => …, (rV)    | class A{virtual T f(){}} class B{override T f(){}}。ポリモーフィズム。vtableでobjに関連付けられたメソッドを呼び出す。                                       |
-| `calli callSiteDescr`               | …, arg0…argN, ftn => …, (rV)    | リフレクション。スタックに引数とメソッドへのポインタ(ftn)があり、そのメソッドにその引数を使って呼び出す。callSiteDescrは引数の説明?(多分、長さとか型とか)。 |
-| `jmp method`                        | … => …                          | 現在のメソッドを終了し、指定したメソッドにジャンプします。現在の引数を宛先の引数に転送(arg?)                                                                |
-| @`ret`                              | (rV(先))=> …, (rV(元))          | 呼び出し先の評価スタックの戻り値を呼び出し先の評価スタックの戻り値に積む。型も呼び出し元の型として管理される？                                              |
-| **演算子系**                        |                                 |                                                                                                                                                             |
-| 四則演算                            |                                 |                                                                                                                                                             |
-| @`add`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 + val2をプッシュ                                                                                                                  |
-| @`sub`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 - val2をプッシュ                                                                                                                  |
-| @`mul`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 * val2をプッシュ                                                                                                                  |
-| @`div`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 / val2をプッシュ                                                                                                                  |
-| @`rem`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 % val2をプッシュ                                                                                                                  |
-| @`neg`                              | …, val => …, result             | -val をプッシュ                                                                                                                                             |
-| ビット演算                          |                                 |                                                                                                                                                             |
-| @`and`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 & val2をプッシュ                                                                                                                  |
-| @`or`                               | …, val1 val2 => …, result       | val1,val2をポップし、val1 \| val2をプッシュ                                                                                                                 |
-| @`xor`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 ^ val2をプッシュ                                                                                                                  |
-| @`not`                              | …, val => …, result             | valポップし、~val をプッシュ                                                                                                                                |
-| シフト演算                          |                                 |                                                                                                                                                             |
-| @`shl`                              | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、左にゼロシフトしてプッシュ                                                                                        |
-| @`shr`                              | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、右に符号シフトしてプッシュ                                                                                        |
-| @`shr.un`                           | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、右にゼロシフトしてプッシュ                                                                                        |
-| 比較演算                            |                                 |                                                                                                                                                             |
-| @`ceq`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 == val2 をプッシュ                                                                                                                |
-| @`clt`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 <  val2 をプッシュ                                                                                                                |
-| @`cgt`                              | …, val1 val2 => …, result       | val1,val2をポップし、val1 >  val2 をプッシュ                                                                                                                |
-| 型変換                              |                                 |                                                                                                                                                             |
-| @`conv.i`                           | …, val => …, result             | valをポップし、valをnative int型に変換してnative int型としてプッシュ                                                                                        |
-| @`conv.u`                           | …, val => …, result             | valをポップし、valをnative unsigned int型に変換してnative int型としてプッシュ                                                                               |
-| @`conv.i1`                          | …, val => …, result             | valをポップし、valをint8型に変換してint32型としてプッシュ     (ILスタック内では表現できる型が限られている)                                                  |
-| @`conv.i4`                          | …, val => …, result             | valをポップし、valをint32型に変換してint32型としてプッシュ                                                                                                  |
-| @`conv.i8`                          | …, val => …, result             | valをポップし、valをint64型に変換してint64型としてプッシュ                                                                                                  |
-| @`conv.u2`                          | …, val => …, result             | valをポップし、valをunsigned int16型に変換してint32型としてプッシュ                                                                                         |
-| @`conv.r8`                          | …, val => …, result             | valをポップし、valをfloat64型に変換してF型としてプッシュ                                                                                                    |
-| **ボックス系**                      |                                 |                                                                                                                                                             |
-| @`box ＄vTT=❰valuetype❱`            | …, val(∫vTT∫) => …, obj         | 値型(val)をpopし、それをbox化したO型をpushする。 box化: {スタック[val]} => {{スタック[O型]} -> {ヒープ[val]}}                                               |
-| @`unbox valuetype`                  | …, obj => …, val(∫vTT∫)         | ↑の逆操作。O型(obj)をpopし、それをunbox化した値型をpushする。(本当の内部の挙動は違うかもしれない?)                                                          |
-| `unbox.any ＄TT=❰type❱`             | …, obj => …, ❰val¦obj❱(∫TT∫)    | 多分、objが、box化された値型なら`unbox`と同じ。そうでないなら`castclass`と同じ。                                                                            |
-| **オブジェクト操作系**              |                                 |                                                                                                                                                             |
-| `castclass type`                    | …, obj => …, obj2(∫TT∫)         | (T)obj。 スタックにobj(O型)があり、❰type型❱にダウンキャスト(アップキャストは使われない)してまた積む(obj2)。O型はアドレスと動的な?型も持っている？           |
-| `isinst type`                       | …, obj => …, ❰res(∫TT∫)¦null❱   | type res = obj as type。 は、❰obj❱が❰type❱のインスタンスかテストし、nullかそのインスタンスを返す。                                                          |
-| **生成系**                          |                                 |                                                                                                                                                             |
-| @`newarr`                           |                                 | etype型の要素を持つ新しい配列を作成します                                                                                                                   |
-| @`newobj .ctor`                     | …, arg0,..argN => …, obj        | .ctor(arg0,..argN) をプッシュ (ヒープ領域にそのインスタンス用のメモリ領域を確保しO型を生成)                                                                 |
-| `localloc`                          | size => addr                    | スタックにsizeがあり、sizeバイト分の領域をローカルメモリプール?(ローカルヒープ?)から確保しその先頭アドレスをスタックに積む。                                |
-|                                     |                                 | (stackalloc int[DateTime.Now.Second])[30] できるので動的生成できている                                                                                      |
-| **初期化系**                        |                                 |                                                                                                                                                             |
-| `initobj type`                      | …, addr => …                    | スタックにアドレスがあり、typeが値型の場合そのアドレスをその値型で初期化する。typeが参照型の場合はnullが入る。                                              |
-| `initblk`                           | …, addr, val, size => …         | スタックにアドレス、値(unsigned int8)、バイト数があり、そのアドレスにその値でバイト数分初期化する。(値をレプリケートする？)                                 |
-| **コピー系**                        |                                 |                                                                                                                                                             |
-| `cpblk`                             | …, destaddr, srcaddr, size => … | スタックに送信元、送信先、バイト数(blk)があり、送信元から送信先へバイト数分データをコピーする。                                                             |
-| `cpobj type`                        | …, dest, src => …,              | dest = (type)src。srcValObjからdestValObjに値をコピーします。                                                                                               |
-| **例外系**                          |                                 |                                                                                                                                                             |
-| @`throw`                            |                                 | 例外をスローします           .try{.try{..}catch{..}}finally{..}                                                                                             |
-| `rethrow`                           | … => …                          | catch句でキャッチした例外を再スローする。(catch句内のみ使用可能)                                                                                            |
-| `endfilter`                         | …, val => …                     | 例外処理のfilterが何か知らないけどendfinallyと同じ様にfilter句の最後で値(val)を取って使ってfilter句の処理を終わる。                                         |
-| `end❰finally¦fault❱`                | … => …                          | 例外ブロックの❰finally¦fault❱節を終了                                                                                                                       |
-| @`leave`                            | …, =>                           | コードの保護された領域を終了します。                                                                                                                        |
-| `ckfinite`                          | …, val => …, val                | if(val == NaN){throw("ArithmeticException");}。スタックにF型?があり、値が有限でない場合(無限?)例外を投げる。値がF型でない場合何もしない?                    |
-| **スタック操作系**                  |                                 |                                                                                                                                                             |
-| `dup`                               | …, val => …, val, val           | スタックの一番上の値を複製します。                                                                                                                          |
-| `pop`                               | …, val => …                     | pop命令は、スタックから最上位の要素を削除します。                                                                                                           |
-| **その他**                          |                                 |                                                                                                                                                             |
-| `sizeof type`                       | … => …, size                    | typeが値型の場合スタックにその値型のサイズ(バイト数)を積む。参照型の場合は参照先のサイズではなく参照のアドレスサイズになる？                                |
-| @`nop`                              | … => …                          | 何もしない。 バイトコードがパッチされている場合、スペースを埋めることを目的。                                                                               |
-| `break`                             | … => …                          | ブレークポイントに到達したことをデバッガーに通知します。                                                                                                    |
-| **よく分からない**                  |                                 |                                                                                                                                                             |
-| ?`unaligned. alignment`             | …, addr => …, addr              | ldindなどでうまく値をスタックに持ってこれない(自然サイズに配置されていない)事を示す？(分からない)                                                           |
-| ?`volatile.`                        | …, addr => …, addr              | スタックにあるアドレスが複数のスレッドから参照されている事を示す？(現在実行されているスレッドの外部で参照できる)                                            |
-| ?`tail.`                            | 書いてない                      | この次のcall@❰i¦virt❱命令で現在のメソッドに戻ってこない？(現在のメソッドのスタックフレームを削除する必要があることを示します。)                             |
-| **型付き参照系**                    |                                 | [↓相互運用/型付き参照](https://ufcpp.net/study/csharp/sp_makeref.html)                                                                                      |
-| `mkrefany class`                    | …, ptr => …, typedRef           | (class❰*¦&❱)ptr。スタックに❰&型¦native int❱があり、classへのポインタにする？                                                                                |
-| `refanyval type`                    | …, TypedRef => …, addr          | type &a = b;のaのアドレス？。 スタックに値型参照(&)？があり、そのアドレスをスタックに積む。                                                                 |
-| `refanytype`                        | …, TypedRef => …, type          | 型指定された参照(TypeRef)には、型トークンとオブジェクトインスタンスへのアドレスが含まれています。その型トークンをスタックに積む。                           |
-| `arglist`                           | … => …, argListHandle           | 現在のメソッドの引数リストハンドル(System.RuntimeArgumentHandle型?(native intのアンマネージポインター))を返すらしい。                                       |
+プッシュとは、ILスタックにプッシュすること。ポップとは、ILスタックからポップすること。(`stloc = ldloc` (ldをstに代入(代入の間には**ILスタックを経由**している)))
+| アセンブリ                             | ILスタック遷移                  | 説明                                                                                                                                                     |
+| :------------------------------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ロード、ストア系 <=ld st=>**         |                                 |                                                                                                                                                          |
+| ILスタック <= 定数                     |                                 |                                                                                                                                                          |
+| @`ldnull`                              | … => …, null                    | nullをプッシュ                                                                                                                                           |
+| @`ldstr string`                        | … => …, string                  | stringをプッシュ                                                                                                                                         |
+| @`ldc.i4 num`                          | … => …, num                     | .i4(int32型)のnumをプッシュ                                                                                                                              |
+| ILスタック <=> 引数                    |                                 |                                                                                                                                                          |
+| @`ldarg.argNum`                        | … => …, val                     | argNumをプッシュ                                                                                                                                         |
+| `ldarga.argNum`                        | … => …, addr                    | &argNumをプッシュ                                                                                                                                        |
+| @`starg.argNum`                        | …, val => …                     | valをポップし、argNum = valをする                                                                                                                        |
+| ILスタック <=> ローカル変数            |                                 |                                                                                                                                                          |
+| @`ldloc.locNum`                        | … => …, val                     | locNumをプッシュ                                                                                                                                         |
+| `ldloca.locNum`                        | … => …, addr                    | &locNumのアドレスをプッシュ                                                                                                                              |
+| @`stloc.locNum`                        | …, val => …                     | valをポップし、locNum = valをする                                                                                                                        |
+| ILスタック <=> 参照先                  |                                 |                                                                                                                                                          |
+| `ldobj type`                           | …, addr => …, val               | addrをポップし、(type)(*addr)をプッシュ                                                                                                                  |
+| `stobj type`                           | …, addr, val => …               | addr,valをポップし、*addr = (type)valをする                                                                                                              |
+| `ldind.i4`                             | …, addr => …, val               | addrをポップし、(int)(*addr)をプッシュ                                                                                                                   |
+| `stind.i4`                             | …, addr, val => …               | addr,valをポップし、*addr = (int)valをする                                                                                                               |
+| ILスタック <=> 配列                    |                                 |                                                                                                                                                          |
+| @`ldlen`                               | …, array => length              | arrayをポップし、array.Length をプッシュ                                                                                                                 |
+| @`ldelem`                              | …, array, index => …, val       | array,indexをポップし、array[index] をプッシュ                                                                                                           |
+| `ldelema`                              | …, array, index => …, addr      | array,indexをポップし、&(array[index]) をプッシュ                                                                                                        |
+| @`stelem`                              | …, array, index, val => …       | array,index,valをポップし、array[index] = val をする                                                                                                     |
+| ILスタック <=> フィールド              |                                 | typeは無かったがSharpLabに出てた。fieldは、型名::フィールド名の形式                                                                                      |
+| `ldfld type field`                     | …, obj => …, val                | objをポップし、(type)obj.fieldをプッシュ (obj:=⟪O型¦値型⟫)(*(&obj+field)している?)                                                                       |
+| `ldflda type field`                    | …, obj => …, addr               | objをポップし、&((type)obj.field)をプッシュ                                                                                                              |
+| `stfld type field`                     | …, obj, val => …                | obj,valをポップし、obj.field = (type)valをする                                                                                                           |
+| ILスタック <=> フィールド(静的)        |                                 |                                                                                                                                                          |
+| `ldsfld type field`                    | …, => …, val                    | field(型.field)をプッシュ                                                                                                                                |
+| `ldsflda type field`                   | …, => …, addr                   | &field(&型.field)をプッシュ                                                                                                                              |
+| `stsfld type field`                    | …, val => …                     | valをポップし、field(型.field) = valをする                                                                                                               |
+| ILスタック <= メソッド(アドレス)       |                                 | ftnが何の略か分からないがメソッドのアドレス(エントリーポイント)だと思われる                                                                              |
+| `ldftn method`                         | … => …, ftn                     | methodをプッシュする (ftnはcalli命令で呼び出せる) 例: ldftn int32 Func(int32)                                                                            |
+| `ldvirtftn method`                     | …, obj => …, ftn                | obj.methodをプッシュする (ftnはcalli命令で呼び出せる) 例: ldvirtftn instance void Cls::Func(int32)                                                       |
+| ILスタック <= トークン(ランタイム表現) |                                 |                                                                                                                                                          |
+| `ldtoken token`                        | … => …, RuntimeHandle           | メタデータトークン(∫仮/イ/静∫を判断する情報を持つ。らしい)をランタイム表現に変換してプッシュ(calliで呼びる?リフレクションで使う?)                        |
+| **分岐系**                             |                                 |                                                                                                                                                          |
+| @`br LABEL`                            | … => …                          | LABELへ無条件分岐                                                                                                                                        |
+| @`beq LABEL`                           | …, val1, val2 => …              | val1,val2をポップし、val1 == val2ならLABELへ分岐                                                                                                         |
+| @`brtrue LABEL`                        | …, val => …                     | valをポップし、val != 0ならLABELへ分岐                                                                                                                   |
+| @`switch (LABEL_0, LABEL_1,..)	`       | …, val => …                     | valをポップし、val == 0ならLABEL_0、val == 1ならLABEL_1、..へ分岐                                                                                        |
+| **コール系**                           |                                 |                                                                                                                                                          |
+| @`call method`                         | …, arg0…argN => …, retVal       | arg0…argNをポップし、method(arg0…argN)する。戻り値がある場合は戻り値(retVal)をプッシュ (多分静的メソッド専用)                                            |
+| `callvirt method`                      | …, obj, arg0…argN => …, retVal  | obj,arg0…argNをポップし、obj.method(arg0…argN)する。戻り値がある場合は戻り値(retVal)をプッシュ (多分仮想とインスタンスメソッド専用)                      |
+| `calli callSiteDescr`                  | …, arg0…argN, ftn => …, retVal  | arg0…argN,ftnをポップし、ftn(arg0…argN)する。戻り値がある場合は戻り値(retVal)をプッシュ                                                                  |
+|                                        |                                 | ldftnとldvirtftnでプッシュされたftnを呼べる。callSiteDescrはメソッドの説明(例:{calli uint32(int32) 定義: .method public static uint32 Func(int32)})      |
+| `jmp method`                           | … => …                          | 現在のメソッドを終了し、指定したメソッドにジャンプします(現在の引数(arg)は指定したメソッドへ転送される)。(多分戻ってこない(メソッドスタックはリセット?)) |
+| @`ret`                                 | ⟪retVal => retVal¦ => ⟫         | 現在のメソッドを終了し、呼び出し元のメソッドに戻る。戻り値がある場合は、現在のILスタックの先頭を呼び出し元のILスタックの先頭にコピーする                 |
+| **演算子系**                           |                                 |                                                                                                                                                          |
+| 四則演算                               |                                 |                                                                                                                                                          |
+| @`add`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 + val2をプッシュ                                                                                                               |
+| @`sub`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 - val2をプッシュ                                                                                                               |
+| @`mul`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 * val2をプッシュ                                                                                                               |
+| @`div`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 / val2をプッシュ                                                                                                               |
+| @`rem`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 % val2をプッシュ                                                                                                               |
+| @`neg`                                 | …, val => …, result             | valポップし、-val をプッシュ                                                                                                                             |
+| ビット演算                             |                                 |                                                                                                                                                          |
+| @`and`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 & val2をプッシュ                                                                                                               |
+| @`or`                                  | …, val1 val2 => …, result       | val1,val2をポップし、val1 \| val2をプッシュ                                                                                                              |
+| @`xor`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 ^ val2をプッシュ                                                                                                               |
+| @`not`                                 | …, val => …, result             | valポップし、~val をプッシュ                                                                                                                             |
+| シフト演算                             |                                 |                                                                                                                                                          |
+| @`shl`                                 | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、左にゼロシフトしてプッシュ                                                                                     |
+| @`shr`                                 | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、右に符号シフトしてプッシュ                                                                                     |
+| @`shr.un`                              | …, val, sh_Amount => …, result  | val,shAmountをポップし、valをsh_Amount分、右にゼロシフトしてプッシュ                                                                                     |
+| 比較演算                               |                                 |                                                                                                                                                          |
+| @`ceq`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 == val2 をプッシュ                                                                                                             |
+| @`clt`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 <  val2 をプッシュ                                                                                                             |
+| @`cgt`                                 | …, val1 val2 => …, result       | val1,val2をポップし、val1 >  val2 をプッシュ                                                                                                             |
+| 型変換                                 |                                 |                                                                                                                                                          |
+| @`conv.i`                              | …, val => …, result             | valをポップし、valをnative int型に変換してnative int型としてプッシュ                                                                                     |
+| @`conv.u`                              | …, val => …, result             | valをポップし、valをnative unsigned int型に変換してnative int型としてプッシュ                                                                            |
+| @`conv.i1`                             | …, val => …, result             | valをポップし、valをint8型に変換してint32型としてプッシュ     (ILスタック内では表現できる型が限られている)                                               |
+| @`conv.i4`                             | …, val => …, result             | valをポップし、valをint32型に変換してint32型としてプッシュ                                                                                               |
+| @`conv.i8`                             | …, val => …, result             | valをポップし、valをint64型に変換してint64型としてプッシュ                                                                                               |
+| @`conv.u2`                             | …, val => …, result             | valをポップし、valをunsigned int16型に変換してint32型としてプッシュ                                                                                      |
+| @`conv.r8`                             | …, val => …, result             | valをポップし、valをfloat64型に変換してF型としてプッシュ                                                                                                 |
+| **ボックス系**                         |                                 |                                                                                                                                                          |
+| @`box ＄vTT=❰valuetype❱`               | …, val(∫vTT∫) => …, obj         | 値型(val)をpopし、それをbox化したO型をpushする。 box化: {ILスタック[val]} => {{ILスタック[O型]} -> {ヒープ[val]}}                                        |
+| @`unbox valuetype`                     | …, obj => …, val(∫vTT∫)         | ↑の逆操作。O型(obj)をpopし、それをunbox化した値型をpushする。(本当の内部の挙動は違うかもしれない?)                                                       |
+| `unbox.any ＄TT=❰type❱`                | …, obj => …, ❰val¦obj❱(∫TT∫)    | 多分、objが、box化された値型なら`unbox`と同じ。そうでないなら`castclass`と同じ。                                                                         |
+| **オブジェクト操作系**                 |                                 |                                                                                                                                                          |
+| `castclass type`                       | …, obj => …, obj2(∫TT∫)         | (T)obj。 ILスタックにobj(O型)があり、❰type型❱にダウンキャスト(アップキャストは使われない)してまた積む(obj2)。O型はアドレスと動的な?型も持っている？      |
+| `isinst type`                          | …, obj => …, ❰res(∫TT∫)¦null❱   | type res = obj as type。 は、❰obj❱が❰type❱のインスタンスかテストし、nullかそのインスタンスを返す。                                                       |
+| **生成系**                             |                                 |                                                                                                                                                          |
+| @`newarr`                              |                                 | etype型の要素を持つ新しい配列を作成します                                                                                                                |
+| @`newobj .ctor`                        | …, arg0,..argN => …, obj        | .ctor(arg0,..argN) をプッシュ (ヒープ領域にそのインスタンス用のメモリ領域を確保しO型を生成)                                                              |
+| `localloc`                             | size => addr                    | ILスタックにsizeがあり、sizeバイト分の領域をローカルメモリプール?(ローカルヒープ?)から確保しその先頭アドレスをILスタックに積む。                         |
+| **初期化系**                           |                                 |                                                                                                                                                          |
+| `initobj type`                         | …, addr => …                    | ILスタックにアドレスがあり、typeが値型の場合そのアドレスをその値型で初期化する。typeが参照型の場合はnullが入る。                                         |
+| `initblk`                              | …, addr, val, size => …         | ILスタックにアドレス、値(unsigned int8)、バイト数があり、そのアドレスにその値でバイト数分初期化する。(値をレプリケートする？)                            |
+| **コピー系**                           |                                 |                                                                                                                                                          |
+| `cpblk`                                | …, destaddr, srcaddr, size => … | ILスタックに送信元、送信先、バイト数(blk)があり、送信元から送信先へバイト数分データをコピーする。                                                        |
+| `cpobj type`                           | …, dest, src => …,              | dest = (type)src。srcValObjからdestValObjに値をコピーします。                                                                                            |
+| **例外系**                             |                                 |                                                                                                                                                          |
+| @`throw`                               |                                 | 例外をスローします           .try{.try{..}catch{..}}finally{..}                                                                                          |
+| `rethrow`                              | … => …                          | catch句でキャッチした例外を再スローする。(catch句内のみ使用可能)                                                                                         |
+| `endfilter`                            | …, val => …                     | 例外処理のfilterが何か知らないけどendfinallyと同じ様にfilter句の最後で値(val)を取って使ってfilter句の処理を終わる。                                      |
+| `end❰finally¦fault❱`                   | … => …                          | 例外ブロックの❰finally¦fault❱節を終了                                                                                                                    |
+| @`leave`                               | …, =>                           | コードの保護された領域を終了します。                                                                                                                     |
+| `ckfinite`                             | …, val => …, val                | if(val == NaN){throw("ArithmeticException");}。ILスタックにF型?があり、値が有限でない場合(無限?)例外を投げる。値がF型でない場合何もしない?               |
+| **ILスタック操作系**                   |                                 |                                                                                                                                                          |
+| `dup`                                  | …, val => …, val, val           | ILスタックの一番上の値を複製します。                                                                                                                     |
+| `pop`                                  | …, val => …                     | pop命令は、ILスタックから最上位の要素を削除します。                                                                                                      |
+| **その他**                             |                                 |                                                                                                                                                          |
+| `sizeof type`                          | … => …, size                    | typeが値型の場合ILスタックにその値型のサイズ(バイト数)を積む。参照型の場合は参照先のサイズではなく参照のアドレスサイズになる？                           |
+| @`nop`                                 | … => …                          | 何もしない。 バイトコードがパッチされている場合、スペースを埋めることを目的。                                                                            |
+| `break`                                | … => …                          | ブレークポイントに到達したことをデバッガーに通知します。                                                                                                 |
+| **よく分からない**                     |                                 |                                                                                                                                                          |
+| ?`unaligned. alignment`                | …, addr => …, addr              | ldindなどでうまく値をILスタックに持ってこれない(自然サイズに配置されていない)事を示す？(分からない)                                                      |
+| ?`volatile.`                           | …, addr => …, addr              | ILスタックにあるアドレスが複数のスレッドから参照されている事を示す？(現在実行されているスレッドの外部で参照できる)                                       |
+| ?`tail.`                               | 書いてない                      | この次のcall@❰i¦virt❱命令で現在のメソッドに戻ってこない？(現在のメソッドのILスタックフレームを削除する必要があることを示します。)                        |
+| **型付き参照系**                       |                                 | [↓相互運用/型付き参照](https://ufcpp.net/study/csharp/sp_makeref.html)                                                                                   |
+| `mkrefany class`                       | …, ptr => …, typedRef           | (class❰*¦&❱)ptr。ILスタックに❰&型¦native int❱があり、classへのポインタにする？                                                                           |
+| `refanyval type`                       | …, TypedRef => …, addr          | type &a = b;のaのアドレス？。 ILスタックに値型参照(&)？があり、そのアドレスをILスタックに積む。                                                          |
+| `refanytype`                           | …, TypedRef => …, type          | 型指定された参照(TypeRef)には、型トークンとオブジェクトインスタンスへのアドレスが含まれています。その型トークンをILスタックに積む。                      |
+| `arglist`                              | … => …, argListHandle           | 現在のメソッドの引数リストハンドル(System.RuntimeArgumentHandle型?(native intのアンマネージポインター))を返すらしい。                                    |
 <!-- markdownlint-enable MD013 -->
 
 ## ILのメタデータ
