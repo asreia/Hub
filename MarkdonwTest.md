@@ -20,7 +20,7 @@ markdownlint: 水平線の上に文字を書くと見出しと見なされ"見�
    ＄引用＝❰⟦1～⟧❰>❱｢引用｣  ❱  
    ＄テーブル＝❰|｡｡⟦|┃＄tableCols＝｢テーブルの列数｣┃⟧｢列の説明｣｡｡|∫LReturn∫｡｡｡｡|｡｡⟦|┃○∫tableCols∫┃⟧❰｡＠❰:❱⟦1～⟧❰-❱＠❰:❱｡❱｡｡|∫LReturn∫｡｡｡｡⏎  
             　⟦∫LReturn∫┃～⟧❰｡｡｡|｡｡⟦|┃○∫tableCols∫｣┃⟧｢テーブルの要素｣｡｡|｡｡｡❱❱ (\<br>を入れると要素内で改行できる)  
-   ＄プログラム＝❰```｢言語(右下の言語モードの選択から"()"内にある文字列)｣∫LReturn∫｡｡｢プログラムのコード｣∫LReturn∫｡｡```❱  
+   ＄プログラム＝❰```｢言語(右下の言語モードの選択から"()"内にある文字列)＠❰:｢タイトル｣❱｣∫LReturn∫｡｡｢プログラムのコード｣∫LReturn∫｡｡```❱  
 
 - 文字列系  
    ＄改行＝⟪∫LToken∫  ¦\<br>⟫  
@@ -136,7 +136,9 @@ markdownlint: 水平線の上に文字を書くと見出しと見なされ"見�
 
 ---
 
-## プログラムを記述する場合
+## プログラムや数式を記述する場合
+
+＠❰:｢タイトル｣❱付けれなかった
 
 ```rb
 num = 0
@@ -145,5 +147,21 @@ while num < 2 do
 end
 print("End")
 ```  
+
+>プレビュー画面が(VScode)version 1.58からKaTeX対応を果たしたので数式が書ける！らしい
+
+[Tex記法](https://qiita.com/shepabashi/items/27b7284d1f0007af533b)
+[KaTex記法](https://www.suzu6.net/posts/102-katex-math-functions/)
+"\$"で囲む
+$\left( \sum_{k=1}^n a_k b_k \right)^{\!\!2} \leq\left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$
+$_{124} ABCD _{3333}EFG_{abc}$
+$_{23}$ //\_{..}_{..}は不可
+
+コードブロックはvscodeだとうまくいかなかった
+
+```math
+left( sum_{k=1}^n a_k b_k right)^{!2} leq
+left( sum_{k=1}^n a_k^2 right) left( sum_{k=1}^n b_k^2 right)
+```
 
 ---
