@@ -73,7 +73,12 @@
 | 実行命令             | ldstr                    | newobj               | ldstr                   | ldc.i4                  | box                     | call                        | call                    | call               |
 | 実行メソッド         |                          | StringBuilder::.ctor |                         |                         |                         | StringBuilder::AppendFormat | StringBuilder::ToString | Console::WriteLine |
 
-ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - \*} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(メソッド)でポップして処理して結果をプッシュする)  
+- ILコードの
+  - ILはスタックマシン、逆ポーランド記法 {3 4 + 1 2 - \*} <=> {(3 + 4) * (1 - 2)}(数字(データ)をプッシュして演算子(メソッド)でポップして処理して結果をプッシュする)  
+  - 1行の形式は、**ラベル: 命令 オペランド**  
+  - 全ての命令は**ILスタック、定数、引数、ローカル変数、ヒープ、外部メモリ、演算器、プログラムカウンタ**への命令(命令は殆ど1バイト)
+    - メソッドは、IL命令が32バイト以下かつ反復と例外を含んでいないそれと、仮想呼び出し、デリゲートでない時、JITコンパイラはそのメソッドは**インライン化**する(メソッドを展開して埋め込まれる)
+  - "."から始まる文字列は**ディレクティブ**と言い、アセンブラが**プログラムの構造(式木?)を認識**するために用いられるもの  
 
 ## アセンブリの構造  
 
@@ -118,53 +123,36 @@ JITコンパイラによってそのメソッドがネイティブコードに�
 
 ## ILの型  
 
-"."から始まる文字列はディレクティブと言い、アセンブラがプログラムの構造(式木?)を認識するために用いられるもの  
-
-- ILスタックには**int⟪32¦64⟫, native int, F型, O型, ポインタ型(native unsigned int, &)**しか区別できない  
+- ILスタックには**int32, int64, native int, F型, O型, ポインタ型(native unsigned int(*), &)**しか区別できない  
   - ILスタックとILスタック以外に入出力する場合は暗黙的な型変換が入る(0拡張、符号拡張、切り捨て、0方向への切り捨て)  
-- マネージポインタ(C#のref)は、  
-  - 何らかの構造の**フィールドに存在しない**  
-    - 静的変数(静的領域)に存在しない  
-  - メソッドスタック、引数、ローカル変数に存在できる(**メソッドの中でしか存在できない**)  
-  - マネージポインタは**マネージポインタ以外**の変数を指さる
-  - **nullにならない**  
-- O型(C#の参照型?)は、  
-  - ⟪class¦valueTypeのボックス化表現(つまりclass)⟫  
-  - isinst命令で動的な型をobjから調べれるので動的な型の情報をもっている  
-  - あるCILオブジェクト命令（特にnewobjおよびnewarr）によって作成されます。  
-  - 引数(call)、戻り値(ret)、ローカル変数(stloc)、配列の要素(stelem)、フィールド(stfld)、に格納出来ます(**localloc以外の全ての場所に格納**できる)。  
-- ILコードの１行の形式は、  
-  - **ラベル: 命令 オペランド**  
-  - 全ての命令は**ILスタック、定数、引数、ローカル変数、ヒープ、外部メモリ、演算器、プログラムカウンタ**への命令  
-  - 命令は殆ど1バイト + 定数のバイト数 = １行のバイト数  
-    - IL命令が32バイト以下かつ反復と例外を含んでいないそれと、仮想呼び出し、デリゲートでない時、JITコンパイラはそのメソッドは**インライン化**する(メソッドを展開して埋め込まれる)  
-- C#の型とILが認識する型の対応表  
-  | C#キーワード           | ILの型 (ILの命令)        | C#型定義                | 型の種類      | 詳細                                                                               |
-  | :--------------------- | :----------------------- | :---------------------- | :------------ | :--------------------------------------------------------------------------------- |
-  | object                 | object                   | System.Object           | 参照型(class) | 値型をこれ(`object`)にキャスト変換すると**ボクシングが発生**する                   |
-  | bool                   | bool                     | System.Boolean          | 値型(struct)  | `bool型`は1バイト                                                                  |
-  | byte                   | uint8 (.i1)              | System.Byte             | 値型(struct)  |                                                                                    |
-  | char                   | char                     | System.Char             | 値型(struct)  | `char型`は**2バイト**でUnicodeの`U+0x0~U+0xFFFF`を表現する。あと、無理やり、       |
-  | short                  | int16 (.i2)              | System.Int16            | 値型(struct)  | `ac[0]=(char)0xD83D; ac[1]=(char)0xDE03;`と入れると**4バイトも表現**できなくもない |
-  | int                    | int32 (.i4)              | System.Int32            | 値型(struct)  |                                                                                    |
-  | long                   | int64 (.i8)              | System.Int64            | 値型(struct)  | 全ての値型(struct)は、`System.ValueType`を継承し、                                 |
-  | ushort                 | uint16 (.u2)             | System.UInt16           | 値型(struct)  | `System.ValueType`は`System.Object`を継承                                          |
-  | uint                   | uint32 (.u4)             | System.UInt32           | 値型(struct)  |                                                                                    |
-  | ulong                  | uint64 (.u8)             | System.UInt64           | 値型(struct)  |                                                                                    |
-  | float                  | float32 (.r4)            | System.Single           | 値型(struct)  |                                                                                    |
-  | double                 | float64 (.r8)            | System.Double           | 値型(struct)  |                                                                                    |
-  | string                 | string                   | System.String           | 参照型(class) | C#の文字コードは**UTF-16**でchar型で表現できない文字はstringで表現する             |
-  | int[]                  | int32[]                  | System.Int32[]          | 参照型(class) | 全ての配列は`System.Array`を継承。`ldelem`での配列命令の為に配列長と要素型がある?  |
-  | int*                   | int32*                   | System.Int32*           | ポインタ型    | `typeof`で調べたら`System.Int32*`と出た                                            |
-  | ref int                | int32&                   | 調べられない            | ポインタ型    |                                                                                    |
-  | ↓ユーザー定義型の定義↓ |                          |                         |               |                                                                                    |
-  | struct S{}             | valuetype S              | S                       | 値型(struct)  |                                                                                    |
-  | class C{}              | class C                  | C                       | 参照型(class) |                                                                                    |
-  | class C<T,U>{}         | class S\`2<int32, int64> | C<int,long>             | 参照型(class) | 変数を、`C<int,long> c;`と定義                                                     |
-  | fixed(int* p = arr){}  | int32* とint32[] pinned  | System.Int32*とInt32[]? | 値型と参照型? | `pinned`にアドレスが入ると**GCはそのデータを移動**しない、nullを入れると解除       |
-  | delegate void F()      | class F                  | F                       | 参照型(class) | `[System.Runtime]System.MulticastDelegate`を継承                                   |
-  | enum E{}               | valuetype E              | E                       | 値型(struct)  | `[System.Runtime]System.Enum`を継承 ([..]はアセンブリ名(`System.Runtime.dll`))     |
-  |                        |                          |                         |               |                                                                                    |
+- マネージドポインタ(IL:&)
+  - **C#のref**である
+  - **メソッドスタックのみ存在**できます
+  - **マネージドポインタを指せない**それ以外は全て指せる
+  - **nullにならない**
+- アンマネージドポインタ(IL:*)
+  - **C#のポインタ(*)**である
+  - **全ての領域に存在**できる
+  - **アンマネージ型**のみ指せます
+  - O型の参照先(ヒープ)のフィールドか静的領域(staticフィールド)を参照する場合は**fixedステートメント**が必要
+  - **nullになります**
+  - **unsafeキーワード**をブロックに付けなければ使えません
+  - C++のような**ポインタ操作**ができます
+- 値型(IL:valuetype, int32, bool,..)
+  - **C#の値型**である(C#のプリミティブ型と構造体)
+  - 構造体でも、構造体のフィールドが再帰的に値型の場合、**アンマネージ構造体**と呼ぶことにする
+- O型(IL:class, string, int32[],..)
+  - **C#の参照型**である。(classまたはvalueType(値型)のボックス化表現(つまりclass))
+  - **全ての領域に存在**できます
+  - **O型は、ヒープへの参照**しか持ちません
+  - **nullになります**
+  - `isinst`命令で動的な型を調べれるので**動的な型の情報を持っている**  
+  - `newobj`と`newarr` 命令によって**生成**されます
+- マネージ型
+  - マネージ型は、**O型**と**マネージドポインタ**の事です
+  - **CLRのGC**によって**管理(マネージ)**されます
+- アンマネージ型
+  - アンマネージ型は、**アンマネージドポインタ**と**アンマネージ構造体**の事です
 
 ## ILのメモリマップ
 
@@ -217,6 +205,35 @@ ILスタックは何かを計算したりコピーしたり制御信号を送信
     ⟦=>┃～⟧❰｡⟦=>┃1～⟧❰プッシュ❱ => 処理(ポップ、計算、コピー、制御信号)｡❱ 
 
 ```
+
+## **C#の型**と**ILが認識する型**の対応表  
+
+  | C#キーワード           | ILの型 (ILの命令)        | C#型定義                | 型の種類      | 詳細                                                                               |
+  | :--------------------- | :----------------------- | :---------------------- | :------------ | :--------------------------------------------------------------------------------- |
+  | object                 | object                   | System.Object           | 参照型(class) | 値型をこれ(`object`)にキャスト変換すると**ボクシングが発生**する                   |
+  | bool                   | bool                     | System.Boolean          | 値型(struct)  | `bool型`は1バイト                                                                  |
+  | byte                   | uint8 (.i1)              | System.Byte             | 値型(struct)  |                                                                                    |
+  | char                   | char                     | System.Char             | 値型(struct)  | `char型`は**2バイト**でUnicodeの`U+0x0~U+0xFFFF`を表現する。あと、無理やり、       |
+  | short                  | int16 (.i2)              | System.Int16            | 値型(struct)  | `ac[0]=(char)0xD83D; ac[1]=(char)0xDE03;`と入れると**4バイトも表現**できなくもない |
+  | int                    | int32 (.i4)              | System.Int32            | 値型(struct)  |                                                                                    |
+  | long                   | int64 (.i8)              | System.Int64            | 値型(struct)  | 全ての値型(struct)は、`System.ValueType`を継承し、                                 |
+  | ushort                 | uint16 (.u2)             | System.UInt16           | 値型(struct)  | `System.ValueType`は`System.Object`を継承                                          |
+  | uint                   | uint32 (.u4)             | System.UInt32           | 値型(struct)  |                                                                                    |
+  | ulong                  | uint64 (.u8)             | System.UInt64           | 値型(struct)  |                                                                                    |
+  | float                  | float32 (.r4)            | System.Single           | 値型(struct)  |                                                                                    |
+  | double                 | float64 (.r8)            | System.Double           | 値型(struct)  |                                                                                    |
+  | string                 | string                   | System.String           | 参照型(class) | C#の文字コードは**UTF-16**でchar型で表現できない文字はstringで表現する             |
+  | int[]                  | int32[]                  | System.Int32[]          | 参照型(class) | 全ての配列は`System.Array`を継承。`ldelem`での配列命令の為に配列長と要素型がある?  |
+  | int*                   | int32*                   | System.Int32*           | ポインタ型    | `typeof`で調べたら`System.Int32*`と出た                                            |
+  | ref int                | int32&                   | 調べられない            | ポインタ型    |                                                                                    |
+  | ↓ユーザー定義型の定義↓ |                          |                         |               |                                                                                    |
+  | struct S{}             | valuetype S              | S                       | 値型(struct)  |                                                                                    |
+  | class C{}              | class C                  | C                       | 参照型(class) |                                                                                    |
+  | class C<T,U>{}         | class S\`2<int32, int64> | C<int,long>             | 参照型(class) | 変数を、`C<int,long> c;`と定義                                                     |
+  | fixed(int* p = arr){}  | int32* とint32[] pinned  | System.Int32*とInt32[]? | 値型と参照型? | `pinned`にアドレスが入ると**GCはそのデータを移動**しない、nullを入れると解除       |
+  | delegate void F()      | class F                  | F                       | 参照型(class) | `[System.Runtime]System.MulticastDelegate`を継承                                   |
+  | enum E{}               | valuetype E              | E                       | 値型(struct)  | `[System.Runtime]System.Enum`を継承 ([..]はアセンブリ名(`System.Runtime.dll`))     |
+  |                        |                          |                         |               |                                                                                    |
 
 ## スタック遷移図
 
@@ -316,7 +333,7 @@ ILスタックは何かを計算したりコピーしたり制御信号を送信
 | `conv.i8`                              | `…, val => …, result`             | `val`をポップし、`val`を`int64型`に変換して`int64型`としてプッシュ                                                                                                                                                   |
 | `conv.u2`                              | `…, val => …, result`             | `val`をポップし、`val`を`unsigned int16型`に変換して`int32型`としてプッシュ                                                                                                                                          |
 | `conv.r8`                              | `…, val => …, result`             | `val`をポップし、`val`を`float64型`に変換して`F型`としてプッシュ                                                                                                                                                     |
-| **ボックス系**                         |                                   | C#コードで**ボックス化**は、`object o = ｢値型｣;` で起こる。**アンボックス**は、さっき代入した `o` を使い `｢値型｣ = o;` で起こる                                                                                      |
+| **ボックス系**                         |                                   | C#コードで**ボックス化**は、`⟪object¦interface⟫ o = ｢値型｣;` で起こる。**アンボックス**は、さっき代入した `o` を使い `｢値型｣ = o;` で起こる                                                                          |
 | `box valuetype`                        | `…, valuetype => …, obj`          | `valuetype`をポップし、`valuetype`を`O型`の参照先(ヒープ)にコピー(ボクシング)してプッシュ (**box化**: {ILスタック[val]} => {{ILスタック[O型]}-->{ヒープ[val]}})                                                      |
 | `unbox valuetype`                      | `…, obj => …, valueTypePtr`       | `obj`をポップし、**ボックス化されている**`obj`の`O型`の**参照**を**マネージドポインタ**(`ref`)に**変えて**プッシュ(`box`と違って**コピーが発生しない**)                                                              |
 | `unbox.any type`                       | `…, obj => …, ⟪valuetype¦obj⟫`    | `obj`をポップし、`obj`がボックス化されているなら`unbox`の後`ldobj`をしてプッシュ(**コピーが発生**)(`box`の逆射)、そうでないなら`castclass`をしてプッシュ([unbox.any](https://www.asukaze.net/etc/cil/unboxany.html)) |
