@@ -19,13 +19,13 @@
 
 ## CLIの用語  
 
-- CLI: .netを中心に**多言語を多プラットフォーム**で動くようにした仕様。ECMA-335で標準化されている
-  - CLR: CLRはCLIをWindows上で動くように**マイクロソフトが実装**したもの
-  - CTS: プログラミング言語間で共通して用いられる**型の集合**  
-  - CIL: IL, MSIL とも呼ばれ、多言語をこのILにコンパイルして**多言語間で共通のライブラリ**として使える(その他、**中間言語**として色々なメリットがる)
+- CLI(Common Language Infrastructure): .netを中心に**多言語を多プラットフォーム**で動くようにした**仕様**。ECMA-335で標準化されている
+  - CLR(Common Language Runtime): CLRはCLIをWindows上で動くように**マイクロソフトが実装**したもの
+  - CTS(Common Type System): プログラミング言語間で共通して用いられる**型の集合**  
+  - CIL(Common Intermediate Language): IL, MSIL とも呼ばれ、多言語をこのILにコンパイルして**多言語間で共通のライブラリ**として使える(その他、**中間言語**として色々なメリットがる)
   - 以下はCLIの実装部分、各プラットフォームにインストールされるもの  
-    - CBL: 開発者が書いたコードを各プラットフォームで動くようにした**ライブラリ**(ILとネイティブ？)
-    - VES: 開発者のILとCBLを使ってこのプラットフォーム用の**ネイティブコードを生成**する
+    - CBL(Base Class Library): 開発者が書いたコードを各プラットフォームで動くようにした**ライブラリ**(ILとネイティブ？)
+    - VES(Virtual Execution System): 開発者のILとCBLを使って実際のプラットフォーム用の**ネイティブコードを生成**する
       - これを実行時、メソッドごとにやるのが**JITコンパイラ**、プログラム起動前にやるのが**AOTコンパイラ**
 
 ## [ILコードの例](http://www5b.biglobe.ne.jp/~yone-ken/VBNET/IL/il08_NewObj.html)  
@@ -94,7 +94,7 @@ CLI(BCLとVES)は実行環境によって色々ある
   - ILコード: 複数のメソッドが定義されてる  
   - マネージ・リソース: 文字列や画像などのデータ  
 
-## コンパイルから.netの実行まで  
+## C#のコンパイルから.netの実行まで  
 
 ```plaintext
   |IL| ---ilasm.exe--> |   .exe    |  
@@ -102,15 +102,14 @@ CLI(BCLとVES)は実行環境によって色々ある
   |C#| --csc.exe---->  |(ILバイナリ)|  
 ```
 
-- コンパイラ  
-  - cmd.exeでのコンパイルは、csc.exe source.cs System_0.dll System_1.dll.. (**❰C#コンパイラ❱ ❰ソースコード❱ ❰参照するアセンブリ(dll)..❱**)  
-    とすると、**dllかexeファイルが生成**される。のでdllの循環参照は起こらない?(<https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14>)  
-  - コンパイラ: C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe (そこのdll群はランタイム用??)  
-  - コンパイラのオプション:<https://qiita.com/toshirot/items/dcf7809007730d835cfc>
+- C#コンパイラ  
+  - cmd.exeのコンパイルでは、csc.exe source.cs System_0.dll System_1.dll.. (**❰C#コンパイラ❱ ❰ソースコード❱ ❰参照するアセンブリ(dll)..❱**)とすると、  
+    **dllかexeファイルが生成**される(C#では`Main関数`、ILでは`.entrypoint`があれば**exeが生成される?**)。のでdllの循環参照は起こらない?[(C#コードのコンパイル)](https://qiita.com/asterisk9101/items/4f0e8da6d1e2e9df8e14)  
+  - コンパイラの場所: C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe (そこのdll群はランタイム用?)[(コンパイラのオプション)](https://qiita.com/toshirot/items/dcf7809007730d835cfc)
 - .NETライブラリ  
-  - **mscorlib.dll**(System.Objectとかの基本型)は指定しなくても参照される(<https://qiita.com/gdrom1gb/items/69ed26a72c6c2b9445e3>)  
-  - 参照するアセンブリ(dll): C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1 (参照アセンブリは定義のみで中身空っぽ??)  
-  - GAC(グローバル・アセンブリ・キャッシュ): C:\Windows\assembly (↑↑をキャッシュしたもの??Windows自身がOSで使っている??)  
+  - **mscorlib.dll**(System.Objectとかの基本型)は指定しなくても参照される[(mscorlib.dllをインポートさせない)](https://qiita.com/gdrom1gb/items/69ed26a72c6c2b9445e3)  
+  - 参照するアセンブリ(dll): C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.1 (参照アセンブリは定義のみで中身空っぽ?)  
+  - GAC(グローバル・アセンブリ・キャッシュ): C:\Windows\assembly (↑↑をキャッシュしたもの??Windows自身がOSで使っている?)  
 - .netの実行: {windowsローダー} => {win32(PEヘッダ)} => {.net(IL(バイナリ))(CLR)}  
 
 ### JITコンパイラ
@@ -123,13 +122,14 @@ JITコンパイラによってそのメソッドがネイティブコードに�
 
 ## ILの型  
 
-- ILスタックには**int32, int64, native int, F型, O型, ポインタ型(native unsigned int(*), &)**しか区別できない  
+- ILスタックには**int32, int64, native int, F型, O型, ポインタ型(native unsigned int(*), &)**しか区別できない(ILスタックは.maxstack nの事)  
   - ILスタックとILスタック以外に入出力する場合は暗黙的な型変換が入る(0拡張、符号拡張、切り捨て、0方向への切り捨て)  
 - マネージドポインタ(IL:&)
   - **C#のref**である
-  - **メソッドスタックのみ存在**できます
+  - **メソッドスタックのみ存在**できます (メソッドスタックは関数スタックです)
   - **マネージドポインタを指せない**それ以外は全て指せる
   - **nullにならない**
+  - アンマネージドポインタを制約した**安全なポインタ**とも言える
 - アンマネージドポインタ(IL:*)
   - **C#のポインタ(*)**である
   - **全ての領域に存在**できる
@@ -137,22 +137,28 @@ JITコンパイラによってそのメソッドがネイティブコードに�
   - O型の参照先(ヒープ)のフィールドか静的領域(staticフィールド)を参照する場合は**fixedステートメント**が必要
   - **nullになります**
   - **unsafeキーワード**をブロックに付けなければ使えません
-  - C++のような**ポインタ操作**ができます
+  - C++のような**ポインタ操作**ができます(安全ではない)
 - 値型(IL:valuetype, int32, bool,..)
-  - **C#の値型**である(C#のプリミティブ型と構造体)
-  - 構造体でも、構造体のフィールドが再帰的に値型の場合、**アンマネージ構造体**と呼ぶことにする
+  - **C#の値型**である(C#の構造体(struct))
+  - **全ての領域に存在**できます
+  - C#のキーワード`int`も定義は`System.Int32`という**構造体(struct)で定義**されている。
+  - 構造体の中でも、構造体のフィールドが**再帰的に値型**の場合、**アンマネージ構造体**と呼ぶことにする
+  - **ユーザー定義構造体**では、**初期化時**にILでは、`intiobj ｢定義型名｣` または `call instance void ｢定義型名｣::.ctor(｢引数の型｣)` が呼ばれます
 - O型(IL:class, string, int32[],..)
-  - **C#の参照型**である。(classまたはvalueType(値型)のボックス化表現(つまりclass))
+  - **C#の参照型**である。(classまたはvalueType(値型)の**ボックス化表現**(つまりclass))
   - **全ての領域に存在**できます
   - **O型は、ヒープへの参照**しか持ちません
+  - マネージドポインタと同じく参照として**安全ではない事はできません**
   - **nullになります**
-  - `isinst`命令で動的な型を調べれるので**動的な型の情報を持っている**  
-  - `newobj`と`newarr` 命令によって**生成**されます
+  - どこからも参照されなくなると**GCの対象**になります
+  - ILの `isinst`命令で動的な型を調べれるので**動的な型の情報を持っています**  
+  - ILの `newobj`と`newarr` 命令によって**生成**されます
 - マネージ型
   - マネージ型は、**O型**と**マネージドポインタ**の事です
   - **CLRのGC**によって**管理(マネージ)**されます
 - アンマネージ型
   - アンマネージ型は、**アンマネージドポインタ**と**アンマネージ構造体**の事です
+- 説明した全ての型で**生成される領域**は、メソッドの中で定義すると**メソッドスタックに生成**し、参照型(class)のフィールドに定義すると**ヒープに生成**される
 
 ## ILのメモリマップ
 
@@ -161,12 +167,12 @@ JITコンパイラによってそのメソッドがネイティブコードに�
 　~底位アドレス~    (この図は感で書いている)
  | プログラム  |                                     ＄Stack＝❰メソッドスタック❱ |`````````|        //refとO型の参照の使われ方を表した図 (refとO型はマネージド(安全))
  |    定数    |                                        ref┌--[↑∫Stack∫]--ref--|->{field}|        //∫Stack∫はMainからメソッドスタックが積まれる
- |  静的変数  |                                           └->[↑∫Stack∫]--O型->|  Heep   |--┐O型  //Heepは[∫Stack∫]と[Static]からO型(とref{field}のみ)によって参照される。
+ |  静的変数  |                                           └->[↑∫Stack∫]--O型->|  Heep   |--┐O型  //Heepは[∫Stack∫]と[Static]から大体、O型によって参照される。
 ↓|   ヒープ   |                                        ref┌--[↑∫Stack∫(Main)] |         |<-┘        //参照されなくなるとGCの対象になる
-↓|   ヒープ   | {マネージドヒープ(GCの管理下にある)}         └->[Static]----O型->|_________|        //refは自分より上の[∫Stack∫]を参照できない
-↓|   ヒープ   |                                                                                  //refは何らかのfieldを参照する事ができる
+↓|   ヒープ   | {マネージドヒープ(GCの管理下にある)}         └->[Static]----O型->|_________|        //refは自分より上のプッシュされた[∫Stack∫]を参照できない
+↓|   ヒープ   |                                                                                  //refは何らかのfieldも参照する事ができる
  |    ...     |                                     
- |    ...     |メ {"--繰り返し--"で繰り返されるスタックをメソッドスタックと呼ぶことにする。ILが使うスタックをILスタックと呼ぶことにする}
+ |    ...     |メ {"--繰り返し--"で繰り返されるスタックをメソッドスタックと呼ぶことにする。ILコードの .maxstack n が使うスタックをILスタックと呼ぶことにする}
 ↑|--繰り返し---|ソ {stackallocは明示的開放不可。メソッドから戻るときに自動的に破棄。}{stackallocを使うとILでlocallocが呼ばれるのでlocallocとstackallocは同じ}
 ↑|⟦～⟧localloc?|ッ{(stackalloc int[DateTime.Now.Second])[30]ができてメソッド実行中動的生成(確保)できているので可変量だと思う}
 ↑| ILスタック  |ド {ILスタックは.maxstack n で容量が決められているので固定量}
@@ -208,39 +214,39 @@ ILスタックは何かを計算したりコピーしたり制御信号を送信
 
 ## **C#の型**と**ILが認識する型**の対応表  
 
-  | C#キーワード           | ILの型 (ILの命令)        | C#型定義                | 型の種類      | 詳細                                                                               |
-  | :--------------------- | :----------------------- | :---------------------- | :------------ | :--------------------------------------------------------------------------------- |
-  | object                 | object                   | System.Object           | 参照型(class) | 値型をこれ(`object`)にキャスト変換すると**ボクシングが発生**する                   |
-  | bool                   | bool                     | System.Boolean          | 値型(struct)  | `bool型`は1バイト                                                                  |
-  | byte                   | uint8 (.i1)              | System.Byte             | 値型(struct)  |                                                                                    |
-  | char                   | char                     | System.Char             | 値型(struct)  | `char型`は**2バイト**でUnicodeの`U+0x0~U+0xFFFF`を表現する。あと、無理やり、       |
-  | short                  | int16 (.i2)              | System.Int16            | 値型(struct)  | `ac[0]=(char)0xD83D; ac[1]=(char)0xDE03;`と入れると**4バイトも表現**できなくもない |
-  | int                    | int32 (.i4)              | System.Int32            | 値型(struct)  |                                                                                    |
-  | long                   | int64 (.i8)              | System.Int64            | 値型(struct)  | 全ての値型(struct)は、`System.ValueType`を継承し、                                 |
-  | ushort                 | uint16 (.u2)             | System.UInt16           | 値型(struct)  | `System.ValueType`は`System.Object`を継承                                          |
-  | uint                   | uint32 (.u4)             | System.UInt32           | 値型(struct)  |                                                                                    |
-  | ulong                  | uint64 (.u8)             | System.UInt64           | 値型(struct)  |                                                                                    |
-  | float                  | float32 (.r4)            | System.Single           | 値型(struct)  |                                                                                    |
-  | double                 | float64 (.r8)            | System.Double           | 値型(struct)  |                                                                                    |
-  | string                 | string                   | System.String           | 参照型(class) | C#の文字コードは**UTF-16**でchar型で表現できない文字はstringで表現する             |
-  | int[]                  | int32[]                  | System.Int32[]          | 参照型(class) | 全ての配列は`System.Array`を継承。`ldelem`での配列命令の為に配列長と要素型がある?  |
-  | int*                   | int32*                   | System.Int32*           | ポインタ型    | `typeof`で調べたら`System.Int32*`と出た                                            |
-  | ref int                | int32&                   | 調べられない            | ポインタ型    |                                                                                    |
-  | ↓ユーザー定義型の定義↓ |                          |                         |               |                                                                                    |
-  | struct S{}             | valuetype S              | S                       | 値型(struct)  |                                                                                    |
-  | class C{}              | class C                  | C                       | 参照型(class) |                                                                                    |
-  | class C<T,U>{}         | class S\`2<int32, int64> | C<int,long>             | 参照型(class) | 変数を、`C<int,long> c;`と定義                                                     |
-  | fixed(int* p = arr){}  | int32* とint32[] pinned  | System.Int32*とInt32[]? | 値型と参照型? | `pinned`にアドレスが入ると**GCはそのデータを移動**しない、nullを入れると解除       |
-  | delegate void F()      | class F                  | F                       | 参照型(class) | `[System.Runtime]System.MulticastDelegate`を継承                                   |
-  | enum E{}               | valuetype E              | E                       | 値型(struct)  | `[System.Runtime]System.Enum`を継承 ([..]はアセンブリ名(`System.Runtime.dll`))     |
-  |                        |                          |                         |               |                                                                                    |
+  | C#キーワード           | C#型定義                 | ILの型 (ILの命令)        | ILの型の種類                  | 詳細                                                                               |
+  | :--------------------- | :----------------------- | :----------------------- | :---------------------------- | :--------------------------------------------------------------------------------- |
+  | object                 | System.Object (class)    | object                   | O型 (class)                   | 値型をこれ(`object`)にキャスト変換すると**ボクシングが発生**する                   |
+  | bool                   | System.Boolean (struct)  | bool                     | 値型 (valuetype)              | `bool型`は1バイト                                                                  |
+  | byte                   | System.Byte (struct)     | uint8 (.i1)              | 値型 (valuetype)              |                                                                                    |
+  | char                   | System.Char (struct)     | char                     | 値型 (valuetype)              | `char型`は**2バイト**でUnicodeの`U+0x0~U+0xFFFF`を表現する。あと、無理やり、       |
+  | short                  | System.Int16 (struct)    | int16 (.i2)              | 値型 (valuetype)              | `ac[0]=(char)0xD83D; ac[1]=(char)0xDE03;`と入れると**4バイトも表現**できなくもない |
+  | int                    | System.Int32 (struct)    | int32 (.i4)              | 値型 (valuetype)              |                                                                                    |
+  | long                   | System.Int64 (struct)    | int64 (.i8)              | 値型 (valuetype)              | 全ての値型(struct)は、`System.ValueType`を継承し、                                 |
+  | ushort                 | System.UInt16 (struct)   | uint16 (.u2)             | 値型 (valuetype)              | `System.ValueType`は`System.Object`を継承                                          |
+  | uint                   | System.UInt32 (struct)   | uint32 (.u4)             | 値型 (valuetype)              |                                                                                    |
+  | ulong                  | System.UInt64 (struct)   | uint64 (.u8)             | 値型 (valuetype)              |                                                                                    |
+  | float                  | System.Single (struct)   | float32 (.r4)            | 値型 (valuetype)              |                                                                                    |
+  | double                 | System.Double (struct)   | float64 (.r8)            | 値型 (valuetype)              |                                                                                    |
+  | string                 | System.String (class)    | string                   | O型 (class)                   | C#の文字コードは**UTF-16**でchar型で表現できない文字はstringで表現する             |
+  | int[]                  | System.Int32[] (class?)  | int32[]                  | O型 (class)                   | 全ての配列は`System.Array`を継承。`ldelem`での配列命令の為に配列長と要素型がある?  |
+  | int*                   | System.Int32* (struct*?) | int32*                   | アンマネージドポインタ型 (*)  | `typeof`で調べたら`System.Int32*`と出た                                            |
+  | ref int                | 調べられない             | int32&                   | マネージドポインタ型 (&)      |                                                                                    |
+  | ↓ユーザー定義型の定義↓ |                          |                          |                               |                                                                                    |
+  | struct S{}             | S (struct)               | valuetype S              | 値型 (valuetype)              |                                                                                    |
+  | class C{}              | C (class)                | class C                  | O型 (class)                   |                                                                                    |
+  | class C<T,U>{}         | C<int,long> (class)      | class S\`2<int32, int64> | O型 (class)                   | 変数を、`C<int,long> c;`と定義                                                     |
+  | fixed(int* p = arr){}  | System.Int32\*とInt32[]  | int32* とint32[] pinned  | アンマネージドポインタ型とO型 | `pinned`にアドレスが入ると**GCはそのデータを移動**しない、nullを入れると解除       |
+  | delegate void F()      | F (class)                | class F                  | O型 (class)                   | `[System.Runtime]System.MulticastDelegate`を継承                                   |
+  | enum E{}               | E (struct)               | valuetype E              | 値型 (valuetype)              | `[System.Runtime]System.Enum`を継承 ([..]はアセンブリ名(`System.Runtime.dll`))     |
+  |                        |                          |                          |                               |                                                                                    |
 
 ## スタック遷移図
 
 命令:add, スタック遷移図:…, value1, value2 => …, result  (ILの一つの命令でプッシュされるのは0個または1個)
-スタック遷移図はIL命令を実行する前後の状態を表し"=>"の前が命令実行前で、後が実行後のILスタックの状態である。
-そして、"=>"の両サイドの列は左に行くほどスタックの底で右に行くほどスタックの先頭になっている。
-"…,"の部分は任意の命令列が入っている。
+スタック遷移図は、IL命令を実行する**前後のILスタックの状態**を表し"=>"の左項が命令実行**前**の状態で、右項が命令実行**後**状態である。
+そして、"=>"の両項のILスタックの状態は左に行くほどスタックの底を表しで右に行くほどスタックの先頭を表している。
+"…,"の部分は任意の値の列が入っている。
 
 ```plaintext
     |``4```|
@@ -254,7 +260,7 @@ ILスタックは何かを計算したりコピーしたり制御信号を送信
 ## IL命令表
 
 プッシュとは、ILスタックにプッシュすること。ポップとは、ILスタックからポップすること。(`stloc = ldloc` (ldをstに代入(代入の間には**ILスタックを経由**している)))
-| アセンブリ                             | ILスタック遷移図                  | 説明 (C#コードとの対応([SharpLab](https://sharplab.io/)でコード書いてILコード見れば多分何となく分かる))                                                                                                              |
+| アセンブリ                             | ILスタック遷移図                  | 説明 (C#コードとの対応([SharpLab](https://sharplab.io/)でコード書いてILコードを見れば多分何となく分かる))                                                                                                            |
 | :------------------------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **ロード、ストア系 <=ld st=>**         |                                   |                                                                                                                                                                                                                      |
 | ILスタック <= 定数                     |                                   |                                                                                                                                                                                                                      |
