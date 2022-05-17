@@ -6,52 +6,6 @@ https://bit.ly/3bQe6xf
 # C#まとめ
 
 ## 低レベル(IL)、型に関すること  
-//\(call)[引数][ローカル変数][オペランド]\(call)[引数][ローカル変数][オペランド]\(call)[引数]..の様に積まれる?(オペランドはld)  
-//オペランドは引数かローカル変数をロード(ld)したものか、それを消費して返ってきた値。
-//call時は引数分のオペランドを消費して引数に代入される。ローカル変数はcall時に領域確保される?(しかしブロックのスコープが寿命になっている)  
-//そして、ret時に返り値無しか１つのオペランドが返り値としてスタックにロード(ld)される。 
-//ILはスタック、ヒープ、静的領域、引数、ローカル変数、を関数単位(スタックマシン)で制御する。  
-
-- C#の型とILの型  
-  - C#の型  
-    - 参照型(O型(クラス, インターフェース, デリゲート, 配列, string, object))  
-        - 参照型はILでは`O型(IL:＃1❰class ∫name∫❱, ∫Type∫[], string, object)`になり、スタック(値型が動く範囲(スタックマシン(.maxstack ❰~❱)、引数、ローカル変数))に  
-             O型という参照?を置き、参照は`ヒープにある参照型のインスタンスフィールドを指している`。 ❰/;＃1: クラス、インターフェース、デリゲートはILではclassと表現される  
-        - O型(オブジェクト参照型)は不透明でポインタ操作はできないが、同一か調べる(`ceqなど`)、キャスト(`castclass, isinst(is, as)`)、を使えます。  
-        - isinstでアップキャスト可能かどうか分かるので多分O型は`動的な型を持っている`と思われます。  
-        - new Cls();, new int[4]; とやるとILで`newobj、newarr`が実行されO型(class ∫name∫, ∫Type∫[])が生成されます。  
-    - 値型(ユーザー定義構造体(struct)、数値型(int,floatなど)、bool)  
-        - 値型はスタックか、O型のメンバ(ヒープ)に存在するような型です。(IL:valuetype ∫name∫, int32, float64など)  
-        - 値型が動く範囲(スタックマシン(.maxstack ❰~❱) + 引数(arg) + ローカル変数(.locals init))は`固定サイズ`だと思う。  
-            (stacalloc(:=localloc)はスタックに動的に足される?)  
-        - boolはILでは1byteを占め0はfalse、それ以外はtrueになる。  
-        - 数値型(とboolも?)はILのスタックマシン上では＄stVal=❰`int32、int64、native int、F`❱になって`それの単位でcpu演算`される。  
-            しかし、ILはそれよりも`細かい型`(int8,float32など(大体`C#の数値型と一対一対応`))をもっており、  
-            スタックマシンとそれ以外(＄alh=❰引数(❰ld¦st❱arg)、ローカル変数(❰ld¦st❱loc)、ヒープ(❰ld¦st❱❰obj¦ind❱))❱で`暗黙的または明示的(conv)`な型変換が入る。  
-        - ユーザー定義構造体(struct)はILの❰∫alh∫❱では`valuetype ∫name∫`になる。  
-            - valuetype ∫name∫を操作するためにはスタックマシンにロード、ストア(ld,st)しないといけないため、スタックマシン(❰∫stVal∫❱)とvaluetype ∫name∫の変換は  
-                valuetype ∫name∫の中身を❰∫stVal∫❱の型に展開(ld)、またはその逆で収束(st)するのかな？？  
-            - ユーザー定義構造体(struct)はStr str = `new Str();`のとき`initobj ∫Type∫`が実行され、
-                `Str str;`という宣言だけの場合、スタックに`valuetype Strが確保されるだけ`で何もされない。  
-  - ILの型  
-    - マネージ型  
-        - マネージ型は`O型(参照型)と、マネージポインタ(IL:&, C#:ref)`です (CLR(.net)の管理によって参照先が勝手に変更されうる)  
-        - ＃1❰マネージ型はCLR(.net)の管理によって`参照先のオブジェクトが移動`(コンパクション)されうります。  
-            その結果、通常は見ることはできないが`マネージ型の値(参照先)が変わっています`。❱  
-        - `O型`のオブジェクトは`参照が外れるとGC`されます。  
-    - アンマネージ型  
-        - アンマネージ型は`マネージ型ではない型と、マネージ型を含んでいない型`。(スタック内で完結しているか、O型(参照型(ヒープ))のメンバ内で完結しているデータ)  
-            つまり、値型(ただし、構造体は＃1❰再帰的に`マネージ型を含んでいない`構造体❱)と、アンマネージポインタ(*) です。  
-            ❰/;＃1: つまり、構造体(値型)であってもマネージ型になりうる?  
-    - マネージポインタ型(IL:&, C#:ref(参照渡し))  
-        - マネージポインタは`スタック(メソッド内)にしか存在できないが、マネージポインタ以外なら何でも指せます`。  
-            IL:❰❰❰＃O型＃❱¦&a❰＃アンマネージ型＃❱❱&[a]=＠❰{~}❰*❱❱❱& (~&&はだめ(マネージポインタはマネージポインタを指せない))  
-        - 参照先が`マネージ型の場合`＃1の説明と同じで`参照先が変更`されうります。  
-        - `C#の場合` ref ∫Type∫ = ref ∫vari∫; や func(ref ∫Type∫){}, func(ref ∫vari∫); という形式で`宣言と同時に初期化が要求`される。  
-    - アンマネージポインタ型(*)  
-        - アンマネージポインタは`何処にでも存在できるが、アンマネージ型しか指せません`。しかもunsafeのみです。  
-            IL:❰＃アンマネージ型＃❱{~}❰*❱ (~&*はだめ(アンマネージポインタはマネージポインタを指せない))  
-        - アンマネージポインタで`マネージ内`(クラスメンバ(ヒープ))の`アンマネージ型`を参照する場合`fixed()`が必要です。  
 
 Java 開発者向けチート シート
 ## 言語表現によるC#の構文構造  
@@ -598,6 +552,49 @@ Java 開発者向けチート シート
 https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUHgegIF5SzyLKrqba76G9UBmAAg1YFEAPABzAAqACzAB7AO4BvIsBETA8PpFAyYSBlBkAxDIFO5QGiagOwZA4aaAIQMDmDLLHj5gJIZAH2aB5BhWALBkD2DEcCyDID8GQNoMgZIZAQAx5WAaxErPKARvrygIcMgM8MgAsMgD8MOoC0cgAUrMQAfKw6gC9ugDH6AJT+gaiYAGzsACysAILJ+WmZphKsUACm4qwAcqLAAJIAtrwANq39rVDArXA8AMatvMAAlqJQdQDceEUBJeUlAAysAELJogBGAFatM8CsZ+f5kluBAcFQEENDrIAQKoDK8oAo9oB070ACtrJAD8oPyOlygFiGJ7PABuAEMwKwAM5pW4XViI9H7Vjg1hNDptDrVMAAcwgYwms3mSxWySgiLGogAZicLvl8ht8Lhns9goBDc0Ab3KAkGgkCQkXaHSAC4TAGBKcOKAHY0QA6AAy43JsjSxFYB1BrAARKMFgBPY2sEBK/nqrVQHVCVgAHlYAFZ8SbUUJRGBgFabXy7fyiS12qxelAkUNFnAAPK8VpgRH0qC0hbLVbG4CiUSsIYrcnG7lPAC+gTwZcIJAYdfrDcb9aY6DYj2D2zYO1YiwmrAAGnVpAAqRbs1mIoao1r5YcEQlyYkRjNp5LGmyASIZABIMJbW1Y7/KIgGj5LQWImATQZANEMDkAMgyALo9APnagCsGQAsGl9HIBuI0AUQyAEgUb4BvuUAeEMnhYdgykqVgACVWiJABpXs4CHW1CTAc12xDflB1LA9nn3DCZlTGZnWSFcs1YGdpAIfsIkAXoZAGGGQBJhiMQB3WJcQB9BhPCxAFjFQBOhkAW4Y4ivZDniJNYggIAjgCIwB1Bg43RABKGKIeMAfoYlOSGcLEAM8iN0ALQZAGsGQBdBh0Nw3F4gTkhUujAHqGQAJhkAG4Y4h4m8rBcQBt40AeIYNyfQARBkKHCMJDIheg1EBWDAGDF2EwIwxJLhuDmTMGWNTiTyMQBQZUAAIZjRgcjuXEySZLk9T8gsQB8V0ABCNZMABtM2KfE89LSrwjEAFfjzyigKOs6rqgpChczCIVpHCjNowFIlZAHWGPjAEWGQAxhkAYoYjEANeUv0AL8UPEvdq+uaVoxJ60KiSISzbIcpzACg5FzAFUGNRADMGQAac0AU3MdBPHRAC83UrAAS7G9AAjbLdruktxADEGZC8MCEHOzA3YqlmAAFMQZjqVhKJPQAzxUAMBcjFoxidEAU0U1CBCxAEpdc97FULwn3kiI4kADoZkOAVD0M6um0M255oLghD1hZyt/LtMGAoKoQGa6gJRM2vmMNZXtJyGNCSgATjXKMYzjEplTGqBQsAR0VACwEwAAKMAPKjAEuGKJlPkwADhhvQBCR0ATqUn0mwAGhkNs2LEAHEsVv+2SfF3cXQeQgWSPiukyJnQAABnEIRxnUtUAFlWlRVFEXJVo9RNTcdweIhw/GQBT5SMC6Nz0kUjE4wAPBMAPKMr1vVwNp5/l5bXQAFBkcQBBBl3TbRdrn2An99XcrDiPVlaGO44TpOU+S09UsyktKKzqBc/zwvhWL09y8r+wb2rzb66H2P48TmceW6ggd7VYbk3V4f96T7Dj4AVSgU5wsRABrRFThGNVqnj0YP/NABxCAyJpiB0SlAQAWP+x36KcZMYE1SXyTsAAA+ufUaoC0yOEAIxRgB75SutdbynhfDt0XEfEMXdWCSyZB8Zmtdnj12NCoYybhOLa3PO5QAigx6UcHRQAgP+UOlpaW+ZDywgXQOgSQMM4brH3PuIgTZ5EKMUQwIAA==
 https://sharplab.io/#v2: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=  
 https://sharplab.io/#v2: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=
+
+
+- C#の型とILの型  
+  - C#の型  
+    - 参照型(O型(●クラス, インターフェース, デリゲート, 配列, string, object))  
+        - 参照型はILでは`O型(IL:＃1●❰class ∫name∫❱, ∫Type∫[], string, object)`になり、スタック(値型が動く範囲(スタックマシン(.maxstack ⟪～⟫)、引数、ローカル変数))に  
+             O型という参照?を置き、参照は`ヒープにある参照型のインスタンスフィールドを指している`。 ❰/;＃1: クラス、インターフェース、デリゲートはILではclassと表現される  
+        - O型(オブジェクト参照型)は●不透明でポインタ操作はできないが、同一か調べる(`ceqなど`)、キャスト(`castclass, isinst(is, as)`)、を使えます。  
+        - isinstでアップキャスト可能かどうか分かるので多分O型は`動的な型を持っている`と思われます。  
+        - new Cls();, new int[4]; とやるとILで`newobj、newarr`が実行されO型(class ∫name∫, ∫Type∫[])が生成されます。  
+    - 値型(ユーザー定義構造体(struct)、数値型(int,floatなど)、bool)  
+        - ●値型はスタックか、O型のメンバ(ヒープ)に存在するような型です。(IL:valuetype ∫name∫, int32, float64など)  
+        - 値型が動く範囲(スタックマシン(.maxstack ❰~❱) + 引数(arg) + ローカル変数(.locals init))は`固定サイズ`だと思う。  
+            (stacalloc(:=localloc)はスタックに動的に足される?)  
+        - boolはILでは1byteを占め0はfalse、それ以外はtrueになる。  
+        - 数値型(とboolも?)はILのスタックマシン上では＄stVal=❰`int32、int64、native int、F`❱になって`それの単位でcpu演算`される。  
+            しかし、ILはそれよりも`細かい型`(int8,float32など(大体`C#の数値型と一対一対応`))をもっており、  
+            スタックマシンとそれ以外(＄alh=❰引数(❰ld¦st❱arg)、ローカル変数(❰ld¦st❱loc)、ヒープ(❰ld¦st❱❰obj¦ind❱))❱で`暗黙的または明示的(conv)`な型変換が入る。  
+        - ユーザー定義構造体(struct)はILの❰∫alh∫❱では`valuetype ∫name∫`になる。  
+            - valuetype ∫name∫を操作するためにはスタックマシンにロード、ストア(ld,st)しないといけないため、スタックマシン(❰∫stVal∫❱)とvaluetype ∫name∫の変換は  
+                valuetype ∫name∫の中身を❰∫stVal∫❱の型に展開(ld)、またはその逆で収束(st)するのかな？？  
+            - ユーザー定義構造体(struct)はStr str = `new Str();`のとき●`initobj ∫Type∫`が実行され、
+                `Str str;`という宣言だけの場合、スタックに`valuetype Strが確保されるだけ`で何もされない。  
+  - ILの型  
+    - マネージ型  
+        - マネージ型は`O型(参照型)`と、**マネージポインタ(IL:&, C#:ref)**です (CLR(.net)の管理によって参照先が勝手に変更されうる)  
+        - ＃1❰マネージ型はCLR(.net)の管理によって`参照先のオブジェクトが移動`(●コンパクション)されうります。  
+            その結果、通常は見ることはできないが`マネージ型の値(参照先)が変わっています`。❱  
+        - `O型`のオブジェクトは`参照が外れるとGC`されます。  
+    - アンマネージ型  
+        - アンマネージ型は`マネージ型ではない型と、マネージ型を含んでいない型`。(スタック内で完結しているか、O型(参照型(ヒープ))のメンバ内で完結しているデータ)  
+            つまり、値型(ただし、構造体は＃1❰再帰的に`マネージ型を含んでいない`構造体❱)と、**アンマネージポインタ(*)** です。  
+            ❰/;＃1: つまり、構造体(値型)であってもマネージ型になりうる?  
+    - マネージポインタ型(IL:&, C#:ref(参照渡し))  
+        - マネージポインタは`スタック(メソッド内)にしか存在できないが、マネージポインタ以外なら何でも指せます`。  
+            IL:❰❰❰＃O型＃❱¦&a❰＃アンマネージ型＃❱❱&[a]=＠❰{~}❰*❱❱❱& (~&&はだめ(マネージポインタはマネージポインタを指せない))  
+        - 参照先が`マネージ型の場合`＃1の説明と同じで`参照先が変更`されうります。  
+        - `C#の場合` ref ∫Type∫ = ref ∫vari∫; や func(ref ∫Type∫){}, func(ref ∫vari∫); という形式で`宣言と同時に初期化が要求`される。  
+    - アンマネージポインタ型(*)  
+        - アンマネージポインタは`何処にでも存在できるが、アンマネージ型しか指せません`。しかもunsafeのみです。  
+            IL:❰＃アンマネージ型＃❱{~}❰*❱ (~&*はだめ(アンマネージポインタはマネージポインタを指せない))  
+        - アンマネージポインタで`マネージ内`(クラスメンバ(ヒープ))の`アンマネージ型`を参照する場合`fixed()`が必要です。  
+
 ## 構造化に関すること  
 ❰/:＄Type=❰＃C#の全ての型＃❱  
 ❰/:＄Lit=❰＃リテラル＃❱  
