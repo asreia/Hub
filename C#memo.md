@@ -10,7 +10,6 @@ https://bit.ly/3bQe6xf
 
 Java 開発者向けチート シート
 ## 言語表現によるC#の構文構造  
-`❰/:＄arg=＄vari=＄name=＄index=＃id❰＃識別子＃❱` 『｢arg｣,｢vari｣,｢name｣,｢index｣  ⇒
 - 定義  
     - 修飾子  
         - アクセス指定子  
@@ -78,7 +77,7 @@ Java 開発者向けチート シート
                 - 型  
                     `∫Enum∫`  
                 - 定義  
-                    `＄Enum_define＝❰＠∫アクセス∫ enum ＄Enum＝∫name∫｡＠❰ : ∫Type∫⊃∫Integer∫❱{⟦, ┃～⟧❰｡＄e＝∫name∫＠❰= ∫LitInteger∫❱｡❱}❱`  
+                    `＄Enum_define＝❰＠∫アクセス∫ enum ＄Enum＝｢name｣｡＠❰ : ∫Type∫⊃∫Integer∫❱{⟦, ┃～⟧❰｡＄e＝｢name｣＠❰= ∫LitInteger∫❱｡❱}❱`  
                 - リテラル  
                     `＄LitEnum＝❰○∫Enum∫.○∫e∫❱ 『Enumは∫Integer∫と識別子のタプルのようなもの`  
         - 参照型  
@@ -113,12 +112,12 @@ Java 開発者向けチート シート
                         `＄LitArray[][]＝❰new ∫Type∫[⟪～⟫]⟦～⟧❰[]❱❱`  
             - デリゲート  
                 - 型、定義  
-                    `【∫Delegate_define∫∠＄Delegate＝⸨∫name∫⸩】`  
-                        `＄Delegate_define＝❰delegate ⟪∫Type∫¦void⟫ ∫name∫｡＠∫変性ジェネ∫(∫仮引数∫)❱`  //インデント入れた
+                    `【∫Delegate_define∫∠＄Delegate＝⸨｢name｣⸩】`  
+                        `＄Delegate_define＝❰delegate ⟪∫Type∫¦void⟫ ｢name｣｡＠∫変性ジェネ∫(∫仮引数∫)❱`  //インデント入れた
                 - リテラル  
                     `＄LitDelegate＝⟪∫ラムダ式∫¦❰｡∫Method∫∸⟪∫Tructor∫¦∫Prodexer∫⟫｡❱⟫` //∫Virtual_method∫｡¦｡削除
                     - ラムダ式  
-                        `＄ラムダ式＝❰⟪｡∫vari∫¦(⟦, ┃～⟧∫vari∫)｡⟫ => ⟪｡∫式∫¦{∫文∫＠❰∫return文∫❱}｡⟫❱`  
+                        `＄ラムダ式＝❰⟪｡｢vari｣¦(⟦, ┃～⟧｢vari｣)｡⟫ => ⟪｡∫式∫¦{∫文∫＠❰∫return文∫❱}｡⟫❱`  
         - 複合型  
             `＄Complex＝⟪∫Struct∫¦∫Class∫¦∫Interface∫⟫`  
             `＄LitComplex⟪∫LitStruct∫¦∫LitClass∫¦∫LitInterface∫⟫`
@@ -142,31 +141,26 @@ Java 開発者向けチート シート
                         `}❱`  
                         `【∫Normal_Struct∫∠＄Normal_Struct_name＝⸨｢name｣⸩】`  
                     - readonly構造体 //防衛的コピーの回避((temp=str).func();)  
-                        `＄Readonly_Struct＝∫Normal_Struct∫∠❰⸨struct⸩❱≪❰⟪≪readonly ≫struct⟫❱⏎`  
-                            `⟦if⟧⟦this⟧∠❰⸨∫Field_member∫∠❰∫イ/静∫❱⸩❱⇒❰⟪❰＆Null❱⟫❱⟦then⟧⟦this⟧∠❰⸨∫Field_member∫∠∫Type∫⸩❱≪❰⟪≪readonly≫ ∫Type∫⟫❱⟦end⟧⏎`  
-                            `∠❰⸨∫Struct_method∫∠∫property∫∠＠❰∫アクセス∫ set;❱⸩❱⇒❰⟪❰＆Null❱⟫❱ 『get-onlyだけ許可`  
-
-                        `＄Readonly_Struct＝【∫Normal_Struct∫∠readonly ⸨struct⸩┃⇒∠∫Field_member∫∠✖⸨∫イ/静∫⸩≫∠∫Field_member∫∠readonly ⸨∫Type∫⸩┃⏎`
-                            `∠∫Struct_method∫∠∫property∫∠✖⸨＠❰∫アクセス∫ set;❱⸩】『get-onlyだけ許可`  
-
-                        `＄Readonly_Struct_name＝∫Readonly_Struct∫∠●∫name∫●`  //●∫ ∫●変えた↓
-                        `【∫Readonly_Struct∫⇒＄Readonly_Struct_name＝⸨∫name∫⸩】`  
+                        `＄Readonly_Struct＝【∫Normal_Struct∫∠readonly ⸨struct⸩┃⇒∠∫Field_member∫∠✖⸨∫イ/静∫⸩∥∠∫Field_member∫∠readonly ⸨∫Type∫⸩⏎『✖⸨∫イ/静∫⸩はインスタンス`
+                            `∥∠∫Struct_method∫∠∫property∫∠✖⸨＠❰＠∫アクセス∫ set;❱⸩`
+                            `∥∠∫Struct_method∫∠∫property∫∠✖⸨＠❰｡＠∫アクセス∫ set{⟪＃value(＃1の型)が使える＃⟫}｡❱⸩】『get-onlyだけ許可`  
+                        `【∫Readonly_Struct∫∠＄Readonly_Struct_name＝⸨｢name｣⸩】`
                     - ref構造体  
-                        `＄Ref_Struct＝∫Normal_Struct∫∠❰⸨struct⸩❱≪＃1❰⟪≪ref ≫struct⟫❱`『＃1:ref構造体はref構造体のメンバかローカルしか置けない(スタックのみ)  
-                        `＄Ref_Struct_name＝∫Ref_Struct∫∠●∫name∫●`  
+                        `＄Ref_Struct＝【∫Normal_Struct∫∠ref ⸨struct⸩】`『ref構造体はref構造体のメンバかローカルしか置けない(スタックのみ)  
+                        `【∫Ref_Struct∫∠＄Ref_Struct_name＝⸨｢name｣⸩】`  
                     - readonly ref構造体  
-                        `＄Readonly_ref_Struct＝∫Readonly_Struct∫∠❰⸨struct⸩❱≪＃1❰⟪≪readonly ref ≫struct⟫❱`  
-                        `＄Readonly_ref_Struct_name＝∫Readonly_ref_Struct∫∠●∫name∫●`  
+                        `＄Readonly_ref_Struct＝【∫Readonly_Struct∫∠readonly ref ⸨struct⸩】`  
+                        `【∫Readonly_ref_Struct∫∠＄Readonly_ref_Struct_name＝⸨｢name｣⸩】`  
                 - リテラル  
                     `＄LitStruct＝❰new ∫Struct∫()❱`  
                 - タプル  
                     - 型  
-                        `＄Tuple＝❰＄recur＝❰(｡⟦, ┃2～⟧⟪｡❰∫Type∫ ＃1＠∫vari∫❱¦∫recur∫｡⟫｡)❱❱`  
-                        `『＃1タプル型は型の中に識別子を持てるが、コンパイル時に消失するため属性で保持している`  
-                        `『＃1を省略した場合、アクセスは∫vari∫.Item⟪1～⟫となる`  
+                        `＄Tuple＝❰＄recur＝❰(｡｡⟦, ┃2～⟧⟪｡❰∫Type∫ ＠｢『1』vari｣❱¦∫recur∫｡⟫｡｡)❱❱`  
+                        `『『1』タプル型は型の中に識別子を持てるが、コンパイル時に消失するため属性で保持している`  
+                        `『『1』を省略した場合、タプルの中の値を取得するには｢vari｣.Item⟪1～⟫となる`  
                         `『タプルはSystem.ValueTuple＠❰<⟦, ┃1～8⟧∫Type∫>❱最後は↑の記述で8個以上の時の入れ子のための型引数(1,2,..,7,8,..) == (1,2,..,7,(8,..))`  
                     - リテラル  
-                        `＄LitTuple＝❰＄recur＝⟪(｡⟦, ┃2～⟧❰＠❰∫name∫: ❱∫式∫❱¦¦∫recur∫｡)❱❱`  
+                        `＄LitTuple＝❰＄recur＝⟪(｡⟦, ┃2～⟧❰＠❰｢name｣: ❱∫式∫❱∪∫recur∫｡)❱❱`  
             - [参照型]クラス  
                 - 型
                     `＄Class＝⟪○∫Normal_Class_name∫¦○∫Abstract_Class_name∫¦○∫Static_Class_name∫¦○∫Sealed_Class_name∫⟫`  
@@ -174,9 +168,9 @@ Java 開発者向けチート シート
                     - 修飾子  
                         `＄Cls修飾子＝❰∫修飾子∫⊃❰｡＠∫アクセス∫ ＠⟪abstract¦sealed¦static⟫ ＠❰partial❱｡❱❱`   
                     - クラス  
-                        `＄Normal_Class＝❰∫Cls修飾子∫⊃❰｡＠∫アクセス∫ ＠❰partial❱｡❱ class ＄Normal_Class_name＝∫name∫｡＠∫ジェネ∫ ＄継承＝＠❰｡: ＠❰∫Class∫❱ ⟪～⟫❰, ∫Interface∫❱｡❱{`  
+                        `＄Normal_Class＝❰∫Cls修飾子∫⊃❰｡＠∫アクセス∫ ＠❰partial❱｡❱ class ＄Normal_Class_name＝｢name｣｡＠∫ジェネ∫ ＄継承＝＠❰｡: ＠❰∫Class∫❱ ⟪～⟫❰, ∫Interface∫❱｡❱{`  
                             `＄クラスメンバ＝❰⟦∫LRetInd∫┃～⟧⟪⏎`  
-                                `∫Field_member∫⟪;¦❰｡｡ = ⟪｡∫Lit∫¦⟪＃静的な∫vari∫＃⟫｡⟫｡｡❱⟫¦⏎`  
+                                `∫Field_member∫⟪;¦❰｡｡ = ⟪｡∫Lit∫¦⟪＃静的な｢vari｣＃⟫｡⟫｡｡❱⟫¦⏎`  
                                 `∫Method∫∠❰⸨∫アクセス∫∠❰abstract❱⸩❱≪❰⟪≪not❰abstract❱≫⟫❱⏎` //∫アクセス∫∠❰abstract❱??  
                                 `∫Complex_define∫⏎`  
                             `❱❱⏎`  
@@ -184,35 +178,35 @@ Java 開発者向けチート シート
                     - 抽象クラス  
                         `＄Abstract_Class＝∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪abstract ≫class⟫❱∠❰⸨∫アクセス∫∠❰abstract❱⸩❱⇒❰⟪＠❰abstract❱⟫❱⏎`  
                             『インスタンス生成できないのでctorやFinalizeが定義できないと思ったが定義できる謎。  
-                        `＄Abstract_Class_name＝∫Abstract_Class∫∠●∫name∫●`  
+                        `＄Abstract_Class_name＝∫Abstract_Class∫∠●｢name｣●`  
                     - staticクラス  
                         `＄Static_Class＝∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪static ≫class⟫❱∠❰●⸨∫クラスメンバ∫∠∫仮/イ/静∫⸩❱⇒❰⟪static⟫❱⏎`  
                             `∠❰⸨∫継承∫⸩❱⇒❰⟪❰＆Null❱⟫❱∠❰⸨∫Method∫∠∫Tructor∫⸩❱⇒❰⟪∫Tructor∫∸⟪ctor¦Finalize❱⟫❱`  
-                        `＄Static_Class_name＝∫Static_Class∫∠●∫name∫●`  
+                        `＄Static_Class_name＝∫Static_Class∫∠●｢name｣●`  
                     - シールドクラス  
                         `＄Sealed_Class＝∫Normal_Class∫∠❰⸨class⸩❱≪❰⟪≪sealed ≫class⟫❱∠❰⸨∫継承∫⸩❱⇒❰⟪❰＆Null❱⟫❱`  
-                        `＄Sealed_Class_name＝∫Sealed_Class∫∠●∫name∫●`  
+                        `＄Sealed_Class_name＝∫Sealed_Class∫∠●｢name｣●`  
                 - リテラル  
                     `＄LitClass＝❰new ∫Class∫()❱`  
                 - 匿名型  
                     - 型  
                         `＄Anonymous＝❰__Anonymous~❱`  
                     - リテラル  
-                        `＄LitAnonymous＝❰new{⟦, ┃1～⟧⟪∫vari∫¦∫vari∫ = ∫Lit∫⟫}❱ 『∫vari∫でアクセスする。メソッド内で完結。new[]{~}と組合せるといい`  
+                        `＄LitAnonymous＝❰new{⟦, ┃1～⟧⟪｢vari｣¦｢vari｣ = ∫Lit∫⟫}❱ 『｢vari｣でアクセスする。メソッド内で完結。new[]{~}と組合せるといい`  
                         `『var ano = ∫LitAnoymous∫というふうにvarしかない`  
             - [参照型]インターフェース
                 - 型
                     `＄Interface＝❰○∫Interface_name∫❱`  
                     `＄Interface_define＝❰∫Normal_Interface∫❱`   
                     - インターフェース //「フィールドを持てない代わりに多重継承できる」  
-                        `＄Normal_Interface＝❰∫Cls修飾子∫⊃❰｡＠∫アクセス∫ ＠❰partial❱｡❱ interface ∫name∫｡＠∫変性ジェネ∫ ＠❰｡: ⟦, ┃～⟧∫Interface∫｡❱{`  
+                        `＄Normal_Interface＝❰∫Cls修飾子∫⊃❰｡＠∫アクセス∫ ＠❰partial❱｡❱ interface ｢name｣｡＠∫変性ジェネ∫ ＠❰｡: ⟦, ┃～⟧∫Interface∫｡❱{`  
                             `＄インターフェースメンバ＝❰⟦∫LRetInd∫┃～⟧❰⏎`  
-                                `∫Field_member∫⊃❰＠∫アクセス∫ ＠⟪static¦const⟫ ∫Type∫ ∫name∫❱⟪;¦❰｡｡ = ⟪｡∫Lit∫¦⟪＃静的な∫vari∫＃⟫｡⟫｡｡❱⟫¦⏎`  
+                                `∫Field_member∫⊃❰＠∫アクセス∫ ＠⟪static¦const⟫ ∫Type∫ ｢name｣❱⟪;¦❰｡｡ = ⟪｡∫Lit∫¦⟪＃静的な｢vari｣＃⟫｡⟫｡｡❱⟫¦⏎`  
                                 `∫Method∫⊃∫Interface_method∫`  
                                 `∫Complex_define∫⏎`  
                             `❱`  
                         `}❱`  
-                        `＄Interface_name＝∫Interface∫∠●∫name∫●`  
+                        `＄Interface_name＝∫Interface∫∠●｢name｣●`  
                 - リテラル  
                     `＄LitInterface＝❰new ❰∫Complex∫∸∫Interface∫❱()❱`  
         - ポインタ型  
@@ -224,12 +218,12 @@ Java 開発者向けチート シート
                 - 型  
                     `＄UMPointer＝❰∫Type∫*❱`  
                 - リテラル  
-                    `＄LitUMPointer＝❰＃∫vari∫は∫Type∫型❰&∫vari∫❱❱`  
+                    `＄LitUMPointer＝❰＃｢vari｣は∫Type∫型❰&｢vari｣❱❱`  
             - [参照型]マネージポインタ(&,ref)  
                 - 型  
                     `＄MPointer＝❰ref ∫Type∫❱`  
                 - リテラル  
-                    `＄LitMPointer＝❰＃∫vari∫は∫Type∫型❰ref ∫vari∫❱❱`  
+                    `＄LitMPointer＝❰＃｢vari｣は∫Type∫型❰ref ｢vari｣❱❱`  
         - ジェネリック  
             - 型  
                 `＄Generic＝⟪∫GeneType∫¦∫Gene∫⟫`   
@@ -242,17 +236,17 @@ Java 開発者向けチート シート
                         `＄LitGeneType＝∫Lit∫`  
                 - 多層型  
                     - 型  
-                        `＄Gene＝❰∫name∫❱`  
+                        `＄Gene＝❰｢name｣❱`  
                     - リテラル  
                         `＄LitGene＝∫Lit∫`  
     - メンバ  
         `＄Member＝❰＠❰unsafe❱⟪∫Field_member∫¦∫Method∫⟫❱`  
         - 変数  
             - メンバ変数//structもclassも同じ  
-                `＄Field_member＝❰∫修飾子∫⊃❰｡＠∫アクセス∫ ＠∫イ/静∫ ＠❰new❱ ＠⟪∫readonly∫¦∫const∫⟫｡❱ ∫Type∫ ⟦, ┃1～⟧❰∫vari∫ ＠❰= ∫式∫❱❱＠❰;❱❱`//;?  
+                `＄Field_member＝❰∫修飾子∫⊃❰｡＠∫アクセス∫ ＠∫イ/静∫ ＠❰new❱ ＠⟪∫readonly∫¦∫const∫⟫｡❱ ∫Type∫ ⟦, ┃1～⟧❰｢vari｣ ＠❰= ∫式∫❱❱＠❰;❱❱`//;?  
         - メソッド  
             - シグネチャ  
-                `＄Signature＝❰∫name∫(∫仮引数∫∠❰●⸨∫Type∫⸩●❱)❱`  
+                `＄Signature＝❰｢name｣(∫仮引数∫∠❰●⸨∫Type∫⸩●❱)❱`  
             - メンバメソッド  
                 `＄Method＝⟪∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⊃⟪∫cctor∫¦∫ctor∫¦∫Finalize∫⟫｡¦⏎`  
                             `｡∫Prodexer∫⊃⟪∫Property∫¦∫Indexer∫⟫｡¦｡∫Iterator∫｡¦｡∫Extension∫｡¦｡∫Operator∫⟫`  
@@ -260,10 +254,10 @@ Java 開発者向けチート シート
                     `＄Method修飾子＝❰＠∫アクセス∫ ∫仮/イ/静∫⊃＠⟪｡abstract¦virtual¦override¦∫イ/静∫⊃＠❰static❱｡❱ ＠❰new❱ ＠❰readonly❱ ＠❰partial❱❱` 
                 - 仮引数 と 戻り値  
                     - 仮引数  
-                            `＄通常仮引数＝❰∫Type∫ ∫arg∫❱`  
-                            `＄オプション仮引数＝❰∫Type∫ ∫arg∫ = ∫Lit∫❱`  
-                            `＄参照渡し＝❰⟪ref¦in¦out⟫ ∫Type∫ ∫arg∫❱`  
-                            `＄可変長仮引数＝❰params ∫Type∫⊃∫Array[][]∫ ∫arg∫❱`  
+                            `＄通常仮引数＝❰∫Type∫ ｢arg｣❱`  
+                            `＄オプション仮引数＝❰∫Type∫ ｢arg｣ = ∫Lit∫❱`  
+                            `＄参照渡し＝❰⟪ref¦in¦out⟫ ∫Type∫ ｢arg｣❱`  
+                            `＄可変長仮引数＝❰params ∫Type∫⊃∫Array[][]∫ ｢arg｣❱`  
                                 `＄仮引数＝⟦, ┃～⟧⟪∫通常仮引数∫¦∫オプション仮引数∫¦参照渡し¦∫可変長仮引数∫❱`  
                     - 戻り値  
                         `＄戻り値＝⟪∫Type∫¦void⟫`  
@@ -298,20 +292,20 @@ Java 開発者向けチート シート
                     - プロパティ と インデクサ  
                         `＄Prodexer＝⟪Property¦Indexer⟫`  
                         - プロパティ //＠❰{get;set;}❱  `/*アクセス: n > n.get、get,setのどっちかのみ*/`  
-                            `＄Property＝❰＠∫アクセス∫ ＠∫仮/イ/静∫ ＠❰readonly❱ ＃1∫Type∫ ∫name∫❰⏎` //＠❰readonly❱は多分structの防衛的コピーの回避  
+                            `＄Property＝❰＠∫アクセス∫ ＠∫仮/イ/静∫ ＠❰readonly❱ ＃1∫Type∫ ｢name｣❰⏎` //＠❰readonly❱は多分structの防衛的コピーの回避  
                                 `{❰＠∫アクセス∫ get;＠❰＠∫アクセス∫ set;❱❱}＠❰= ∫Lit∫;❱¦⏎`  
                                 `{＄getset＝❰｡｡＠❰｡＠∫アクセス∫ get{return ⟪＃＃1の型の値を返す＃⟫}｡❱＠❰｡＠∫アクセス∫ set{⟪＃value(＃1の型)が使える＃⟫}｡❱｡｡❱}⏎`  
                             `❱❱`  
                         - インデクサー  
-                            `＄Indexer＝❰＠∫アクセス∫ ∫仮/イ/静∫⊃＠⟪virtual¦override¦static⟫ ＠❰readonly❱ ∫Type∫ this[∫Type∫ ∫index∫] {∫getset∫}❱`  
+                            `＄Indexer＝❰＠∫アクセス∫ ∫仮/イ/静∫⊃＠⟪virtual¦override¦static⟫ ＠❰readonly❱ ∫Type∫ this[∫Type∫ ｢index｣] {∫getset∫}❱`  
                     - イテレーター  
                         - Iter戻り値  
                             `＄Iter戻り値⊃⟪IEnumerable<∫Type∫>¦IEnumerator<∫Type∫>⟫`  
                             `＄yield＝❰yield ⟪break¦return ∫Lit∫⟫❱`  
-                                `＄Iterator＝❰＠∫アクセス∫ ∫仮/イ/静∫ ＠❰readonly❱ ∫Iter戻り値∫ ∫name∫｡＠∫ジェネ∫(∫仮引数∫)∫型制約∫⟪｡;¦{⟪＃∫yield∫を含む処理＃⟫}｡⟫❱`  
+                                `＄Iterator＝❰＠∫アクセス∫ ∫仮/イ/静∫ ＠❰readonly❱ ∫Iter戻り値∫ ｢name｣｡＠∫ジェネ∫(∫仮引数∫)∫型制約∫⟪｡;¦{⟪＃∫yield∫を含む処理＃⟫}｡⟫❱`  
                     - 拡張メソッド//classもstaticにする  
-                        `＄Extension＝❰＠∫アクセス∫ static ∫戻り値∫ ∫name∫｡＠∫ジェネ∫(this ∫Type∫ ∫arg∫, ∫仮引数∫)∫型制約∫{⟪＃静的メソッドの処理＃⟫}❱`  
-                        //`＄Extension＝❰＠∫アクセス∫ static ∫戻り値∫ ∫name∫<T>(this ref T ∫arg∫, ∫仮引数∫)where T: struct{⟪＃静的メソッドの処理＃⟫}❱`//refはstructのみ  
+                        `＄Extension＝❰＠∫アクセス∫ static ∫戻り値∫ ｢name｣｡＠∫ジェネ∫(this ∫Type∫ ｢arg｣, ∫仮引数∫)∫型制約∫{⟪＃静的メソッドの処理＃⟫}❱`  
+                        //`＄Extension＝❰＠∫アクセス∫ static ∫戻り値∫ ｢name｣<T>(this ref T ｢arg｣, ∫仮引数∫)where T: struct{⟪＃静的メソッドの処理＃⟫}❱`//refはstructのみ  
                     - 演算子のオーバーロード//❰readonly❱だめ//後で======================================================================  
                         `＄Operator＝❰❱`  
                         - ユーザー定義型変換  
@@ -329,7 +323,7 @@ Java 開発者向けチート シート
                                 `❱`  
                             - インターフェース明示的実装  
                                 `＄Interface_explicit_method＝❰∫method∫∠❰｡｡＠⸨∫アクセス∫⸩ ＠⸨∫仮/イ/静∫⸩ ＠⸨＠❰readonly❱⸩｡｡❱⇒⏎`  
-                                    `❰⟪⟫⟪＠❰abstract❱⟫⟪⟫❱❱∠❰●⸨∫name∫⸩❱≪❰⟪≪❰＃定義元のinterface名＃❱.≫∫name∫⟫❱`  
+                                    `❰⟪⟫⟪＠❰abstract❱⟫⟪⟫❱❱∠❰●⸨｢name｣⸩❱≪❰⟪≪❰＃定義元のinterface名＃❱.≫｢name｣⟫❱`  
     - ローカル  
         - ローカル変数
             `∫Local_variable∫`  
@@ -340,17 +334,17 @@ Java 開発者向けチート シート
         `＄path0＝⟪＃名前空間~∫Complex∫までのパス＃⟫`  
         `＄path1＝⟪＃名前空間のパス＃⟫`  
         `＄＝❰＄recur＝⟪～⟫❰｡｡⏎`  
-        `⟦;⏎┃～⟧⟪｡❰using ∫path1∫❱¦❰using static ∫path0∫❱¦❰using ∫name∫ = ∫path0∫❱¦❰extern alias ∫name∫❱｡⟫`  
-        `namespace ∫name∫{`  
+        `⟦;⏎┃～⟧⟪｡❰using ∫path1∫❱¦❰using static ∫path0∫❱¦❰using ｢name｣ = ∫path0∫❱¦❰extern alias ｢name｣❱｡⟫`  
+        `namespace ｢name｣{`  
             `∫recur∫`  
         `}`  
         `｡｡❱❱`  
 - 使用(演算、宣言、生成、代入、分岐)  
     - 型  
         - 宣言  
-            `＄宣言＝❰∫Type∫ ∫vari∫❱`  
+            `＄宣言＝❰∫Type∫ ｢vari｣❱`  
         - キャスト  
-            `＄キャスト＝❰(∫Type∫)⟪∫vari∫¦∫Lit∫⟫❱`  
+            `＄キャスト＝❰(∫Type∫)⟪｢vari｣¦∫Lit∫⟫❱`  
         - is  
             `＄is＝❰∫Instance∫ is ∫Complex∫❱`  
         - as  
@@ -369,16 +363,16 @@ Java 開発者向けチート シート
         - デリゲート  
             `＄デリゲート生成＝❰∫Method∫∸⟪∫Tructor∫¦∫Prodexer∫¦∫Operator∫⟫❱`  
         - 配列  
-            `＄配列生成＝❰❰｡｡new＠❰∫Type∫❱⟪｡❰[∫index∫]❱¦❰[]{⟦, ┃1～⟧∫Lit∫}❱｡⟫｡｡❱¦¦❰｡{⟦, ┃1～⟧∫Lit∫}｡❱❱`  
+            `＄配列生成＝❰❰｡｡new＠❰∫Type∫❱⟪｡❰[｢index｣]❱¦❰[]{⟦, ┃1～⟧∫Lit∫}❱｡⟫｡｡❱∪❰｡{⟦, ┃1～⟧∫Lit∫}｡❱❱`  
     - メンバアクセス  
-        `＄Instance＝❰∫vari∫❱ = ∫Use_ctor∫;` 
-        `＄メンバアクセス＝❰⟪○∫Instance∫¦∫Complex∫¦∫Lit∫⟫.❰∫Member∫❱∠❰●⸨∫name∫⸩●❱❱`  
+        `＄Instance＝❰｢vari｣❱ = ∫Use_ctor∫;` 
+        `＄メンバアクセス＝❰⟪○∫Instance∫¦∫Complex∫¦∫Lit∫⟫.❰∫Member∫❱∠❰●⸨｢name｣⸩●❱❱`  
     - メソッド  
         - ラムダ式  
             `＄Use_ラムダ式＝⟪∫ラムダ式変数∫(∫実引数∫)¦((∫Type∫⊃∫Delegate∫)(∫ラムダ式∫))(∫実引数∫)⟫`『キャストして戻り値と引数の型が分かれば名前が無くても呼べる  
-            `＄代入ラムダ式＝❰∫Type∫⊃∫Delegate∫ ＄ラムダ式変数＝∫vari∫ = ∫ラムダ式∫❱`『ラムダ式には型情報がないのでターゲットの型を見て型推論する  
+            `＄代入ラムダ式＝❰∫Type∫⊃∫Delegate∫ ＄ラムダ式変数＝｢vari｣ = ∫ラムダ式∫❱`『ラムダ式には型情報がないのでターゲットの型を見て型推論する  
         - メソッド  
-            `＄Use_Normal_method＝❰∫Normal_method∫∠❰●⸨∫name∫⸩●❱(実引数)❱`  
+            `＄Use_Normal_method＝❰∫Normal_method∫∠❰●⸨｢name｣⸩●❱(実引数)❱`  
         - コンストラクター  
             `＄Use_ctor＝❰new ∫ctor∫∠❰●⸨∫Complex∫⊃∫cname∫⸩●❱(実引数)❱`  
         - 静的コンストラクター  
@@ -386,20 +380,20 @@ Java 開発者向けチート シート
         - デストラクター  
             `＄Use_Finalize＝⟪＃GCのコレクト時＃⟫`  
         - 拡張メソッド  
-            `＄Use_Extension＝❰⟪∫Lit∫¦∫Instance∫⟫.∫Extension∫∠❰●⸨∫name∫⸩●❱(実引数)❱`  
+            `＄Use_Extension＝❰⟪∫Lit∫¦∫Instance∫⟫.∫Extension∫∠❰●⸨｢name｣⸩●❱(実引数)❱`  
         - プロパティ  
-            `＄Use_Property_get＝❰∫式∫∠❰●⸨∫Property∫∠❰∫name∫❱⸩●❱❱`  
-            `＄Use_Property_set＝❰∫Property∫∠❰●⸨∫name∫⸩●❱ = ∫式∫❱`  
+            `＄Use_Property_get＝❰∫式∫∠❰●⸨∫Property∫∠❰｢name｣❱⸩●❱❱`  
+            `＄Use_Property_set＝❰∫Property∫∠❰●⸨｢name｣⸩●❱ = ∫式∫❱`  
         - インデクサー  
-            `＄Use_Indexer_get＝❰∫式∫∠❰●⸨∫Indexer∫∠❰∫name∫❱⸩●❱[∫index∫]❱`  
-            `＄Use_Indexer_set＝❰∫Indexer∫∠❰●⸨∫name∫⸩●❱ = ∫式∫❱`  
+            `＄Use_Indexer_get＝❰∫式∫∠❰●⸨∫Indexer∫∠❰｢name｣❱⸩●❱[｢index｣]❱`  
+            `＄Use_Indexer_set＝❰∫Indexer∫∠❰●⸨｢name｣⸩●❱ = ∫式∫❱`  
         - イテレーター  
-            `＄Use_Iterator＝❰⟪＃ループ構文の更新の所＃⟫⊃❰●⸨＄iter＝❰｡∫Lit∫⊃❰＃Enumera⟪ble¦tor⟫の⟪∫vari∫¦∫Lit∫⟫＃❱｡❱⸩●❱¦¦❰∫iter∫❱.⟪＃イテレータのメソッド＃⟫❱`  
+            `＄Use_Iterator＝❰⟪＃ループ構文の更新の所＃⟫⊃❰●⸨＄iter＝❰｡∫Lit∫⊃❰＃Enumera⟪ble¦tor⟫の⟪｢vari｣¦∫Lit∫⟫＃❱｡❱⸩●❱∪❰∫iter∫❱.⟪＃イテレータのメソッド＃⟫❱`  
         - 演算子のオーバーロード//後で==================================================================================================================  
             - ユーザー定義型変換   
 - 構造化  
     - 式  
-        `＄値＝⟪＃戻り値がある0引数のメソッドや∫Lit∫、∫vari∫など＃⟫`  
+        `＄値＝⟪＃戻り値がある0引数のメソッドや∫Lit∫、｢vari｣など＃⟫`  
         `＄関数＝⟪＃戻り値がある1引数以上のメソッドなど＃⟫`  
         `＄式＝⟪＃＄式＝⟪∫値∫¦∫関数∫(⟦, ┃1～⟧∫式∫)⟫のようなもの＃⟫`  
     - 文  
@@ -408,23 +402,23 @@ Java 開発者向けチート シート
         - 埋め込みステートメント  
     - 変数定義  
         `＄変数定義＝⟪∫Field_member∫¦Local_variable⟫`  
-        `＄Local_variable＝❰＠⟪const¦out⟫ ⟪∫Type∫¦var⟫ ⟦, ┃1～⟧❰＠❰@❱∫vari∫ ＠❰= ∫式∫❱❱❱`  
+        `＄Local_variable＝❰＠⟪const¦out⟫ ⟪∫Type∫¦var⟫ ⟦, ┃1～⟧❰＠❰@❱｢vari｣ ＠❰= ∫式∫❱❱❱`  
         `『２つの同名の識別子の片方に"@"を付けてもIL上では同じ識別子として扱われて、キーワードにも付けれてキーワードを識別子にできる。`  
             `『それによって他の言語で書かれた識別子がキーワードと被っても"@"を付ければ使えるようになる("@"は識別子である事をコンパイラに教えている?)`  
         - 代入  
             - 代入  
-                `＄Assign＝❰∫vari∫ = ∫式∫❱ 『代入という∫文∫と、代入する∫値∫を返すという∫式∫、という両方の側面がある`  
+                `＄Assign＝❰｢vari｣ = ∫式∫❱ 『代入という∫文∫と、代入する∫値∫を返すという∫式∫、という両方の側面がある`  
                 - タプル分解代入  
-                    `＄TupleAssign＝❰＠❰var❱ ＄recur＝❰(｡⟦, ┃2～⟧❰＠⟪var¦∫Type∫⟫ ∫vari∫❱¦¦∫recur∫｡)❱ = ∫LitTuple∫❱`  
+                    `＄TupleAssign＝❰＠❰var❱ ＄recur＝❰(｡⟦, ┃2～⟧❰＠⟪var¦∫Type∫⟫ ｢vari｣❱∪∫recur∫｡)❱ = ∫LitTuple∫❱`  
                     `//∫Complex∫のユーザー定義タプル分解代入拡張メソッド`  
                         `//定義//public static void Deconstruct<T1, T2>(this Tuple<T1, T2> x, out T1 item1, out T2 item2){item1 = x.Item1; item2 = x.Item2;}`  
                         `//使用//var tuple = Tuple.Create("abc", 100); var (x, y) = tuple;`  
             - 引数渡し  
-                `＄実引数＝⟦, ┃～⟧⟪∫式∫¦❰∫vari∫: ∫式∫❱¦❰in ∫式∫❱¦❰out ＠∫Type∫ ∫vari∫❱¦❰ref ∫vari∫❱⟫`  
+                `＄実引数＝⟦, ┃～⟧⟪∫式∫¦❰｢vari｣: ∫式∫❱¦❰in ∫式∫❱¦❰out ＠∫Type∫ ｢vari｣❱¦❰ref ｢vari｣❱⟫`  
     - ステートメント//困りはしない?  
         - 制御構文  
             - goto  
-                `＄Label＝❰∫name∫❱:`  
+                `＄Label＝❰｢name｣❱:`  
                 `＄goto文＝❰goto ○∫Label∫;❱`  
             - if  
                 `＄if文＝❰＄RecurIf＝❰｡｡｡｡if(⟪＃∫LitBool∫を返す∫式∫＃⟫)⟪＃1∫文∫¦{⟪1～⟫∫文∫}⟫｡＠⟪｡｡｡❰｡｡else⟪ ＃1∫文∫¦{⟪1～⟫∫文∫}⟫｡｡❱｡¦｡❰else ∫RecurIf∫❱｡｡｡⟫｡｡｡｡❱❱`  
@@ -441,10 +435,10 @@ Java 開発者向けチート シート
                 `＄while文＝❰while(⟪＃∫LitBool∫を返す∫式∫＃⟫)⟪＃1∫文∫¦{⟪1～⟫∫文∫}⟫❱`  
                     `『＃1∫変数定義∫は含めいない`  
             - for  
-                `＄for変数＝❰∫Local_variable∫⊃❰⟪∫Type∫¦var⟫ ⟦, ┃～⟧❰∫vari∫ = ∫式∫❱❱∠❰⸨⟪∫Type∫¦var⟫⸩❱≪❰⟪＠⟪∫Type∫¦var⟫⟫❱❱`  
+                `＄for変数＝❰∫Local_variable∫⊃❰⟪∫Type∫¦var⟫ ⟦, ┃～⟧❰｢vari｣ = ∫式∫❱❱∠❰⸨⟪∫Type∫¦var⟫⸩❱≪❰⟪＠⟪∫Type∫¦var⟫⟫❱❱`  
                 `＄for文＝❰for(∫for変数∫;＠⟪＃∫LitBool∫を返す∫式∫＃⟫;∫for変数∫)❱{⟪1～⟫∫文∫}`  
             - foreach  
-                `＄foreach変数＝❰∫Local_variable∫⊃❰＃1⟪∫Type∫¦var⟫ ∫vari∫❱❱ 『＃1が必ず必要`  
+                `＄foreach変数＝❰∫Local_variable∫⊃❰＃1⟪∫Type∫¦var⟫ ｢vari｣❱❱ 『＃1が必ず必要`  
                 `＄foreach文＝❰(＃1∫foreach変数∫ in ⟪＃Enumera⟪ble¦tor⟫のインスタンス＃⟫)⟪＃2∫文∫¦{⟪1～⟫∫文∫}⟫❱『＃1はreadonly的`  
                     `『＃2∫変数定義∫は含めいない`  
         - 例外処理  
@@ -452,20 +446,20 @@ Java 開発者向けチート シート
             `try{`  
                 `∫Recur∫`  
             `}`  
-            `⟪～⟫❰｡｡｡catch＠❰｡｡(∫Type∫⊃⟪＃Exceptionを継承したクラス＃⟫ ∫vari∫) ＠❰｡when(⟪＃∫LitBool∫を返す∫式∫＃⟫)｡❱｡｡❱{`  
+            `⟪～⟫❰｡｡｡catch＠❰｡｡(∫Type∫⊃⟪＃Exceptionを継承したクラス＃⟫ ｢vari｣) ＠❰｡when(⟪＃∫LitBool∫を返す∫式∫＃⟫)｡❱｡｡❱{`  
                 `⟪＃例外処理＃⟫`  
             `}`  
             `｡｡｡❱＠❰｡finally{`  
                 `⟪＃リソース廃棄＃⟫`  
             `}｡❱｡｡❱❱`  
         - usingステートメント  
-            `＄using_statement＝❰using(∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ＄Resource＝∫vari∫ = ⟪＃nullかIDisposableのインスタンスを返す∫式∫＃⟫){`  
+            `＄using_statement＝❰using(∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ＄Resource＝｢vari｣ = ⟪＃nullかIDisposableのインスタンスを返す∫式∫＃⟫){`  
                 `⟪＃○∫Resource∫を使う処理＃⟫`  
             `}❱`  
                 `『ブロック{}を抜けるとDisposeが呼ばれる`  
             - using変数宣言  
-                `＄using変数宣言＝❰using ∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ∫vari∫❱`  
-                    `『∫vari∫のブロック{}の範囲はスコープ全体になるので注意`  
+                `＄using変数宣言＝❰using ∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ｢vari｣❱`  
+                    `『｢vari｣のブロック{}の範囲はスコープ全体になるので注意`  
         - 戻り値  
             `＄return文＝❰return ∫式∫❱`  
 - クラス  
