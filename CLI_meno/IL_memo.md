@@ -97,9 +97,10 @@ CLI(BCLとVES)は実行環境によって色々ある
 ## C#のコンパイルから.netの実行まで  
 
 ```plaintext
-  |IL| ---ilasm.exe--> |   .exe    |  
+  |IL| ---ilasm.exe--> |```.exe````|  
   |__| <--ildasm.exe-- |   .dll    | ---CLR(AOT or JIT)--> ネイティブ  
-  |C#| --csc.exe---->  |(ILバイナリ)|  
+  |C#| --csc.exe-----> |(ILバイナリ)|  
+  |__| <--ILSpy------- |___________|
 ```
 
 - C#コンパイラ  
