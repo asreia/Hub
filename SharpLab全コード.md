@@ -2083,3 +2083,93 @@ public class Class{
     public Field field;
 }
 ```
+
+## UTF-16とUTF-8まとめ
+
+### [UTF-16とUTF-8まとめ]============================================================================================
+
+```C#
+using System;
+public class C {
+    unsafe public static void Main() {
+        char c = '￿'; //char型(2byte)はUnicodeと一致(2^16(0~65535)まで(サロゲートの領域も文字としている?))
+        System.Console.WriteLine((int)c);
+        string s = "😃";//string型はUTF-16 //Unicodeにはサロゲートという4バイトで表す為の穴が空いている
+                        //下位サロゲート: D800 - DBFF (1024) 1024 * 1024 = 2^20
+                        //上位サロゲート: DC00 - DFFF (1024) 2^20 + 2^16 - 1 = 0x10FFFF(0x0-0x10FFFF)
+        fixed(char* cp = s){//"😃" == 0xD83D 0xDE03 == 55357 56835
+            System.Console.WriteLine(((int)cp[0]).ToString() + " " + ((int)cp[1]).ToString());
+            
+            //UTF-16の4バイト文字"😃"をchar型に入れて表示してみる
+            char[] ac = new char[2];
+            ac[0] = cp[0]; ac[1] = cp[1]; ac[0] = (char)0xD83D; ac[1] = (char)0xDE03;
+            System.Console.WriteLine(ac);
+        }
+        //UTF-8は、上位ビットに符号を持ちそれによって何バイト必要とする文字か決まる
+        //1byte(7bit)__U+007F   0XXX_XXXX
+        //2byte(11bit)_U+07FF   110X_XXXX 10XX_XXXX
+        //3byte(16bit)_U+FFFF   1110_XXXX 10XX_XXXX 10XX_XXXX
+        //4byte(21bit)_U+10FFFF 1111_0XXX 10XX_XXXX 10XX_XXXX 10XX_XXXX
+    }
+}
+```
+
+## 型付き参照(TypedReference)まとめ
+
+### [型付き参照(TypedReference)まとめ]============================================================================================
+
+```C#
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        //型付き参照
+        int x = 10;
+        TypedReference r = __makeref(x); // x の参照を作る
+
+        __refvalue(r, int) = 99; // 参照元の x も書き換わる
+
+        Console.WriteLine(x); // 99
+        
+        System.Type t = __reftype(r);
+        Console.WriteLine(t);
+       
+        //ref版
+        int x1 = 10;
+        ref int r1 = ref x1; // x の参照を作る
+
+        r1 = 99; // 参照元の x も書き換わる
+
+        Console.WriteLine(x1); // 99
+        
+        System.Type t1 = r1.GetType();
+        Console.WriteLine(t1);
+        
+        //__arglistは、配列引数(paramの様なもの)
+        arglistFunc(__arglist(1, "aaa", 'x', 1.5)); // 呼び出し側にも __arglist を書く
+    }
+    
+    static void arglistFunc(__arglist) // 仮引数のところに __arglist を書く
+    {
+        // 中身のとりだしには ArgIterator 構造体を使う
+        ArgIterator argumentIterator = new ArgIterator(__arglist);
+        while (argumentIterator.GetRemainingCount() > 0)
+        {
+            object value = null;
+
+            TypedReference r = argumentIterator.GetNextArg(); // 可変個引数から要素取り出し
+            System.Type t = __reftype(r); // TypedReference から、元の型を取得
+
+            // 型(t)で分岐して、__refvalue(r,型) で値の取り出し
+            if (t == typeof(int)) value = __refvalue(r, int);
+            else if (t == typeof(char)) value = __refvalue(r, char);
+            else if (t == typeof(double)) value = __refvalue(r, double);
+            else value = __refvalue(r, string);
+
+            Console.WriteLine(t.Name + ": " + value);
+        }
+    }
+}
+```
