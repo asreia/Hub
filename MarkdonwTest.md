@@ -43,6 +43,7 @@ markdownlint: 水平線の上に文字を書くと見出しと見なされ"見�
 [Wiki:Markdown](https://ja.wikipedia.org/wiki/Markdown):WikiのMarkdownのページ  
 
 [![画像だよ](https://cldup.com/dTxpPi9lDf.thumb.png "ポップアップ")](https://nodesource.com/products/nsolid)  
+[![ローカル画像だよ](Elaina.png "ポップアップ")](https://nodesource.com/products/nsolid)
 
 ## アンカーリンク  
 
