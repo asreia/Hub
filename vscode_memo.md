@@ -202,7 +202,7 @@ export function activate(context: vscode.ExtensionContext) {//処理を登録す
 > 拡張機能のエディターの`コントリビューション`タブは`package.json`の`"contributes"`と一致する  
 > `package.json`の`設定項目`: p251, 公開とパッケージ配布:p254~260  
 
-### 咲来たんオススメの拡張機能
+### 咲来さんオススメの拡張機能
 
 p220~p236参照
 
