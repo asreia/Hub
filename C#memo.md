@@ -243,7 +243,7 @@
             - シグネチャ  
                 `＄Signature＝❰｢name｣(⟪＃∫仮引数∫の∫Type∫の列＃⟫)❱`
             - メンバメソッド  
-                `＄Method＝⟪∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⊃⟪∫cctor∫¦∫ctor∫¦∫Finalize∫⟫｡¦⏎`  
+                `＄Method＝⟪∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Virtual_method∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⊃⟪∫cctor∫¦∫ctor∫¦∫Finalize∫⟫｡¦⏎`  
                             `｡∫Prodexer∫⊃⟪∫Property∫¦∫Indexer∫⟫｡¦｡∫Iterator∫｡¦｡∫Extension∫｡¦｡∫Operator∫⟫`  
                 - メソッド修飾子  
                     `＄Method修飾子＝❰＠∫アクセス∫ ∫仮/イ/静∫⊃＠⟪｡abstract¦virtual¦override¦∫イ/静∫⊃＠❰static❱｡⟫ ＠❰new❱ ＠❰readonly❱ ＠❰partial❱❱`
@@ -312,7 +312,6 @@
                             - インターフェース普通のメソッド  
                                 `＄Interface_normal_method＝【∫Method∫∠✖⸨∫アクセス∫⸩∫interfaceアクセス∫┃∠✖⸨∫仮/イ/静∫⸩∫仮/イ/静/s∫∸❰override❱｡┃∠✖⸨＠❰readonly❱⸩｡｡❱】`
                             - インターフェース明示的実装  
-                                `＄Interface_explicit_method＝【∫method∫∠✖⸨∫アクセス∫⸩┃∠⸨∫仮/イ/静∫⸩⊃＠❰abstract❱┃∠✖⸨＠❰readonly❱⸩┃∠⟪＃定義元のInterface名＃⟫.⸨｢name｣⸩】`
                                 `＄Interface_explicit_method＝【∫method∫∠✖⸨∫アクセス∫⸩┃∠⸨∫仮/イ/静∫⸩⊃＠❰abstract❱┃∠✖⸨＠❰readonly❱⸩┃∠⟪＃定義元のInterface名＃⟫.⸨｢name｣⸩】`
     - ローカル  
         - ローカル変数
