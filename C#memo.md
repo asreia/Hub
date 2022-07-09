@@ -38,7 +38,7 @@
                         - 型  
                             `＄Int＝⟪sbyte¦short¦int¦long¦System.⟪SByte¦Int16¦Int32¦Int64⟫⟫`  
                         - リテラル  
-                            `＄LitInt＝❰＠❰-❱⟪～⟫❱`  //言語表現拡張する?`⟪-～⟫`
+                            `＄LitInt＝❰＠❰-❱⟪～⟫❱`
                     - 符号なし  
                         - 型  
                             `＄UInt＝⟪byte¦ushort¦uint¦ulong¦System.⟪Byte¦UInt16¦UInt32¦UInt64⟫⟫`  
@@ -53,7 +53,7 @@
                     - 型  
                         `＄Decimal＝⟪decimal¦System.Decimal⟫`  
                     - リテラル  
-                        `＄LitDecimal＝⟪＃十進数の型ぁの数ぅ＃⟫`//後でで  
+                        `＄LitDecimal＝⟪＃十進数の型の数＃⟫`
             - 真理値型  
                 - 型  
                     `＄Bool＝⟪bool¦System.Boolean⟫`  
@@ -68,7 +68,7 @@
                 - 型  
                     `∫Enum∫`  
                 - 定義  
-                    `＄Enum_define＝❰＠∫アクセス∫ enum ＄Enum＝｢name｣｡＠❰ : ∫Type∫⊃∫Integer∫❱{⟦, ┃～⟧❰｡＄e＝｢name｣＠❰= ∫LitInteger∫❱｡❱}❱`  
+                    `＄Enum_define＝❰＠∫アクセス∫ enum ＄Enum＝｢name｣｡＠❰ : ∫Type∫⊃∫Integer∫❱{⟦, ┃～⟧❰｡＄e＝｢val_name｣＠❰= ∫LitInteger∫❱｡❱}❱`  
                 - リテラル  
                     `＄LitEnum＝❰○∫Enum∫.○∫e∫❱ 『Enumは∫Integer∫と識別子のタプルのようなもの`  
         - 参照型  
@@ -88,7 +88,7 @@
                     `＄LitString＝❰"⟪～⟫⟪U+┃～0x10FFFF⟫"❱`  
             - 配列(`＄Array`)  
                 - 型  
-                    `＄Array＝⟪∫Array[,]∫¦∫Array[][]∫¦System.Array⟫`  //¦Array削除
+                    `＄Array＝⟪∫Array[,]∫¦∫Array[][]∫¦System.Array⟫`  
                 - リテラル  
                     `＄LitArray＝⟪∫LitArray[,]∫¦∫LitArray[][]∫⟫`  
                 - 配列(`＄Array[,]`)  
@@ -103,10 +103,10 @@
                         `＄LitArray[][]＝❰new ∫Type∫[⟪～⟫]⟦～⟧❰[]❱❱`  
             - デリゲート  
                 - 型、定義  
-                    `【∫Delegate_define∫∠＄Delegate＝⸨｢name｣⸩】`  
                     `＄Delegate_define＝❰delegate ⟪∫Type∫¦void⟫ ｢name｣｡＠∫変性ジェネ∫(∫仮引数∫)❱`
+                    `【∫Delegate_define∫∠＄Delegate＝⸨｢name｣⸩】`  
                 - リテラル  
-                    `＄LitDelegate＝⟪∫ラムダ式∫¦❰｡∫Method∫∸⟪∫Tructor∫¦∫Prodexer∫⟫｡❱⟫` //∫Virtual_method∫｡¦｡削除
+                    `＄LitDelegate＝⟪∫ラムダ式∫¦❰｡∫Method∫∸⟪∫Tructor∫¦∫Prodexer∫⟫｡❱⟫` 
                     - ラムダ式  
                         `＄ラムダ式＝❰⟪｡｢vari｣¦(⟦, ┃～⟧｢vari｣)｡⟫ => ⟪｡∫式∫¦{∫文∫＠❰∫return文∫❱}｡⟫❱`  
         - 複合型  
@@ -164,7 +164,7 @@
                         `＄Normal_Class＝❰∫Cls修飾子∫⊃❰｡＠∫アクセス∫ ＠❰partial❱｡❱ class ＄Normal_Class_name＝｢name｣｡＠∫ジェネ∫ ＄継承＝＠❰｡: ＠❰∫Class∫❱＠❰,❱＄実装＝⟦, ┃～⟧❰∫Interface∫❱｡❱{`  
                             `＄クラスメンバ＝❰⟦∫LRetInd∫┃～⟧⟪⏎`  
                                 `∫Field_member∫❰｡｡ = ⟪｡∫Lit∫¦⟪＃静的な｢vari｣＃⟫｡⟫｡｡❱¦⏎`  
-                                `【∫Method∫∠∫仮/イ/静∫∠✖⸨abstract❱⸩】⏎` //∫仮/イ/静∫∠❰abstract❱に変更  
+                                `【∫Method∫∠∫仮/イ/静∫∠✖⸨abstract❱⸩】⏎`
                                 `∫Complex_define∫⏎`  
                             `❱❱⏎`  
                         `}❱`  
@@ -181,13 +181,13 @@
                         `＄Sealed_Class＝【∫Normal_Class∫∠sealed ⸨class⸩┃∠✖⸨∫継承∫⸩】`  
                         `【∫Sealed_Class∫∠＄Sealed_Class_name＝⸨｢name｣⸩】`
                 - リテラル  
-                    `＄LitClass＝⟪new ∫Class∫(∫実引数∫)¦default⟫`  //∫実引数∫追加
+                    `＄LitClass＝⟪new ∫Class∫(∫実引数∫)¦default⟫`  
                 - 匿名型  
                     - 型  
                         `＄Anonymous＝❰__Anonymous~❱`  
                     - リテラル  
                         `＄LitAnonymous＝❰new{⟦, ┃1～⟧⟪｢vari｣¦｢vari｣ = ∫Lit∫⟫}❱ 『｢vari｣でアクセスする。メソッド内で完結。new[]{~}と組合せるといい`  
-                        `『var ano = ∫LitAnoymous∫というふうにvarしかない。あとILコードがToStringとかのメソッド定義ですごい長い`  
+                        `『var ano = ∫LitAnoymous∫というふうにvarしかないのでメッソドの戻り値にできない。あとILコードがToStringとかのメソッド定義ですごい長い`  
                         `『ILで、[1] class '<>f__AnonymousType~のnewobjなので普通に値型も参照型もヒープにコピーされる`
             - [参照型]インターフェース
                 - 型
@@ -203,7 +203,7 @@
                         `}❱` 
                         `【∫Normal_Interface∫∠＄Interface_name＝⸨｢name｣⸩】`  
                 - リテラル  
-                    `＄LitInterface＝❰new ❰∫Complex∫∸∫Interface∫❱(∫実引数∫)❱`  //∫実引数∫追加
+                    `＄LitInterface＝❰new ❰∫Complex∫∸∫Interface∫❱(∫実引数∫)❱`  
         - ポインタ型  
             - 型  
                 `＄Pointer＝⟪∫UMPointer∫¦∫MPointer∫⟫`  
@@ -224,12 +224,12 @@
                 `＄Generic＝⟪∫GeneType∫¦∫Gene∫⟫`   
             - リテラル  
                 `＄LitGeneric＝⟪∫LitGeneType∫¦∫LitGene∫⟫`  
-                - 具体ジェネリック型  
+                - ジェネリック付きの型  
                     - 型  
                         `＄GeneType＝❰∫Type∫<∫Type∫>❱`  
                     - リテラル  
-                        `＄LitGeneType＝⟪new ∫GeneType∫(∫実引数∫)¦default⟫`//∫Lit∫から変更  
-                - 抽象ジェネりック型
+                        `＄LitGeneType＝⟪new ∫GeneType∫(∫実引数∫)¦default⟫`
+                - ジェネリック型
                     - 型  
                         `＄Gene＝❰｢name｣❱`  
                     - リテラル  
@@ -238,12 +238,10 @@
         `＄Member＝❰＠❰unsafe❱⟪∫Field_member∫¦∫Method∫⟫❱`  
         - 変数  
             - メンバ変数//structもclassも同じ  
-                `＄Field_member＝❰∫修飾子∫⊃❰｡＠∫アクセス∫ ＠∫イ/静∫ ＠❰new❱ ＠⟪∫readonly∫¦∫const∫⟫｡❱ ∫Type∫ ⟦, ┃1～⟧⟪｢vari｣¦｢vari｣ = ∫式∫⟫;❱`//{❰｢vari｣ ＠❰= ∫式∫❱❱＠❰;❱} => {⟪｢vari｣¦｢vari｣ = ∫式∫⟫;}に変更
+                `＄Field_member＝❰∫修飾子∫⊃❰｡＠∫アクセス∫ ＠∫イ/静∫ ＠❰new❱ ＠⟪∫readonly∫¦∫const∫⟫｡❱ ∫Type∫ ⟦, ┃1～⟧⟪｢vari｣¦｢vari｣ = ∫式∫⟫;❱`
         - メソッド  
             - シグネチャ  
-                `＄Signature＝❰｢name｣(⟪＃∫仮引数∫の∫Type∫の列＃⟫)❱`//これであってる?
-                `【(∫仮引数∫∠＄Signature＝❰｢name｣(⸨∫Type∫⸩)❱】`  
-                `＄Signature＝❰｢name｣(∫仮引数∫∠❰●⸨∫Type∫⸩●❱)❱`  
+                `＄Signature＝❰｢name｣(⟪＃∫仮引数∫の∫Type∫の列＃⟫)❱`
             - メンバメソッド  
                 `＄Method＝⟪∫Normal_method∫｡¦｡∫Instance∫｡¦｡∫Static∫｡¦｡∫part_method∫｡¦｡∫Interface_method∫｡¦｡∫expr_method∫｡¦｡∫Tructor∫⊃⟪∫cctor∫¦∫ctor∫¦∫Finalize∫⟫｡¦⏎`  
                             `｡∫Prodexer∫⊃⟪∫Property∫¦∫Indexer∫⟫｡¦｡∫Iterator∫｡¦｡∫Extension∫｡¦｡∫Operator∫⟫`  
@@ -293,7 +291,7 @@
                                 `{＄getSet＝❰｡｡＠❰｡＠∫アクセス∫ get{return ⟪＃『1』の型の値を返す＃⟫}｡❱＠❰｡＠∫アクセス∫ set{⟪＃value(『1』の型)が使える＃⟫}｡❱｡｡❱}⏎`  
                             `⟫❱`  
                         - インデクサー  
-                            `＄Indexer＝❰＠∫アクセス∫ ∫仮/イ/静∫∸❰static❱ ＠❰readonly❱ ∫Type∫ this[∫Type∫ ｢index｣] ⟪{∫getSet∫}¦get;set;⟫❱`//∸❰static❱  
+                            `＄Indexer＝❰＠∫アクセス∫ ∫仮/イ/静∫∸❰static❱ ＠❰readonly❱ ∫Type∫ this[∫Type∫ ｢index｣] ⟪{∫getSet∫}¦get;set;⟫❱`
                     - イテレーター  
                         - Iter戻り値  
                             `＄Iter戻り値⊃⟪IEnumerable<∫Type∫>¦IEnumerator<∫Type∫>⟫`  
@@ -325,11 +323,11 @@
     - 名前空間  
         `＄path0＝⟪＃名前空間~∫Complex∫までのパス＃⟫`  
         `＄path1＝⟪＃名前空間のパス＃⟫`  
-        `＄＝❰＄recur＝⟦～⟧❰｡｡⏎`  
-        `⟦;∫LReturn∫┃～⟧⟪｡❰using ∫path1∫❱¦❰using static ∫path0∫❱¦❰using ｢name｣ = ∫path0∫❱¦❰extern alias ｢name｣❱｡⟫`  
-        `namespace ｢name｣{`  
-            `∫recur∫`  
-        `}`  
+        `＄Namespace＝❰＄recur＝⟦～⟧❰｡｡⏎`  
+        `⟦;∫LReturn∫┃～⟧⟪｡❰using ∫path1∫❱¦❰using static ∫path0∫❱¦❰using ｢name｣ = ∫path0∫❱¦❰extern alias ｢name｣❱｡⟫⏎`  
+        `namespace ｢name｣{⏎`  
+            `∫recur∫⏎`  
+        `}⏎`  
         `｡｡❱❱`  
 - 使用(演算、宣言、生成、代入、分岐)  
     - 型  
@@ -351,8 +349,7 @@
             `＄nameof()＝❰nameof(∫Type∫)❱`  
     - 生成  
         - 複合型  
-            `＄複合型生成＝❰new ∫Complex∫∸⟪∫Interface∫¦∫Abstract_Class_name∫⟫(∫実引数∫)❱` //∫Abstract_Class_name∫も??追加した  
-        - デリゲート  
+            `＄複合型生成＝❰new ∫Complex∫∸⟪∫Interface∫¦∫Abstract_Class_name∫⟫(∫実引数∫)❱` 
             `＄デリゲート生成＝❰∫Method∫∸⟪∫Tructor∫¦∫Prodexer∫¦∫Operator∫⟫❱`
         - 配列  
             `＄配列生成＝⟪❰｡｡｡new ⟪｡｡∫Type∫[｢index｣]¦＠❰∫Type∫❱[]{⟦, ┃1～⟧∫Lit∫}｡｡⟫｡｡｡❱｡¦｡{⟦, ┃1～⟧∫Lit∫}⟫`  
@@ -390,10 +387,10 @@
     - 式  
         `＄値＝⟪＃戻り値がある0引数のメソッドや∫Lit∫、｢vari｣など＃⟫`  
         `＄関数＝⟪＃戻り値がある1引数以上のメソッドなど＃⟫` 
-        `＄式＝⟪＃＄式＝⟪∫値∫¦∫関数∫(⟦, ┃1～⟧∫式∫)⟫のようなもの＃⟫`//∫関数∫∫値∫で関数適用を表現している?  
+        `＄式＝⟪＃＄式＝⟪∫値∫¦∫関数∫(⟦, ┃1～⟧∫式∫)⟫のようなもの＃⟫`//∫関数∫∫値∫で関数適用を表現している  
     - 文  
         `＄構文＝⟪＃コンパイラへ指示。修飾子や制御構文、セミコロン、ブロックなど＃⟫`  
-        `＄文＝⟪＃＄文＝⟪∫構文∫¦❰｡∫構文∫ ⟦ ┃1～⟧⟪∫式∫¦∫文∫⟫｡❱⟫のようなもの＃⟫`//構文を並べる、構文の入れ子構造、式を構文に与える、を表現している?  
+        `＄文＝⟪＃＄文＝⟪∫構文∫¦❰｡∫構文∫ ⟦ ┃1～⟧⟪∫式∫¦∫文∫⟫｡❱⟫のようなもの＃⟫`//構文を並べる、構文の入れ子構造、式を構文に与える、を表現している  
         - 埋め込みステートメント  
     - 変数定義  
         `＄変数定義＝⟪∫Field_member∫¦∫Local_variable∫⟫`  
@@ -410,7 +407,7 @@
                         `//使用//var tuple = Tuple.Create("abc", 100); var (x, y) = tuple;//https://ufcpp.net/study/csharp/datatype/deconstruction/#arbitrary-types`  
             - 引数渡し  
                 `＄実引数＝⟦, ┃～⟧⟪∫式∫¦❰｢vari｣: ∫式∫❱¦❰in ∫式∫❱¦❰out ＠∫Type∫ ｢vari｣❱¦❰ref ｢vari｣❱⟫`  
-    - ステートメント//困りはしない?  
+    - ステートメント  
         - 制御構文  
             - goto  
                 `＄Label＝❰｢name｣❱:`  
@@ -420,7 +417,7 @@
                     `＄body＝⟪∫『1』文∫¦{⟪1～⟫∫文∫}⟫｡¦｡∫Recur∫⟫`
                     `『『1』∫変数定義∫は含めいない`  
             - ?:  
-                `＄3項演算子＝❰∫式∫⊃❰｡⟪＃∫LitBool∫を返す∫式∫＃⟫?∫式∫:∫式∫｡❱`  
+                `＄3項演算子＝❰∫式∫⊃❰｡⟪＃∫LitBool∫を返す∫式∫＃⟫?∫式∫:∫式∫｡❱❱`  
             - switch//また後で==================case int n when n < 100: return 2;=========================================== 
                 `＄switch文＝❰switch(∫式∫){`  
                     `⟦⟪ ¦∫LRetInd∫⟫┃～⟧❰｡｡case ∫式∫:`  
@@ -435,14 +432,14 @@
                 `＄for文＝❰for(｡｡∫for変数∫;＠⟪＃∫LitBool∫を返す∫式∫＃⟫;⟪＃∫for変数∫をカウントする∫式∫＃⟫｡｡)❱{⟪1～⟫∫文∫}`  
             - foreach  
                 `＄foreach変数＝❰∫Local_variable∫⊃❰『1』⟪∫Type∫¦var⟫ ｢vari｣❱❱ 『『1』が必ず必要`  
-                `＄foreach文＝❰(＃1∫foreach変数∫ in ⟪＃Enumera⟪ble¦tor⟫のインスタンス＃⟫)⟪『2』∫文∫¦{⟪1～⟫∫文∫}⟫❱『『1』はreadonly的`  
+                `＄foreach文＝❰(『1』∫foreach変数∫ in ⟪＃Enumera⟪ble¦tor⟫のインスタンス＃⟫)⟪『2』∫文∫¦{⟪1～⟫∫文∫}⟫❱『『1』はreadonly的`  
                     `『『2』∫変数定義∫は含めいない`  
         - 例外処理  
             `＄Exception_handling＝❰＄Recur＝❰｡｡｡｡⏎`  
             `try{`  
                 `∫Recur∫`  
             `}`  
-            `⟪～⟫❰｡｡｡catch＠❰｡｡(∫Type∫⊃⟪＃Exceptionを継承したクラス＃⟫ ｢vari｣) ＠❰｡when(⟪＃∫LitBool∫を返す∫式∫＃⟫)｡❱｡｡❱{`  
+            `⟦～⟧❰｡｡｡catch＠❰｡｡(∫Type∫⊃⟪＃Exceptionを継承したクラス＃⟫ ｢vari｣) ＠❰｡when(⟪＃∫LitBool∫を返す∫式∫＃⟫)｡❱｡｡❱{`  
                 `⟪＃例外処理＃⟫`  
             `}`  
             `｡｡｡❱＠❰｡finally{`  
@@ -454,10 +451,10 @@
             `}❱`  
                 `『ブロック{}を抜けるとDisposeが呼ばれる`  
             - using変数宣言  
-                `＄using変数宣言＝❰using ∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ｢vari｣❱`  
+                `＄using変数宣言＝❰using ∫Type∫⊃⟪＃IDisposableを継承した∫Type∫＃⟫ ｢vari｣;❱`  
                     `『｢vari｣のブロック{}の範囲はスコープ全体になるので注意`  
         - 戻り値  
-            `＄return文＝❰return ∫式∫❱`  
+            `＄return文＝❰return ∫式∫;❱`  
 
 ## SharpLab
   - クラス  
