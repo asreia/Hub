@@ -1,0 +1,36 @@
+# Script関係
+
+## 補足
+
+- private void Update() の様なコールバックは**Unityが**privateでも**関数ポインタ**として登録し**呼び出し**ている(多分)
+
+## MonoBehaviour
+
+### 概要
+
+MonoBehaviourは、必ずGameObjectにアタッチして**Componentとして振る舞い**、**Unityのシステムの中**に **(各部分に)シングルトン**として生成されます
+**ゲームループ**の特定のタイミングで呼び出される**コールバックが多く**定義されており、主にランタイム時に**Component間で情報をやり取り**しゲームを制御します
+
+- **注意事項**
+  - ファイル名とクラス名が**同じでない**とGameObjectに**アタッチ時エラー**になる
+
+### コールバック
+
+### メソッド
+
+## ScriptableObject
+
+### 概要
+
+ScriptableObjectは、**ScriptableなObject**であり**Unityのシステムの中**に **(各部分に)シングルトン**として生成され一つの**モジュールシステム**として運用されます
+
+- **注意事項**
+  - ファイル名とクラス名が**同じでない**とCreateAsset時警告がでる
+  No script asset for ScrObj. Check that the definition is in a file of the same name and that it compiles properly.
+
+### メソッド
+
+- **静的**メソッド
+  - CreateInstance<T>()
+  **ScriptableObject**を継承したT型のインスタンスを**生成**する
+  **new T()**では生成されても**Unityに管理されない**(コールバックが呼ばれない)
