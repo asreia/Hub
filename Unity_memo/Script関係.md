@@ -31,6 +31,6 @@ ScriptableObjectは、**ScriptableなObject**であり**Unityのシステムの�
 ### メソッド
 
 - **静的**メソッド
-  - CreateInstance<T>()
+  - `CreateInstance<T>()`
   **ScriptableObject**を継承したT型のインスタンスを**生成**する
   **new T()**では生成されても**Unityに管理されない**(コールバックが呼ばれない)
