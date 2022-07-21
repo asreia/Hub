@@ -1,6 +1,6 @@
 # 主要なUnityObject系列
 
-## Object
+## Object (UnityEngine.Object, UnityObject)
 
 ### 概要
 
@@ -11,12 +11,12 @@ UnityObjectのフィールドの**m_CachedPtr**: UnityObject(instance) -> C++Obj
 C++Objectのフィールドの**GCHandle**: C++Object -> UnityObject(instance)
 で通信している。と思われる
 - **C++Object**は、UnityObject以外にも**Assetファイル**への通信(AssetDatabase)と、**SerializeObject**への通信をしている
-- C++Objectには、**シリアライズデータ**、**InstanceID**、などがある
+- C++Objectには、**Assetデータ**、**シリアライズデータ**、**InstanceID**、などがある
 - UnityObjectは全て、**Inspectorに表示可能**である(多分)
 - 注意
   - nullなのにnullじゃない問題
   UnityObjectを引数にDestroy＠❰Immediate❱を呼び**Destroyが実行**されると即座に**C++Objectが破棄**されますが、
-  UnityObjectのC#側に**C#の参照関係**が残っているとC#の**GCの対象にならない**為そのUnityObjectを**破棄してくれません**そして、
+  UnityObjectであるC#側に**C#の参照関係**が残っているとC#の**GCの対象にならない**為そのUnityObjectを**破棄してくれません**そして、
   UnityObjectで**オーバーライドされた等価演算子(!=,==)**で、`UnityObject(instance) == null`は、**false**が返ってしまいます(参照関係がないと見える)
   そのUnityObjectが大きいオブジェクト(テクスチャなど)を参照していた場合は**C#の参照関係**が残っているので**破棄されません**
 
