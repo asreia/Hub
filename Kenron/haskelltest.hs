@@ -58,6 +58,11 @@ whereScope 2 = a
 whereScope _ = b
     where b = "def"
 
+applicative_style :: Maybe Integer
+applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計算することができる(C#のNullable型)
+
+data D a b = A a b | B1 (a,b) | C Int (D a b) deriving(Show)
+
 data Val = Abc | Def | Val deriving(Show) -- 型コンストラクタと値コンストラクタ つまり、型と値は、大文字から始まる(関数と型引数は小文字から)
                                             -- コンストラクタというのは、引数を受け取って型または値を作るから
 type Waybe = Maybe -- たしか、型シノニム
