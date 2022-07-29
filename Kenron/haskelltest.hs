@@ -61,7 +61,124 @@ whereScope _ = b
 applicative_style :: Maybe Integer
 applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計算することができる(C#のNullable型)
 
+listDo = do         -- 食わせる所までが一行。上から実行される。
+    op <- [(+),(*)] -- [(+),(*)] >>= (\op ->
+    x <- [2,3]      -- [2,3] >>= (\x ->
+    y <- [4,5]      -- [4,5] >>= (\y ->
+    [op x y]        -- [op x y])))
+listDo1 = do         -- 食わせる所までが一行。上から実行される。
+    op <- [(+),(*)] -- [(+),(*)] >>= (\op ->
+    x <- [op 2, op 3]      -- [2,3] >>= (\x ->
+    y <- [x 4,x 5]      -- [4,5] >>= (\y ->
+    [y]        -- [op x y])))
+-- listDo1 = do     -- join . fmap f $ m で、各行から終わりがjoin . fmap f <- m の様なもの              -- (((aaa <- m \a) <- m \a) <- m \a) <- m
+--     op) <- [(+),(*)] 
+--     x) <- [2,3]     
+--     y) <- [4,5]     
+--     [op x y])))  
+
+updateAbc :: IO ()
+updateAbc = do
+    a <- getLine
+    b <- getLine
+    c <- getLine
+    putStrLn $ a ++ b ++ c
+    if a == "quit"
+        then
+        putStrLn "End"
+        else
+        updateAbc
+
+x :: (Eq t, Num t) => t -> Int  --モナドの文脈があればどこでも"do"することができる
+x 0 = 0
+x n = x (n-1) + length
+    (do
+    a <- [1,2,3]
+    b <- [Just 4,Just 5,
+        do
+        a <- Just 4
+        b <- Just 2
+        Nothing
+        return $ a + b
+        ]
+    ["a"]
+    )
+
+y = do
+     a <- \x -> x * 2
+     b <- \x -> a + x
+     \x -> a * b + x
+-- ↕↕↕↕↕↕↕↕↕↕Readerモナド(関数モナド((->) r))↕↕↕↕↕↕↕↕↕↕ -- \xのxには同じ値が入るmapしてる感じ
+y' = (\x -> x * 2) >>= \a -> (\x -> a + x) >>= \b -> (\x -> a * b + x)
+
+j' = Just 1 >>= (\a -> Just 2 >>= (\b -> Just (a+b)))
+
+newtype Arrow' r a = Arrow' {arrow' :: r -> a}
+
+instance Functor (Arrow' r) where
+    fmap f g = Arrow' $ (\x -> f (arrow' g x))
+
+instance Applicative (Arrow' r) where
+    pure a = Arrow' $ const a
+    f <*> g = Arrow' $ \x -> (arrow' f x) (arrow' g x)
+
+
+instance Monad (Arrow' r) where
+    return a = Arrow' $ const a
+    (Arrow' h) >>= f = Arrow' $ \w -> arrow' (f (h w)) w
+    -- h >>= f = \w -> f (h w) w
+
+arr = (Arrow' $ \x -> x * 2) >>= (\a -> Arrow' $ \y -> y + 1)
+
+listMonad = [(+),(*)] >>= (\op -> [2,3] >>= (\x -> [4,5] >>= (\y -> [op x y])))
+pure' = pure 1 :: Num a => IO a -- "Num a =>"が無いとエラー
+-- ❰(){}[]"'_`;,❱中置記法に使えない記号
+infixl 0 <=#
+(<=#) a b = ()
+infixl 1 <=*
+(<=*) a b = ()
+infixl 2 <=**
+(<=**) a b = ()
+infixl 3 <=***
+(<=***) a b = ()
+infixl 4 <=****
+(<=****) a b = ()
+infixl 5 <=*****
+(<=*****) a b = ()
+infixl 6 <=******
+(<=******) a b = ()
+infixl 7 <=*******
+(<=*******) a b = ()
+infixl 8 <=********
+(<=********) a b = ()
+infixl 9 <=*********
+(<=*********) a b = ()
+
+infixr 0 #=>
+(#=>) a b = ()
+infixr 1 *=>
+(*=>) a b = ()
+infixr 2 **=>
+(**=>) a b = ()
+infixr 3 ***=>
+(***=>) a b = ()
+infixr 4 ****=>
+(****=>) a b = ()
+infixr 5 *****=>
+(*****=>) a b = ()
+infixr 6 ******=>
+(******=>) a b = ()
+infixr 7 *******=>
+(*******=>) a b = ()
+infixr 8 ********=>
+(********=>) a b = ()
+infixr 9 *********=>
+(*********=>) a b = ()
 data D a b = A a b | B1 (a,b) | C Int (D a b) deriving(Show)
+data Tree a = EmptyTree | Node a (Tree a) (Tree a) (Tree a) (Tree a)
+
+-- l :: (t1 -> t2) -> t2
+-- l h = h $ h
 
 data Val = Abc | Def | Val deriving(Show) -- 型コンストラクタと値コンストラクタ つまり、型と値は、大文字から始まる(関数と型引数は小文字から)
                                             -- コンストラクタというのは、引数を受け取って型または値を作るから
@@ -103,7 +220,7 @@ class Eq' a where
 
 -- fmapは、(1 a -> 1 b) -> (f a -> f b)と考えると自然変換でもある?(型と関数からなる圏の射の関手でもある) 
 -- fmapはC#でList<int>を引数にList<string>を返すような => interface Functor<f> {f<b> fmap<a,b>(Func<a,b> Arrow_ab, f<a> f_a);}
-                                                                    -- //CS0307: 型パラメーター「F」は型引数と一緒に使用できません //文脈には関数を定義できない
+                                                                    -- //CS0307: 型パラメーター「f」は型引数と一緒に使用できません //文脈には関数を定義できない
 -- instance Functor Maybe where -- :k Maybe => Maybe :: * -> *, :k Functor => (* -> *) -> Constraint
     -- fmap :: (a -> b) -> f a -> f b -- f a, f b のように、aを型引数に取っていてMaybeは型引数を一つ取るのでカインド(種類)が合う
 -- instance (Eq m) => Eq (Maybe m) where --Maybe Int とか具体型を書かなくても、型引数?多相型?を使える。(Eq m) => はC#では、where m : Eqでジェネリックの型制約の様な
