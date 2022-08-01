@@ -1,8 +1,16 @@
+module Haskelltest where
 import qualified Data.Map as M --Data.Map内の定義物をM.∫LAny∫で参照
+import Control.Monad -- ()はインポートしたい物がない?H本P91
+import System.IO.Unsafe ( unsafePerformIO )
+
+unsafeExe :: String
+unsafeExe = unsafePerformIO getLine ++ "!!"
 
 -- print = putStrLn $ show
 -- main :: IO ()
 -- main = return () -- putStrLn "abc"
+-- main :: IO ()
+-- main = putStrLn "Hello_World"
 main :: IO()
 main = do   --IOdoの中では戻り値がIOなら良い? IOはdo構文の中でしか実行できない?
     print "Hello"
@@ -58,6 +66,128 @@ whereScope 2 = a
 whereScope _ = b
     where b = "def"
 
+caseSiki :: (Eq a1, Num a2, Num a1) => a1 -> a2
+caseSiki x = 123 + case x == 4 of -- 演算子が使える
+    True -> 100
+    False -> 1
+
+-- f :: (Eq a) => a -> ()
+t :: Maybe [a] -> ()
+t (Just [a,b]) = ()
+t Nothing = ()
+t (Just a) = ()
+-- f (Just 2) = ()
+f :: Bool -> ()
+f True = ()
+f False = ()
+
+f1 :: Maybe a -> ()
+f1 (Just a) = ()
+f1 Nothing = ()
+
+f2 :: Maybe (Maybe a) -> ()
+f2 (Just (Just a)) = ()
+f2 (Just Nothing) = ()
+f2 Nothing = ()
+
+g1 a 
+    | a == (1,2) = ()
+    | (6, 2) == (4,2) = ()
+    | True = ()
+g2 |False = ()
+g3 |True = ()
+
+f3 :: Show a => a -> String
+f3 a = show a
+-- f3 1 = show 1
+-- f3 True = show True
+
+-- f4 :: (Show a) => a -> String
+-- f4 a = show a
+-- f4 1 = show 1
+-- f4 True = show True
+
+-- data Type1 = A
+data Type2 = Type2 deriving(Show)
+-- data Type3 = A | B | C
+-- data Type4 a b = A a b
+-- data Type5 = A Type5 | Nil deriving(Show)
+data Type4 = A Int deriving(Show)
+
+class Show i => Interface i where
+    value :: i
+    -- strval :: String
+    odoroki :: i -> String
+    odoroki a = show a ++ "!!"
+    ifunc :: i -> i -> String
+
+class Wrapper w where
+    wrapper :: a -> w a
+
+instance Interface Int where
+    -- value :: Int
+    value = 496
+    ifunc a b = show a ++ "," ++ show b
+
+va = value :: Int
+od = odoroki (124 :: Int)
+ic = ifunc (123 :: Int) (456 :: Int)
+
+uncurryVal :: Int
+uncurryVal = uncurrying (1,2,3) -- => 5
+curryVal :: Int
+curryVal = currying 1 2 3 -- => 5
+
+func :: a -> b -> c -> ()
+func a b c = () -- "()"は非関数型のnullのようなもの
+
+f11 :: Int -> Int -> Int
+f11 x y = x + y
+
+uncurrying :: (Int, Int, Int) -> Int
+uncurrying (a, b, c) = a * b + c
+
+currying :: Int -> Int -> Int -> Int
+currying a b c = a * b + c
+
+-- 関数適用
+infixr 0 #$
+(#$) :: (a -> b) -> a -> b
+f #$ a = f a
+-- 関数合成(射の合成)
+(#.) :: (b -> c) -> (a -> b) -> (a -> c)
+f #. g = \x -> f (g x)
+-- 射の関手 (Maybeの実装の場合)
+fmap_ :: (a -> b) -> Maybe a -> Maybe b
+fmap_ f Nothing = Nothing
+fmap_ f (Just a) = Just (f a)
+-- (リストの実装の場合)
+-- fmap = map -- (map f [] = []; map f (x:xs) = f x : map f xs)
+-- Applicative (Maybeの実装の場合)
+pure_ :: a -> Maybe a
+pure_ a = Just a
+(<#*>) :: Maybe (a -> b) -> Maybe a -> Maybe b
+Nothing <#*> _ = Nothing
+Just f <#*> a = fmap f a
+-- (リストの実装の場合)
+pure__ :: a -> [a]
+pure__ a = [a]
+(<##*>) :: [a1 -> a2] -> [a1] -> [a2]
+[] <##*> _ = []       -- fs,xsなど二重ループしたかったら二重再帰ループか?(fs<#*>とfmap xs)
+(f:fs) <##*> xs = fmap f xs ++ (fs <##*> xs)
+-- Monad (Maybeの実装の場合)
+return_ :: a -> Maybe a
+(>>#=) :: Maybe a -> (a -> Maybe b) -> Maybe b
+return_ a = Just a
+Nothing >>#= _ = Nothing
+Just a >>#= f = f a
+
+newtype State_ s a = State_ {runState_ :: s -> (a, s)}
+return__ :: a -> State_ s a
+(>>##=) :: State_ s a -> (a -> State_ s a) -> State_ s a
+return__ a = State_ $ \s -> (a, s)
+State_ s >>##= f = State_ $ \a -> let (v, ns) = s a in runState_ (f v) ns
+
 applicative_style :: Maybe Integer
 applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計算することができる(C#のNullable型)
 
@@ -66,12 +196,12 @@ listDo = do         -- 食わせる所までが一行。上から実行される
     x <- [2,3]      -- [2,3] >>= (\x ->
     y <- [4,5]      -- [4,5] >>= (\y ->
     [op x y]        -- [op x y])))
-listDo1 = do         -- 食わせる所までが一行。上から実行される。
-    op <- [(+),(*)] -- [(+),(*)] >>= (\op ->
-    x <- [op 2, op 3]      -- [2,3] >>= (\x ->
-    y <- [x 4,x 5]      -- [4,5] >>= (\y ->
-    [y]        -- [op x y])))
--- listDo1 = do     -- join . fmap f $ m で、各行から終わりがjoin . fmap f <- m の様なもの              -- (((aaa <- m \a) <- m \a) <- m \a) <- m
+listDo1 = do         
+    op <- [(+),(*)] 
+    x <- [op 2, op 3]
+    y <- [x 4,x 5]
+    [y]
+-- listDo1 = do     -- join . fmap f $ m で、各行から終わりがjoin . fmap f <- m の様なもの
 --     op) <- [(+),(*)] 
 --     x) <- [2,3]     
 --     y) <- [4,5]     
@@ -135,46 +265,26 @@ pure' = pure 1 :: Num a => IO a -- "Num a =>"が無いとエラー
 -- ❰(){}[]"'_`;,❱中置記法に使えない記号
 infixl 0 <=#
 (<=#) a b = ()
-infixl 1 <=*
-(<=*) a b = ()
-infixl 2 <=**
-(<=**) a b = ()
-infixl 3 <=***
-(<=***) a b = ()
-infixl 4 <=****
-(<=****) a b = ()
-infixl 5 <=*****
-(<=*****) a b = ()
-infixl 6 <=******
-(<=******) a b = ()
-infixl 7 <=*******
-(<=*******) a b = ()
-infixl 8 <=********
-(<=********) a b = ()
-infixl 9 <=*********
-(<=*********) a b = ()
-
-infixr 0 #=>
-(#=>) a b = ()
-infixr 1 *=>
-(*=>) a b = ()
 infixr 2 **=>
 (**=>) a b = ()
-infixr 3 ***=>
-(***=>) a b = ()
-infixr 4 ****=>
-(****=>) a b = ()
-infixr 5 *****=>
-(*****=>) a b = ()
-infixr 6 ******=>
-(******=>) a b = ()
-infixr 7 *******=>
-(*******=>) a b = ()
-infixr 8 ********=>
-(********=>) a b = ()
-infixr 9 *********=>
-(*********=>) a b = ()
-data D a b = A a b | B1 (a,b) | C Int (D a b) deriving(Show)
+
+iOFunc1 :: Maybe (IO String)
+iOFunc1 = Just (getLine >>= \x -> return x)
+iOFunc :: IO [String]
+iOFunc = sequence [getLine >>= \x -> return x] -- sequenceの中で実行される?
+
+-- https://yomi322.hateblo.jp/entry/2012/10/18/204707
+quotYRem :: Integral a => a -> a -> Bool
+quotYRem x y = (x `quot` y) * y + (x `rem` y) == x -- => True
+divYMod :: Integral a => a -> a -> Bool
+divYMod x y = (x `div`  y) * y + (x `mod` y) == x -- => True
+-- divの 5 `div` (-2) == -3 になるのは
+    -- 5 / (-2) == -2.5 をマイナス方向に丸めると-3でdivと同じになる(modはその時の余り)
+    -- 5 / (-2) == -2.5 をプラス  方向に丸めると-2でquotと同じになる(remはその時の余り)
+    -- しかし、5 / 2 == (-5) / (-2) == 2.5 で商がプラスになるとdivもquotもマイナス方向に丸める
+    -- 見方を変えると、divはマイナス無限方向に丸め、quotはゼロ方向に丸める(少数切り捨て)と見ることもできる
+
+data D_ a b = A_ a b | B1 (a,b) | C_ Int (D_ a b) deriving(Show)
 data Tree a = EmptyTree | Node a (Tree a) (Tree a) (Tree a) (Tree a)
 
 -- l :: (t1 -> t2) -> t2
@@ -205,7 +315,7 @@ dorutiTuple = (name doruti, atk doruti)
 
 -- 型クラス============================================================================================================================================================
 -- C#との比較: https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUHvDAAgCUiQiBhAewBtqwBvAXyOIHFyq6GW30iAIS416TVgHoJcAIbAZ3MUQC8pIsiKcNgvET36Dho8ZOnTUgBSUAxIGsGQPYMgF7dAMSqBo9UAyDIEJHQCIMgOwZA5gyAuwyAVwyARwyAPwyAqwyAxQyAXQyABwz+gBYRgH/OAJR4AJZQwACmYABmMgDGuUQAogCOAPoAPDIAfERSxFUA5EQKAO4AFvm5eIy6+gBG1HREuVMWCgAeMAoAnmkqTQCEubS5FvPLANxSsyrKqosqRFDUwEQAJERHyhKnw3pjE5vbcwtEy6tEG9NdmkDhIHk8fudLtc7g8ThCpIAAc0A8DqAGO1ABaKgCztQCV/nhmIQBKIGFwqnVCWAmlJsgBneRQUoVSodMlEXr9QYvNgAZiIb1ok2mzPmiiJv2UDQ5BlmADp2LlgAAVRYAB22KzhwGVuWoBQsJBWADJ9T8ZXLFSqLGrVBqVdrdWkAPxEYCQMogKRkE6qD1EeUuiX6aWyhWai3HJ2a23sA1GxYm4Pmy3hm06qOO50QV1STiezTnX0Z/16QOmkOJ61anWCaPGoNm1Vh8u2qtpl3kKTCHMdn1+3ASABUZhMgETCAyARYZAP0M4UAzwyAPYZAMMMgEGGQcj0x9iRFWhU3Ig6rHVS71QAMRkm4GuDx+FwxAAskNcAZUJgAGxsAAsRGvMmyFo5d5MADcZDAIhij0VQoFyLphTAC09kLIhAOA4DwMg0hYPgxCiAAc0hVD2HQ+9jEwkZcKgwQCJMeDHwATgsAAiXl+U+e5vmWOjgSozBaIsCwSVqMkGjSYo0ilKZtjAGAwDSYEpDFfMymaCRigABnOD04TIABaTTVnkzjuN4mp+J4ckhJEsSLAkrDpJBMVj1PRTikwNS91zbTVnsrd9J4wzSRMwThNE6YsJgEYbNkhpPLKKRigEVRszhYR3Lsk8vMIowaPoxiPhmFiljSdi4PSwxMp4viBLM0StksyTwqeSLUuipTuS9FRwS0nSUtPbyyqMirApyqy6rk1tHPfVrHniohkoaPTiofLifPK/zKpykKwpk+r5L0GKAFZzmzcEks62aewMC8LyAA===
-data Color = R | G | B
+data Color = R | G | B_
 
 -- class    Eq' a     where
 --              ↓  C#では、class Color : Eq'<Color> のようなinterface実装
@@ -218,7 +328,6 @@ class Eq' a where
     x === y = not $ x =/= y -- C#interfaceのデフォルト実装のような(Haskellでもデフォルト実装とよぶ)
     x =/= y = not $ x === y
 
--- fmapは、(1 a -> 1 b) -> (f a -> f b)と考えると自然変換でもある?(型と関数からなる圏の射の関手でもある) 
 -- fmapはC#でList<int>を引数にList<string>を返すような => interface Functor<f> {f<b> fmap<a,b>(Func<a,b> Arrow_ab, f<a> f_a);}
                                                                     -- //CS0307: 型パラメーター「f」は型引数と一緒に使用できません //文脈には関数を定義できない
 -- instance Functor Maybe where -- :k Maybe => Maybe :: * -> *, :k Functor => (* -> *) -> Constraint
@@ -227,7 +336,7 @@ class Eq' a where
 instance Eq' Color where
     R === R = True      -- "==="は上のclassの"==="をオーバーライドして実装している
     G === G = True
-    B === B = True
+    B_ === B_ = True
     _ === _ = False
 
 c0 :: Bool
@@ -235,12 +344,12 @@ c0 = R === R -- =>True
 c1 :: Bool
 c1 = R === G -- =>False
 c2 :: Bool
-c2 = G === B -- =>False
+c2 = G === B_ -- =>False
 
 c3 :: Bool
 c3 = R =/= R -- =>False
 c4 :: Bool
 c4 = R =/= G -- =>True
 c5 :: Bool
-c5 = G =/= B -- =>True
+c5 = G =/= B_ -- =>True
 -- ====================================================================================================================================================================
