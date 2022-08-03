@@ -182,11 +182,34 @@ return_ a = Just a
 Nothing >>#= _ = Nothing
 Just a >>#= f = f a
 
+-- return x = [x]
+-- xs >>= f = concat (map f xs)
+
 newtype State_ s a = State_ {runState_ :: s -> (a, s)}
 return__ :: a -> State_ s a
 (>>##=) :: State_ s a -> (a -> State_ s a) -> State_ s a
-return__ a = State_ $ \s -> (a, s)
-State_ s >>##= f = State_ $ \a -> let (v, ns) = s a in runState_ (f v) ns
+return__ x = State_ $ \s -> (x, s)
+State_ h >>##= f = State_ $ \s -> let (a, newState) = h s in runState_ (f a) newState
+
+fff x y = x + y
+ggg x y = x * y
+
+infixl 4 #<=#
+a #<=# b = a + b
+infixr 4 #=>#
+a #=># b = a * b
+
+-- infixl 4 infixfunc
+-- infixfunc a b = a + b
+
+foldMap' :: Monoid m => (a -> m) -> [a] -> m
+foldMap' f xs = mconcat $ map f xs
+
+maybeId :: Maybe a -> Maybe a
+maybeId a = a
+
+fd Nothing = Nothing
+fd (Just (a, b)) = Just a
 
 applicative_style :: Maybe Integer
 applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計算することができる(C#のNullable型)
