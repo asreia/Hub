@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant $" #-}
 module Haskelltest where
 import qualified Data.Map as M --Data.Map内の定義物をM.∫LAny∫で参照
 import Control.Monad -- ()はインポートしたい物がない?H本P91
@@ -102,8 +104,8 @@ f3 a = show a
 -- f3 1 = show 1
 -- f3 True = show True
 
--- f4 :: (Show a) => a -> String
--- f4 a = show a
+f4 :: (Show a) => a -> String
+f4 a = show a
 -- f4 1 = show 1
 -- f4 True = show True
 
@@ -213,6 +215,66 @@ fd (Just (a, b)) = Just a
 
 applicative_style :: Maybe Integer
 applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計算することができる(C#のNullable型)
+
+
+-- 青線の"Eta reduce"は役に立つ
+-- "func1"は、0引数を取り、値(Value)を返す関数
+func1 :: Type
+func1 = Value
+data Type = Value deriving(Show)
+-- func10 1 = show 1
+ret1 = func1 -- => Value
+-- "func2"は、1引数を取り、その引数を返す関数
+func2 :: a -> a -- func2 :: a -> b はエラー。"a = xの型"とされるため?(a -> bは証明できないので書けない)
+func2 x = x
+ret2 = Value
+-- "func3"は、1引数を取り値(Value)を返す
+func3 :: a -> Type
+func3 x = Value
+ret3 = func3 () -- => Value
+-- "f"が値を取り、値を返す関数
+func4 :: (a -> b) -> a -> b
+func4 f x = f x
+ret4 = func4 show 4 -- => "4"
+-- "f"が値を取り、関数を返す関数
+func5 :: (a -> (b -> c)) -> a -> (b -> c)
+func5 f x = f x
+ret5 = func5 (*) 5
+-- "f"が関数を取り、値を返す関数
+func6 :: ((a -> b) -> c) -> (a -> b) -> c
+func6 f g = f g
+-- func6 f = f でもok。"func6 f"は"(a -> b) -> c"型を返すから(ポイントフリースタイル)
+ret6 = func6 (\g -> show.g $ 2) (8/) -- => "4"
+-- "f"が関数を取り、関数を返す関数
+func7 :: ((a -> b) -> (c -> d)) -> (a -> b) -> (c -> d)
+func7 f g = f g
+ret7 = func7 (\g -> (++).show.g $ 2) (8/) $ "st" -- => "4"
+-- "func8"は再帰関数
+func8 :: (Eq a, Num a) => a -> a -- パターンマッチで"=="比較されるのでEq型クラス制約が必要?
+func8 0 = 0 -- "0"は
+func8 n = func8 (n - 1)
+ret8 = func8 8 -- => 0
+-- 
+func9 :: (Eq a, Num a) => a -> a
+func9 0 = 0 -- "0"は"Int"?型で具体的な型の値なのに多相変数をNumの型クラス制約で"a = "0"の型"ができてしまっている
+func9 n = n + func9 (n - 1)
+-- whereネスト
+where' = where'1
+    where
+        where'1 = where'2 -- where'1 = where'4 はエラー
+            where
+                where'2 = where'3
+                    where
+                        where'3 = ()
+                        where'4 = ()
+
+-- 引数再帰(万能?(自身の結果が出力の型と合わないとだめ))、外側再帰(fold出来るようなモノを外側にし、それと自身の結果を合わせて出力の型と合わないとだめ)、単位元、初期値、foldl、foldr 15
+-- 多相変数に何か演算しようと思うなら型制約をする
+sumList :: (Eq a, Num a) => a -> (a, [a])
+sumList n = sumList' (0, []) n
+    where
+        sumList' (e, xs) 0 = (e, xs)
+        sumList' (e, xs) n = sumList' (e + n, n:xs) (n - 1)
 
 listDo = do         -- 食わせる所までが一行。上から実行される。
     op <- [(+),(*)] -- [(+),(*)] >>= (\op ->
