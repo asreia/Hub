@@ -3,6 +3,8 @@
         "choco",
         "doruti",
         "fmap",
+        "foldl",
+        "foldr",
         "ghci",
         "Hask",
         "kaduki",
