@@ -1,5 +1,6 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-} -- ↓の"HLINT ignore"を追加すると、これも付いてくる
 {-# HLINT ignore "Redundant $" #-}
+{-# OPTIONS_GHC -Wno-missing-methods #-}
 module Haskelltest where
 import qualified Data.Map as M --Data.Map内の定義物をM.∫LAny∫で参照
 import Control.Monad -- ()はインポートしたい物がない?H本P91
@@ -96,7 +97,7 @@ g1 a
     | a == (1,2) = ()
     | (6, 2) == (4,2) = ()
     | True = ()
-g2 |False = ()
+-- g2 |False = ()
 g3 |True = ()
 
 f3 :: Show a => a -> String
@@ -106,8 +107,12 @@ f3 a = show a
 
 f4 :: (Show a) => a -> String
 f4 a = show a
--- f4 1 = show 1
+-- f4 "abc" = show "abc"
 -- f4 True = show True
+f5 :: a -> Int
+f5 a = 1
+-- f5 True = 2
+-- f5 "abc" = 3
 
 -- data Type1 = A
 data Type2 = Type2 deriving(Show)
@@ -222,16 +227,15 @@ applicative_style = pure (+) <*> Just 3 <*> Just 5 -- 文脈付きのまま計�
 func1 :: Type
 func1 = Value
 data Type = Value deriving(Show)
--- func10 1 = show 1
 ret1 = func1 -- => Value
--- "func2"は、1引数を取り、その引数を返す関数
-func2 :: a -> a -- func2 :: a -> b はエラー。"a = xの型"とされるため?(a -> bは証明できないので書けない)
-func2 x = x
-ret2 = Value
--- "func3"は、1引数を取り値(Value)を返す
-func3 :: a -> Type
-func3 x = Value
-ret3 = func3 () -- => Value
+-- "func2"は、1引数を取り値(Value)を返す
+func2 :: a -> Type
+func2 x = Value
+ret2 = func2 () -- => Value
+-- "func3"は、1引数を取り、その引数を返す関数
+func3 :: a -> a -- func3 :: a -> b はエラー。{a = "x"の型}とされるため?(a -> bは証明できないので書けない)
+func3 x = x
+ret3 = func3 Value -- => Value
 -- "f"が値を取り、値を返す関数
 func4 :: (a -> b) -> a -> b
 func4 f x = f x
@@ -239,25 +243,61 @@ ret4 = func4 show 4 -- => "4"
 -- "f"が値を取り、関数を返す関数
 func5 :: (a -> (b -> c)) -> a -> (b -> c)
 func5 f x = f x
-ret5 = func5 (*) 5
--- "f"が関数を取り、値を返す関数
+ret5 = func5 (*) 5 $ 4 -- => 20
+-- "f"が関数を取り、値を返す関数 -- コールバック関数
 func6 :: ((a -> b) -> c) -> (a -> b) -> c
-func6 f g = f g
--- func6 f = f でもok。"func6 f"は"(a -> b) -> c"型を返すから(ポイントフリースタイル)
-ret6 = func6 (\g -> show.g $ 2) (8/) -- => "4"
+func6 f g = f g -- func6 f = f でもok。"func6 f"は"(a -> b) -> c"型を返すから(ポイントフリースタイル)
+ret6 = func6 (\g -> show.g $ 2) (8/) -- => "4.0"
 -- "f"が関数を取り、関数を返す関数
 func7 :: ((a -> b) -> (c -> d)) -> (a -> b) -> (c -> d)
 func7 f g = f g
-ret7 = func7 (\g -> (++).show.g $ 2) (8/) $ "st" -- => "4"
+ret7 = func7 (\g -> (++).show.g $ 2) (8/) $ "th" -- => "4th"
 -- "func8"は再帰関数
 func8 :: (Eq a, Num a) => a -> a -- パターンマッチで"=="比較されるのでEq型クラス制約が必要?
 func8 0 = 0 -- "0"は
 func8 n = func8 (n - 1)
 ret8 = func8 8 -- => 0
--- 
+-- "func9"は再帰しその結果を("+"で)畳み込む関数
 func9 :: (Eq a, Num a) => a -> a
-func9 0 = 0 -- "0"は"Int"?型で具体的な型の値なのに多相変数をNumの型クラス制約で"a = "0"の型"ができてしまっている
+func9 0 = 0 -- "0"は"Int"?型で具体的な型の値なのに多相変数をNumの型クラスで制約した"a"が{a = "0"の型}ができてしまっている
 func9 n = n + func9 (n - 1)
+ret9 = func9 9 -- => 45
+-- "func10"は、再帰しその引数の中で畳み込む関数
+func10 :: (Eq a, Num a) => a -> a
+func10 0 = 0
+func10 n = func10' 0 n -- 畳み込むための引数が必要
+    where
+        -- func10' :: (Eq b, Num b, Num a) => a -> b -> a -- 期待された型 'a1'(aかな?) と実際の型 'b' が一致しませんでした。
+                                                        -- 恐らく、{Eq b かつ Num b}な型と{Num a}な型が"+"演算子において型が唯一に定まらない可能性があるからだと思う
+        func10' :: (Eq a, Num a) => a -> a -> a
+        func10' e 0 = e
+        func10' e n = func10' (e + n) (n - 1)
+ret10 = func10 10 -- => 55
+-- "func11"は、多重再帰関数(ノードとリーフに付いてる1を畳み込む)
+func11 :: (Eq a, Num a) => a -> a
+func11 0 = 1 -- リーフ
+func11 n = func11(n - 1) + 1 + func11(n - 1) -- ノード
+ret11 = func11 11 -- => 4095 (sum . map (2^) $ [0..11]) 
+
+-- "test1 n m = n + m"の型
+-- test1 :: Int -> Number -> Number -- 期待された型 'Number' と実際の型 'Int' が一致しませんでした。
+    -- ↓確かに"1 + One"は定義されていない
+data Number = One | Two deriving(Eq, Show)
+instance Num Number where
+    -- 恐らく、(+) :: (Num a) => Number -> a -> a のような型にはなっていない
+    One + One = Two
+    One + Two = One
+    Two + One = One
+    Two + Two = Two
+numberTest :: Number; numberTest = One + One -- => Two
+-- test1 :: Int -> Integer -> Integer -- 期待された型 'Integer' と実際の型 'Int' が一致しませんでした。-- ↑と同じ理由
+-- test1 :: (Num a, Integral b) => a -> b -> b -- 期待された型 'a' と実際の型 'b' をマッチングできませんでした。
+    -- {n + m} => {a + b} => {Num + Integral} => {型クラス1 + 型クラス1を継承した型クラス2}を、しようとしたが、"+"演算子はある特定の一つの型に対する定義なので、
+    -- この場合、"型クラス1"は"型クラス2"の部分集合の型しか選択肢が無く"型クラス1"を"型クラス2"の差集合を取った場合、確実に"+"演算子に対して型が唯一に定まらずエラーとなる
+test1 :: Num a => a -> a -> a
+test1 n m = n + m
+test2 :: Number -> Number -> Number
+test2 n m = n + m
 -- whereネスト
 where' = where'1
     where
@@ -267,6 +307,20 @@ where' = where'1
                     where
                         where'3 = ()
                         where'4 = ()
+
+-- 多分木を定義してみた
+data Tabunki a =  Node' a [Tabunki a]
+
+tabunki :: Tabunki Int
+tabunki = Node' 1 [Node' 2 [], Node' 3 [], Node' 4 [Node' 5 [Node' 6 [], Node' 7 []], Node' 8 [Node' 9 [], Node' 10 []]]]
+
+tabunkiSagasu :: Int -> Tabunki Int -> Bool
+tabunkiSagasu n (Node' a []) = a == n     -- 畳み込み(||) . マップ(tabunkiSagasu n)
+tabunkiSagasu n (Node' a xs) = a == n || foldr ((||) . tabunkiSagasu n) False xs 
+-- foldr万能すぎ(これだけでマップと畳み込みができる) {最初に考えたやつ->(foldr (||) False . map (tabunkiSagasu n)) xs}
+
+hatiWoSagasu :: Bool
+hatiWoSagasu = tabunkiSagasu 8 tabunki -- => True
 
 -- 引数再帰(万能?(自身の結果が出力の型と合わないとだめ))、外側再帰(fold出来るようなモノを外側にし、それと自身の結果を合わせて出力の型と合わないとだめ)、単位元、初期値、foldl、foldr 15
 -- 多相変数に何か演算しようと思うなら型制約をする
@@ -388,9 +442,9 @@ list' :: List Integer
 list' = (1 :- 2 :- 3 :- Empty) +-+ (4 :- 5 :- 6 :- 7 :- Empty) -- =>1 :- (2 :- (3 :- (4 :- (5 :- (6 :- (7 :- Empty))))))
 
 -- レコード構文
-data Animal = Ningen {namae :: String, takasa :: Float} | Cat {name :: String, atk :: Int} deriving(Show)
+data Animal = Yousei {namae :: String, takasa :: Float} | Cat {name :: String, atk :: Int} deriving(Show)
 coco :: Animal
-coco = Ningen {namae = "kaduki_coco", takasa = 150}
+coco = Yousei {namae = "kaduki_coco", takasa = 150}
 doruti :: Animal
 doruti = Cat{name = "ogiya_nyanco", atk = 9999}
 cocoTuple :: (String, Float)
