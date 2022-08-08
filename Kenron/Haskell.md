@@ -405,12 +405,32 @@ c5 = G =/= B_ -- =>True
 
 ## 純粋関数型と非関数型(C#)
 
+### 状態(State)
 
-- delegate(Func<>)による高階関数、Stateモナドによる状態管理
+- **状態を引数として渡す**ことで、関数は状態を持たず、**参照透過な関数**となる
+  - 状態を持つ順序回路から、状態自体を渡すことで**組合せ回路**になったイメージ
+    - (全加算器のキャリービットの受け渡しに似ている)
+  - 純粋な関数は自分が行った操作を隠さない
+  - **❰状態❱**は、誰が持っている(**have**)のか、誰から参照(**read**)されているのか、誰が更新(**write**)しているのか
+    - ❰状態❱は、**アクセス指定子で影響範囲を制限**すると、他の関数を汚さなくて済む
+- しかし、関数の入れ子を再帰的にこの方式にすると、全ての最初の**状態はMain関数から渡す**ことになる
+- Haskellはこの方式である(mainの外から状態を必要とする全ての関数に状態を引数として再帰的に渡していく)
+  - なので、状態の保持とその更新に関するバグは無い(が、状態の受け渡しは面倒かも知れない?)
+[State](https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUH1AZgAINiBZPAbz2LuIHoHASBUAsGQNqdBpQ0CSGQVH1AHU0DWDIDXlQFEMgQAZACr6Ac81aAG00DqDIBEGLt0Ar8YE0GWvSKlMANmIAKAJZRgMYmeABKYgGVgAQ2ABTIwDUnAGwiuAKhAADt6uADzWltYAfMS22nQ0uPQpxtbETlHmxADOdgC8cQDcCak5xIVOxIi5RUxcgHYMgC9mcqUpqJgAnEYAJABEMkZONiDEVE4AvpaKKpxGeaNUORN9NiXJqXSoAOzGmblrpROlpRjopUmbdADGAPZQOcBW2Y8urhXEAAzrVw7ObkY2ldHG9ARtfpsjOgYECIX9QbC4fQjJhLK83DZEb8bAA6ACSbgAtuhMeCIaTsUVGAwjHYGoBZhkAnQyACYZAGxKgAU07iAUNjABIMgD8GBSAfQZAEAMiKYAH0PkZpdLMDZ5fKqUwAKyAaAVADIM7MAMq4AfkAzQyAQ4ZAM8MzIagFo5Bq0vmAcwZANGRgDMGJSAaIYjsQ8BMgA=)
+
+- Func<>とラムダ式による高階関数は実は書きやすいかも
+[C#でHaskell](https://sharplab.io/#v2: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)
+
+### 代数的データ型
+
+- **文脈による抽象化とそのマッチ演算(自然変換とか)**、**代数的データ型**、**式と関数**、**副作用とStateモナド**
+- delegate(Func<>)による高階関数、**Stateモナド**による状態管理
 - 抽象化のオーバーヘッドを喰らう可能性
 - 関手と自然変換
   - 対象: 型(Func<T>は指数対象)
   - 射: 関数(純粋な)(純粋関数と呼ぶ?)(参照不可能な出力は許す?WriteLine()とか)
+    - g . f . g でfが状態を更新しgが影響を受けると、最初のgと最後のgは同じ関数では無くなる
+    - そのため、`g<state_val:128 . f>state_val:128 . g<state_val:0`とする必要がある?
   - 関手
     - 対象(型): 型構築子はジェネリック([]関手 <=> List<T>関手)、
     - 射(関数): 非関数型のfmap、型(クラス)毎にFunctor<B>を定義するしかない?`interface Functor<f> {f<b> fmap<a,b>(Func<a,b> Arrow_ab, f<a> f_a);} //CS0307: 型パラメーター「f」は型引数と一緒に使用できません //文脈には関数を定義できない`
@@ -419,10 +439,25 @@ c5 = G =/= B_ -- =>True
     - リファクタリングとは、プログラムの**挙動からコードへの対応を関手**として、その挙動を変えずにコードを良くする行為は、**悪いコード**から**良いコード**への**自然変換**である
   - 直積、直和
     - 直積: フィールドメンバ変数、引数はデフォルトで直積(アンカリー)
-    - 直和: Union型?、ポリモーフィズム、型の値を直和と見る
-      - ifなどの分岐は、直和の場合分け
+    - 直和: Union型?(EnumとStructLayout_Explicit(演算の時Enumでパターンマッチし場合分けの処理をする(参照すべき変数を間違える可能性)))、floatはUnion型とも見える
+    ポリモーフィズム、型(Intとか)の値を直和と見る。↑**C#で代数的データ型(data)**を表現してみる試み
+      - ifなどの分岐は、直和の場合分け。
+      (*)とか(+)とかの演算子は、最終的にALUによる場合分け(ALUへの制御信号({\*,/,+,-}なら2^2=4本)と入力データ(8bitCpuなら2項演算なので2\*8=16本)によるパターンマッチ)
 - 関数型とオブジェクト指向の違い
-  - OOPはクラスがモジュール、関数型は関数の階層
+  - **`=`の意味の違い**。何であるか?何をするか?
+  - **if文は演算子**(パターンマッチによる場合分けの処理が増えると複雑になる(依存の関数,クラスを利用または定義して場合分けを隠蔽する))
+  - OOPは**クラスがモジュール**、関数型は関数の階層
+  - データ競合
+  - 参照不可能な出力は許す,readOnlyな変数も許す(この2つは許しても参照透過を維持する)、**状態が変わりうる変数への参照**,R/W可能な変数への参照は許さない(この2つは参照透過を維持しない)
+    - 副作用はconst, readonly, privateで制限 (せめて書き込み可能な場所はprivateなどアクセス指定子で制限するとか)
+    - **副作用をどう捉えるか**、randomという変数は乱数という値が、timeという変数には現在時刻という値が、
+  - haskellはIOモナドと実際にそれを評価する場所が遠くなる可能性
+  - あらゆる**抽象化をクラスの中に隠蔽**する(フレームを跨ぐ処理とか)
+  - foldMap, foldr
+  - 関数の構造の違い、再帰関数、**C#でhaskellの関数**を表現してみる試み、C#で**haskell互換なcode**をかけるか?
+  - haskellは、全public全static、関数は状態の更新を恐れる必要がない、オブジェクトのインスタンス化というのが無い
+
+- 関手の条件は、関手先でも関手元と同じ、単位律、推移律、を保っているか?
 
 ## 圏論とHaskell
 
@@ -445,14 +480,19 @@ c5 = G =/= B_ -- =>True
     - 関手
       - **対象: 型コンストラクタ**
       - 射: Functorの`fmap`
-        - `Functor ((->) r)`はドメインを`r`に固定したHom関手[Hom関手と関数型(->)](https://scrapbox.io/mrsekut-p/Hom%E9%96%A2%E6%89%8B%E3%81%A8%E9%96%A2%E6%95%B0%E5%9E%8B(-%3E))
+        - `Functor ((->) r)`はドメインを`r`に固定した共変Hom関手[Hom関手と関数型(->)](https://scrapbox.io/mrsekut-p/Hom%E9%96%A2%E6%89%8B%E3%81%A8%E9%96%A2%E6%95%B0%E5%9E%8B(-%3E))
     - 自然変換: 型が`m a`となっている時、関数が文脈(`m`)だけに依存する関数 (対象を関手先の対象から関手先の対象への射に対応付ける。その射を全て集めたものが自然変換)[自然変換](https://youtu.be/IpvhsTpsULk?t=192)
       - 型コンストラクタから型コンストラクタへ変換する関数かな?(つまり、文脈だけを変換する関数)(`length: [a] -> Int`の様に`[]->Int`(文脈->具体型)に変換するのもある)
-      - `nat :: (Functor f, Functor g) => f a -> g a`
+      - `nat :: (Functor f, Functor g) => f a -> g a` 対象に対して射(自然変換の成分)を一対一に対応させるが、文脈から文脈への自然変換(関数)は複数ありえる?
       - [Hask圏における自然変換](https://scrapbox.io/mrsekut-p/Hask%E5%9C%8F%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E8%87%AA%E7%84%B6%E5%A4%89%E6%8F%9B)
         - ↑`eta2 n = [n*10]`は自然変換ではないと思う。`*`の演算が`n`がNum型クラスに属している型である事を要求している。[自然性とは](https://youtu.be/E8vr8j5uyII?list=PLzJWjr7AvxH37O6GPqx20NpF0HaSrndVc&t=2391)
+      - 成分 と コンポーネントは同じ意味、`αx`となった時に`x`は自然変換`α`の`x`成分という
+      - 関手と自然変換からなる圏を**関手圏**と呼び、**関手圏はCat(圏の圏)の指数対象**である(D^Cとか(X → D^C: Xの対象をD^Cの関手、Xの射をD^Cの自然変換に対応させる関手))[X → D^C](https://youtu.be/D__Ik4qPXWY?list=PLzJWjr7AvxH37O6GPqx20NpF0HaSrndVc&t=1286)
       - 自然変換の図 [自然変換と合成](https://youtu.be/IpvhsTpsULk?t=109), [自然変換](https://scrapbox.io/mrsekut-p/%E8%87%AA%E7%84%B6%E5%A4%89%E6%8F%9B)
       ![自然変換](自然変換.png)
+      - **水平合成**とは、ある圏を準同型と準同型の間の準同型した自然変換と、その準同型を準同型と準同型の間の準同型した自然変換を合成したもの?
+        - (自然変換と、その自然変換の自然変換を合成したもの?(多重自然変換?!(2つの文脈を同時に変換してしまう)))(垂直合成は連続自然変換?)
+        - ![自然変換の水平合成](自然変換の水平合成.png)
     - 終対象: ユニット型`()`と同型な型全て
     - 始対象: 値が一つも無い型?!
     - 直積への射を作る関数: `(&&&)`
@@ -471,6 +511,7 @@ c5 = G =/= B_ -- =>True
       - `c->(a,b)`: `(ab)^c` = `(a^c)×(b^c)` :`(c->a, c->b)`
       - `(b|c)->a`: `a^(b+c)` = `(a^b)×(a^c)` :`(b->a,c->a)`
       - `(b,a)->c`: `c^ba` = `(c^b)^a` :`a->b->c` (カリー化)
+      - `(B+C)×A` = `B×A+C×A`
   - Curry-Haward-Lambek対応
     良く分からんけど、**型と関数**からなる圏と**論理**の圏が**対応**(関手がある?)するという話
     - 射`a->b`: a ⇒ b (ならば)
