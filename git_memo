@@ -85,6 +85,12 @@ gitの構造
 gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち方が分かる}
     コマンド集:https://www.wakuwakubank.com/posts/262-git-command/
     .gitignoreファイルをgit管理下のフォルダ(.gitがあるフォルダ)に入れて中に正規表現?でファイル、ディレクトリ名を改行で列挙するとそれらのものはgit管理外になる?(.gitignore自体はgit管理下になれる)
+        #https://qiita.com/inabe49/items/16ee3d9d1ce68daa9fff
+        #https://oki2a24.com/2016/07/19/apply-gitignore-to-tracking-files/
+        #Modifiedになったら追跡されていて、除外が効かなくなる(gitタブに表示される)(もしくは警告が出る)
+        #恐らくUntrackedのみ除外対象。追跡されていたらWindowsエクスプローラーで別フォルダにコピペして退避してDeletedをプッシュし追跡から外す
+        /**/bin
+        /**/obj
 
     git config: -l 設定情報の表示
     git init: このコマンドを実行したディレクトリがgitによって管理される
