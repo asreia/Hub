@@ -1,0 +1,15 @@
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\bin\Debug\net6.0\Switch_Express.exe
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\bin\Debug\net6.0\Switch_Express.deps.json
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\bin\Debug\net6.0\Switch_Express.runtimeconfig.json
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\bin\Debug\net6.0\Switch_Express.dll
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\bin\Debug\net6.0\Switch_Express.pdb
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.csproj.AssemblyReference.cache
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.GeneratedMSBuildEditorConfig.editorconfig
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.AssemblyInfoInputs.cache
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.AssemblyInfo.cs
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.csproj.CoreCompileInputs.cache
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.dll
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\refint\Switch_Express.dll
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.pdb
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\Switch_Express.genruntimeconfig.cache
+C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\obj\Debug\net6.0\ref\Switch_Express.dll
