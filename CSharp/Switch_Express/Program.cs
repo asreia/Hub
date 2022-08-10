@@ -34,7 +34,7 @@ public class M
     {
         int n = new C{2,4,6} switch{
             {d: 4} => 2,
-            (2,4,6) and {d: >=5} => 4,
+            (2,4,6) and {d: >=4} => 4,
                 _ => 10
         };
         string n1 = new C{2,4,5}.arr switch{
