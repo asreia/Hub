@@ -37,7 +37,7 @@ public class M
             (2,4,6) and {d: >=4} => 4,
                 _ => 10
         };
-        string n1 = new C{2,4,5}.arr switch{
+        string n1 = new C{2,4,6}.arr switch{
             // [1,2,3,4] = "[1,2,3,4]" //'リスト パターン' は現在、プレビュー段階であり、*サポートされていません*。
             _ => "abc"
         };

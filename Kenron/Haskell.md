@@ -226,6 +226,7 @@ f x y = x + y          -- 関数の定義
     -- f5 True = show True  -- "Show a"を特定の型にすることはできない
     -- f5 "abc" = show "abc"
     ```
+a
 
 #### [ガード](http://walk.northcol.org/haskell/expressions/#_%E3%82%AC%E3%83%BC%E3%83%89case_%E5%BC%8F)
 
