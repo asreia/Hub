@@ -7,6 +7,7 @@
         "foldr",
         "ghci",
         "Hask",
+        "haskelltest",
         "Haward",
         "kaduki",
         "Lambek",

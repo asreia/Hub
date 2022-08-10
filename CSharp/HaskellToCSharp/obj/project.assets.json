@@ -13,11 +13,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\python学習メモ\\vscode-works_study\\git_test\\CSharp\\HaskellToCSharp\\HaskellToCSharp.csproj",
       "projectName": "HaskellToCSharp",
       "projectPath": "C:\\python学習メモ\\vscode-works_study\\git_test\\CSharp\\HaskellToCSharp\\HaskellToCSharp.csproj",
       "packagesPath": "C:\\Users\\asreia\\.nuget\\packages\\",
       "outputPath": "C:\\python学習メモ\\vscode-works_study\\git_test\\CSharp\\HaskellToCSharp\\obj\\",
+=======
+      "projectUniqueName": "C:\\python学習メモ\\vscode-works_study\\git_test\\HaskellToCSharp\\HaskellToCSharp.csproj",
+      "projectName": "HaskellToCSharp",
+      "projectPath": "C:\\python学習メモ\\vscode-works_study\\git_test\\HaskellToCSharp\\HaskellToCSharp.csproj",
+      "packagesPath": "C:\\Users\\asreia\\.nuget\\packages\\",
+      "outputPath": "C:\\python学習メモ\\vscode-works_study\\git_test\\HaskellToCSharp\\obj\\",
+>>>>>>> fbd13c7 (Switch式習得中↓の大量のコミットうざい)
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\asreia\\AppData\\Roaming\\NuGet\\NuGet.Config",

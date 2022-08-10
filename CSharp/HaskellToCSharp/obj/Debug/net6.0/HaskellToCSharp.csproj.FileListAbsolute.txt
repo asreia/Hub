@@ -13,6 +13,7 @@ C:\python学習メモ\vscode-works_study\git_test\HaskellToCSharp\obj\Debug\net6
 C:\python学習メモ\vscode-works_study\git_test\HaskellToCSharp\obj\Debug\net6.0\HaskellToCSharp.pdb
 C:\python学習メモ\vscode-works_study\git_test\HaskellToCSharp\obj\Debug\net6.0\HaskellToCSharp.genruntimeconfig.cache
 C:\python学習メモ\vscode-works_study\git_test\HaskellToCSharp\obj\Debug\net6.0\ref\HaskellToCSharp.dll
+<<<<<<< HEAD
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\bin\Debug\net6.0\HaskellToCSharp.exe
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\bin\Debug\net6.0\HaskellToCSharp.deps.json
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\bin\Debug\net6.0\HaskellToCSharp.runtimeconfig.json
@@ -28,3 +29,5 @@ C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\obj\Deb
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\obj\Debug\net6.0\HaskellToCSharp.pdb
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\obj\Debug\net6.0\HaskellToCSharp.genruntimeconfig.cache
 C:\python学習メモ\vscode-works_study\git_test\CSharp\HaskellToCSharp\obj\Debug\net6.0\ref\HaskellToCSharp.dll
+=======
+>>>>>>> fbd13c7 (Switch式習得中↓の大量のコミットうざい)

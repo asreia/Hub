@@ -7,4 +7,8 @@ build_property.InvariantGlobalization =
 build_property.PlatformNeutralAssembly = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Switch_Express
+<<<<<<< HEAD
 build_property.ProjectDir = c:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\
+=======
+build_property.ProjectDir = C:\python学習メモ\vscode-works_study\git_test\CSharp\Switch_Express\
+>>>>>>> fbd13c7 (Switch式習得中↓の大量のコミットうざい)
