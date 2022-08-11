@@ -1,3 +1,5 @@
 #https://qiita.com/inabe49/items/16ee3d9d1ce68daa9fff
+#https://oki2a24.com/2016/07/19/apply-gitignore-to-tracking-files/
+#Modifiedになったら追跡されていて、除外が効かなくなる(gitタブに表示される)(もしくは警告が出る)
 /**/bin
 /**/obj
