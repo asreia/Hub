@@ -113,6 +113,8 @@ f5 :: a -> Int
 f5 a = 1
 -- f5 True = 2
 -- f5 "abc" = 3
+f6 :: Int -> Int -> Bool
+f6 a b |a > b && b > 2 || not (a < 2) = True
 
 -- data Type1 = A
 data Type2 = Type2 deriving(Show)
