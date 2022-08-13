@@ -249,11 +249,11 @@
                     `＄Method修飾子＝❰＠∫アクセス∫ ∫仮/イ/静∫⊃＠⟪｡abstract¦virtual¦override¦∫イ/静∫⊃＠❰static❱｡⟫ ＠❰new❱ ＠❰readonly❱ ＠❰partial❱❱`
                 - 仮引数 と 戻り値  
                     - 仮引数  
-                            `＄通常仮引数＝❰∫Type∫ ｢arg｣❱`  
+                            `＄普通仮引数＝❰∫Type∫ ｢arg｣❱`  
                             `＄オプション仮引数＝❰∫Type∫ ｢arg｣ = ∫Lit∫❱`  
                             `＄参照渡し＝❰⟪ref¦in¦out⟫ ∫Type∫ ｢arg｣❱`  
                             `＄可変長仮引数＝❰params ∫Type∫⊃∫Array[][]∫ ｢arg｣❱`  
-                                `＄仮引数＝⟦, ┃～⟧⟪∫通常仮引数∫¦∫オプション仮引数∫¦参照渡し¦∫可変長仮引数∫⟫`  
+                                `＄仮引数＝⟦, ┃～⟧⟪∫普通仮引数∫¦∫オプション仮引数∫¦参照渡し¦∫可変長仮引数∫⟫`  
                     - 戻り値  
                         `＄戻り値＝⟪∫Type∫¦void⟫`  
                 - メンバメソッド実装  
@@ -334,8 +334,6 @@
             `＄宣言＝❰∫Type∫ ｢vari｣❱`  
         - キャスト (IL:castclass ∫Type∫)  
             `＄キャスト＝❰(∫Type∫)⟪｢vari｣¦∫Lit∫⟫❱`  
-        - is  (IL:isinst ∫Reference_type∫=>obj != null(正確にはcgt.un(`>`)している))
-            `＄is＝❰∫Instance∫ is ∫Reference_type∫❱`  
         - as  (IL:isinst ∫Reference_type∫)
             `＄as＝❰∫Instance∫ as ∫Reference_type∫❱`  
         - default()  
@@ -417,12 +415,36 @@
                     `『『1』∫変数定義∫は含めいない`  
             - ?:  
                 `＄3項演算子＝❰∫式∫⊃❰｡⟪＃∫LitBool∫を返す∫式∫＃⟫?∫式∫:∫式∫｡❱❱`  
-            - switch//また後で==================case int n when n < 100: return 2;=========================================== 
+            - switch文//また後で==================case int n when n < 100: return 2;=========================================== 
                 `＄switch文＝❰switch(∫式∫){`  
                     `⟦⟪ ¦∫LRetInd∫⟫┃～⟧❰｡｡case ∫式∫:`  
                         `⟦⟪ ¦∫LRetInd∫⟫┃～⟧∫文∫`  
                         `⟪break;¦∫return文∫¦∫goto文∫⟫`  
-                `｡｡❱}❱`  
+                    `｡｡❱`
+                `}❱`
+            - switch式とisとそのPattern [Switch_isのマッチ](CSharpMemo_images\Switch_isのマッチ.png) [パターン マッチング](https://ufcpp.net/study/csharp/datatype/patterns/?p=1)
+                - switch式
+                    `＄switch式＝❰⟪｢変数｣¦∫Lit∫⟫ switch{｡⟦,┃～⟧❰∫Pattern∫ => ∫式∫❱｡}❱`
+                - is  //isは参照型でなくてもいける
+                    `＄is式＝❰⟪｢変数｣¦∫Lit∫⟫ is ∫Pattern∫ ｢変数定義｣❱ //is式はboolを返す。`
+                    `｢変数定義｣にはis式がtrueの時⟪｢変数｣¦∫Lit∫⟫が入り、falseの時nullが入る?(nullが入る時の部分のスコープがないようになってる?)。`
+                    `が、スコープがis式が属している式とif文のthenブロックしかない`
+                - Pattern
+                    `＄Pattern＝⟪∫Constant_P∫¦∫Property_P∫¦∫Positional_P∫¦∫Type_P∫¦∫Var_P∫¦∫Discard_P∫¦∫Relational_P∫¦∫Pattern_C_and_or∫¦∫Pattern_C_not∫¦∫Pattern_C_()∫⟫`
+                    `＄Constant_P＝❰∫Lit∫❱`
+                    `＄Property_P＝％❰∫Type∫❱❰｡{｡⟦,┃～⟧❰｢メンバ｣: ∫Pattern∫❱｡}｡❱`
+                    `＄Positional_P＝％❰∫Type∫❱❰｡(｡⟦,┃～⟧❰∫Pattern∫❱｡)｡❱`
+                    `＄Type_P＝❰∫Type∫ ＠❰｢変数定義｣❱❱      //Haskellでは型でパターンマッチするのは許されない。でも、これが直和型の代わりにはなりうる(レコード型が直和型にならないかな)`
+                    `＄Var_P＝❰var ｢変数定義｣❱ //nullでも受けるので"v"はnullになりうる //多相変数的な`
+                    `＄Discard_P＝⟪var _¦_⟫ //"var _"はis,caseのみ`
+                    `＄Relational_P＝❰⟪<¦<=¦>¦>=⟫ ∫Pattern∫❱                     //ガード的な`
+                    `＄Pattern_C_and_or＝❰∫Pattern∫ ⟪and¦or⟫ ∫Pattern∫❱`
+                    `＄Pattern_C_not＝❰not ∫Pattern∫❱`
+                    `＄Pattern_C_()＝❰｡(｡⟦ ┃2～⟧❰∫Pattern∫❱｡)｡❱     //単に主にand,orの結合性を解決` 
+                    `//List_Pは配列かインデクサをもつ様な型にマッチする。"..∫Pattern∫"はList_Pにマッチ。".."はその間を捨てる。`
+                    `//`..`は2つ以上書くとエラー(多分どう範囲を区切ればいいか分からない)。"..var arr"はその区間のコピーになってしまうので"Span<T>"だと効率がいい`
+                    `＄List_P＝❰｡[｡⟦,┃～⟧⟪∫Pattern∫¦..¦..∫Pattern∫⟫｡]｡❱ //List_PはC#11の機能で現在プレビュー`
+
             - while  
                 `＄while文＝❰while(⟪＃∫LitBool∫を返す∫式∫＃⟫)⟪『1』∫文∫¦{⟪1～⟫∫文∫}⟫❱`  
                     `『『1』∫変数定義∫は含めいない`  
@@ -464,7 +486,7 @@
       - 動的な型、静的な型、アクセス元、アクセス先  
           [ILとメソッドの種類](https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQA7AhgLYCmAzgA74DGxABALLHAAWA9jANJi4wDeOtQbWQBmWvgBGpYACdqwYaloBlAK7liM2v2xC9wscnQA2YQBYVACgCUvAL76A9I8Ca6YBC3QIcMgXoZAwwyBJhn1A/RBhEwEg0XNaAEkbeyCnR0AShkBnhkBOhkB+hnTvfwTaEO5pfFwacMDIyWk5KgVkCwBBGwBuPWdAXqNAQxjLQDu5QGeDaxyAvJDcYgB3UghWBUrZeVoANzAZYFV8CFpC4GLS3QixJZW1jbraADU4hyFnPsG8oJHxyenF5dX1zdwikuIy2js/s5RhMpsBAPYMgCxNQBgSoBABkAICqAfFdAAhGgHvlQC/AYArBkA9QyAS4Y0oBrBkAAHKAEwZAFoMxMAQgyAaIYztsJBBiPjAA2mgHUGQAiDLdfH5AB4MgDsGQC7DKkMoBf+MABUqATQYqYBouUABgyACwZALgGgDEGAB0Kr+kTQKlUEhAag0Mh0CUcACpaZIGSbaAB9WkABVkTRNjnutBuvUGfMFKQyvNxaV5gAiGJUYwBBDLzLO58YAs7UAfgyAYwZAGYMbKp1j+ekirAWmhkYBgdFOjVsVzdjkAVQyAH4ZAAsMFZxST8PX6dxCh3eGy2O1+e0EAO7pcAIP+DXmAOi9AHoZAF5AFfkgAJ/wAO5MDnsBAI7ktDns2qy9Xs9bxxXHZ+S8Ahv8AMsPRmMgGvyQGOfvuQbj2eAaiIh2PH4Bgoln56XS+v/cANoqAACKvKpJk2Rcg+z5ciOo7vrOh5zguoIrmuUhzDUyHbm8u6fN8NBHj+fbOP2IFZGk95PoBwHpKRgywfueEEa0N6UZy/gQZRJFgf4sEIU8SFbuu8grjuHz0cQ36/p05GPixHpcrBiEvIJNSHq8RyiV82wHox1w3qxfjsUB+kKXx0yqSJ7aaZ2EmETegBQcoAH2bSbJtEfoeFk4VpDFCIAcAxZjmeZdkxkH+NBsGAHPE156I+d7ycekW2dFHHUVxfgRVFQSPpxZFxQlTEJDJRlydxH55bprq0I+Um5Rl9yPsZ8W1Xkj6ObRjWJUEOmCM4ehdaWBF2EAA=)
           [仮想メソッド](https://drive.google.com/file/d/1OIWXOpBnGQMefxL4qLLCwGlYo_isn-Xz/view?usp=sharing)
-          ![仮想関数の呼び出し](仮想関数の呼び出し.jpg)
+          ![仮想関数の呼び出し](CSharpMemo_images\仮想関数の呼び出し.jpg)
           [仮想関数テーブル(Vtable)](https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgBgAIBhIgXiNUwDoSB7KAZ3oBsBTAbjzw1IIDeeIiKoBmIgDcAlmGAQAhqyoAWIgDUAYgQAUASgEkaAdTDTg7ADLSo7HQCISBECC0F7ezgF9ho1BJk5RWVUNS1MfUMTMwtrWwcnF3CPbzwfXF50UkwiEH4hXFFxInpJdjAzOHZVDW1Io1NzKxs7R0wk7RT0ov8iWwB3KVl5JRrw+uimuNaSdtdNTC60zNIsvNmCnokBoaDR0NrdAwaY5vjHdA73T26/bfZBwJGQsIWJxtiWhMv5xZvl/BZEgSdboTZ3EplCrSKpjOrHSafc7Aq5LQoQ0rlSrVA7jBEfM4zMQdP6pXDpFYAWXBIgwYN8RREwKIAGMJJQdsD9Nx0YyiAzGWyaG5uXyiAB6cXkAB8KPmBElJHQOiewT0gGsGQC1DIBjhkAnQyACYZFT83LlSMS8m4BUUdDonHo2XphfDOBKpbK5iaxV6+YrnPLTbMXIcraIbbN7WJHSLPK6ZYH5b6VcM1Vq9YbxYl/es5sHeYyw+gI1HnbHZebPd7K66lVcA+bc16w5GHU6ji7JXHy9ojUm9qwNTqDUba+t65a80UQ0zEYTuVP+RPREK8S6fW65eEe6qlAO08PfnWSfOwwQi06IjGO7K/eEq1XfSSAzeFsfbZgzyvS/Hb3fvYqPQsAYATgi4iAWH5vJe65djkv5evut6jkeoFEE2EEXu20EkluyY7qmQ4ZsagFIb887zpKgDpZoAm3mACFu6oDEwrD0MA+H6oAqgyADEMgCADOowAKAARhw6qABEMgBRDIAPiqAA4MHGANEMgCHDIAvQyAMMMgCTDIAMgyAF42gB+DDJgBADOR4qAKtKNGAFYMgDR6oAp3KAFBygDmDAxTHAIAdgyAA6mgAGDIAigxcYAugyOYpqnqoAJgyACIMgBmDI5vECUJgDeboATMmcTJuqALcMSn6mpgDpGoAEgx6QZ9nMWpgC7DIAVwyAEcMgA/DIAqwyAMUMgBdDIABwyOYAXMqAOBKonqiZgDGDCFQXZShBkRYJ7A5Q8ZpEAAtNKRA0oykpwW4IAANoGXBRSGM+xDZlcXgwEty0iIYRHrWam07XeAC6MAiCdVbhAtV1watj7rM+mBbXdv6GMBQEkq9KEzbtk01geJHhLca5wadb1FKDRDpF4QA==)
           [C++Vtable解説](https://www.youtube.com/watch?v=2MtC4tBLlow&list=LL&index=1)
       - CS0122とCS1540
@@ -477,7 +499,7 @@
   - インターフェース  
       - インターフェースはフィールドがない抽象クラス  
           [interface](https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQOwDtgBTAJwDMBDAYyIAIBJQ0gBgG8B6dg486owewZAqwyBihkA/DIGuGQJMMgGQZAgMaAzBkBWDIBEGQKdygNE1+FAEYBnYCWrBAFgyAYFUAaDDlrXanbrXwBuToEOGQM8MgBYZAkJqAHU36A7uUBng0BrBkVASIYVQDsGQHMGQBKGN0BOhkB+hgTfQCSGQGLtQAAowE0GQGiGY0AKhkBLhlErG2R0ADZae3wAVwBbWgBeWgAWR3LrZABmWkqa5HbaXTJ6/CoACgBKVgBfbtrCBkIAJSJgWa7sG2XgVeAN4AAFeogKXXRZ1mQAdkPj2dp4WnRHRd2bdgAqQFB/wAO5H1AI7kP3Ytn+AJ0+kMVGAoPBwwYAEFkABWbauQC9DIBhhkkgCztQCV/vxANRE/nYsXYgE10klpQCA7oBTV3yxiCLlxkmCS1+gJBYIhgIAbmASMB6hQIAiBiN6AA1dE3eacRR5GLxZIJNl44L8cIqQAblqFAMYM8mUeSWuiI4qIMClDAAyvK5or2BarTA0oANuUAigwFNUpTUc5VLAAOJDAAooxAhgDRyAFCkViiV8pH0E5hx0LTih8ORoiKVns/iAQkdlKrEv72aEzV9rKGAPbEOHW22pkh1jPO+uN4gwfgAYTt6DR7WYxkAdmaALATIoB87UAoxH8PrGZSAMQZANFygGkGMLcUiUGiAUMVIoB/BkA/vKACldAPfKgF+AnCfPBMXg0Q6kdC0EBPkhsTiAZMJtw+iHvwkAWoZAGOGBJAAmGItAHUGaJAF0GSJAD8GeDAB8VQBPBmrPYU3vZgADp6FRDE5llR1HFbdsCI+Ox713IhIkAKoZRA8URiliSR+EAODNAC5PQAQtznI8lmhAwjBbLDcLlcjOEAWMVAF6jQBDGMANGUbxwHA0FoNM6wAc1fd90FYJY+n2R5Nhue5aFQD49P6FMxIVThJxnec+jSQBR/UALQZAA+zQB5Bk4RgeGYYIQPA6JAFkGPINH4IkJ0AKIZIkAfStLyrPTpREoiCMzdhOK48cJ2kQBCOUATtNACEGPJABYNQAIFUAQAYMukAstSDGtaAs2163Um4lgw9AAE4pm6nyWBmYAAAswF0GZcPWTYzguK5ZhmHY9j2FLtnm5a9lsqc8ukJDAAcGQAYhnQlaeqw/qhpG0TiM4DLIg27a9ramxDt847htGvDzq4Ki+EiQBxhkEQBKhnEMC53gwB9BnY7i534X9qP80CwPyJzAEDI6Qiru6wHr6wbntwh1yNR2h0ZIdAntO+gccxdgArAwAJRWkKG+GiAqdq23qP2iQAghnQdnlGUQ9geUPHOAJ5hiZetS3oHIcRzxlmcLGCZplmpZPgw1BUFYKZ8CIAB3VS2xamZRua7ZPk+ThAF/4wAMKJABHABBfcAPpoIQxCkOQlGUQBjuUAeIZIuCQAsTUAWcTAEzfQB/I2C6tOBW6w6ZoaIAzSTzjB+/6wKmP4ZmiAZ+mMWgaskWgEuwCPI8GXxaGzwYA1ofhAHqGYoEmMQBpy0AAgTAGV5YwvE9iJ+cL8Fi96RQA0AAwYvWjogNGiejGOYyQw5wIuVtHtJAGoVQBAhmBwALRXkSIMrnYxytH8fJ6YlipjsucZjSQBVBh2k0VDn3vI/2HdPtzvfR8iP1EgDcq0gP9RoiQoANwYyr8EptIRG99H7WEACYM8FIr7wdjROOQDABCZggng1Fx4TkABx69k0iQRNHkAMYUwEQJ7lA2gpCEaKEiPwAOIdojlSQoAZwZABgSl6cB1DgYrwAPw4CAA)
-          ![Interfaceの仮想呼び出し](Interfaceの仮想呼び出し.png)
+          ![Interfaceの仮想呼び出し](CSharpMemo_images\Interfaceの仮想呼び出し.png)
       - thisの型  
           インターフェースのthisは`readonly Interface this`  
   - 構造体  
