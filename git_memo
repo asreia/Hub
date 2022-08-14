@@ -4,8 +4,8 @@
 プッシュした直後に--amendしてプッシュしてコンフリクトを起こした場合、VSCodeのUI上ではMERGE_HEADをうまくコミットできなくなる
     (fatal: You have not concluded your merge. (MERGE_HEAD exists))ので、git commit -m "マージ終わって.."でコミットするか、git reset --mergeする
 
-    Vim [i]:編集モード [Esc]:通常モード [:w]:保存 [:q]:終了 [:q!]:保存なしで終了 //[:q]の":"も入れる 
-    [ZZ]と[:x]:変更があれば保存して終了
+    Vim ❰i❱:編集モード ❰Esc❱:通常モード ❰:w❱:保存 ❰:q❱:終了 ❰:q!❱:保存なしで終了 //❰:q❱の":"も入れる 
+    ❰ZZ❱と❰:x❱:変更があれば保存して終了
     powershell エスケープシーケンス:` (stash@`{0`})
 
 参考資料
@@ -148,6 +148,7 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         指定した<BC>と直前の<BC>とのdiffを取り、後は通常の3-way-mergeをしてdiffで変更された部分だけ更新する?
         //いや、単純にHEADと<BC>とその分岐の親の<C>との3-way-mergeだと思う
     git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。
+        //[コミットメッセージの変更(git rebase -i HEAD~⟪1～⟫)(rewored.png)(git push --force)(git reabase --abort)](https://docs.github.com/ja/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/changing-a-commit-message)
         -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作は連続cherry-pickと同じらしい)
         -i有りは<BC>から現在の<B>までの全ての<C>に特殊な操作をする。その特殊な操作の一つに全ての<C>を一つに纏めることができる(squash)
     vscodeの同期は現在の<B>をpullしてからpushする。 
