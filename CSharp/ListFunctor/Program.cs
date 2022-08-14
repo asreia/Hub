@@ -27,8 +27,8 @@
             ))))));
         Console.WriteLine(ListShow(List_Functor<int,int>(x => x * 2)(list_int)));
     }
-<<<<<<< HEAD
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -48,3 +48,5 @@
 =======
 }
 >>>>>>> 5e76831 (__)
+=======
+>>>>>>> b3fd25b (_)
