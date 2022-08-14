@@ -132,6 +132,10 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
     stashはスタック(新しいstashがstash@{0}に積まれる)。<W>と<S>を一旦、一時的に別の所?に退避することができる(--indexはステージされていればステージの状態で戻す。付けなければ全て<W>に戻ると思う)
         stashは<Modified>を退避させる。popなどで戻すときに<Modified>があるとマージして上書きされる(errorになる)のでコミットや退避や変更を破棄などして戻す。
         VScodeの"変更を破棄"はgit stash -> git drop ? stashを戻す(pop,apply)操作は差し替えではなくmergeしている?
+        > -u は　--include-untracked の略です。新規作成ファイル(追跡対象に含まれていないファイル)も退避することができます。
+        [git stashの使い方](https://qiita.com/keisuke0508/items/4ad7caf544b1ad631fd7)
+        ちょっと試したことがある用: save(stash) -> apply -> 試す -> save -> pop 1 -> drop (うまくいかない場合がある。Cliborにコピーしておく)
+            もう適当にコミットでいいかも: commit -> 試す -> save -> drop -> amend
         git stash (save ("コメント")): <W>と<S>を退避させる
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
