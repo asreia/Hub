@@ -317,6 +317,14 @@ type Waybe = Maybe -- たしか、型シノニム
 
 infixr 5 :-
 data List a = Empty | a :- (List a) deriving(Eq, Ord, Show, Read) -- 型引数は小文字から(大抵一文字)、List Int,List m の様に型なのか型引数か多相型なのか区別している
+
+listFunctor :: (a -> b) -> List a -> List b
+listFunctor f Empty = Empty
+listFunctor f (x :- xs) = f x :- listFunctor f xs
+
+lFVal :: List Int
+lFVal = listFunctor (* 2) (1 :- 2 :- 3 :- 4 :- Empty)
+
 (+-+) :: List a -> List a -> List a
 Empty +-+ ys = ys
 (x :- xs) +-+ ys = x :- xs +-+ ys -- 1 :- (2 :- (..))という形になるので 1 :- (..) => (1 :- xs) という風にガッチする? 

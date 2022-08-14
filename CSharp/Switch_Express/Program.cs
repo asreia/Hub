@@ -104,6 +104,52 @@ public class M
             // [1,2,3,4] = "[1,2,3,4]" //'リスト パターン' は現在、プレビュー段階であり、*サポートされていません*。
         Person person = new Person("namae", new DateTime(1800, 12, 31));
         Console.WriteLine(person);
+        D.M();
     }
-    record Person(string name, DateTime birthday); //レコード型はC# 9.0 //ちょクワガタに進化して欲しい！
+    record Person(string name, DateTime birthday); //レコード型はC# 9.0 //↓の様なちょクワガタに進化して欲しい！https://ufcpp.net/study/csharp/datatype/record/
+
+    // record Shape //Shapeは構造を持たない基底クラス
+    // {
+    //     Rect(float height, float width) |
+    //     Triangle(float height, float width) |
+    //     Circle(float radius)
+    // }
+    // record Maybe<T> //基底クラスが型引数を持ち派生がそれを使う。ILレベルで更新が必要そう..いや単に継承先から型引数を渡すだけ(Just<T>(T t) : Maybe<T>)
+    //{
+    //     Just(T t) |
+    //     Nothing()
+    //}
+    //これなら可能
+    record Maybe();
+    record Just<T>(T t) : Maybe; //C#はメンバには必ず名前が必要。Haskellは無い(マッチで位置でアクセスしてる)。これもタプルみたいにItem1とかできれば消せる
+    record Nothing() : Maybe;
+    record Shape();
+    record Rect(float height, float width) : Shape;
+    record Triangle(float height, float width): Shape;
+    record Circle(float radius) : Shape;
+    //Maybe Shape
+    class D
+    {
+        public static void M()
+        {
+            //Haskellとの違い
+            //Haskellの関数の評価とマッチ: "func a b"のように"()"を書かない。結合的にだめな時に"()"を付けるだけ
+            //Haskellの型推論: 型推論がすごすぎて型を指定しなくてもいいためC#のジェネリックの型を指定しなくてもいい
+            //Haskellの値を生成?: 値コンストラクタに引数を並べるだけなので"new"とか特別なキーワードがない(Pythonもない)
+            //Haskellはメンバアクセスがない: Haskellはマッチを利用して変数からメンバの値を取り出している
+            //Haskellの直和型は継承構造ではなく、デフォルト機能
+
+            //maybe_Shape = Just (Rect 1.2 2.2)
+            Maybe maybe_Shape = new Just<Shape>(new Rect(1.2f, 2.2f));
+            // Maybe maybe_Shape = Just(Rect(1.2f, 2.2f)); //new,ジェネリック を除去してみた
+            (float, float)? shape = maybe_Shape switch
+            {   //Just (Rect height width) = Just (height, width) //Haskellに"t,height,width"が現れないのは順番(位置)でアクセスしてるから?"and"もない
+                Just<Shape> and {t: Rect and {height: float h, width: float w}} => (h, w), //プロパティアクセスは省略できない
+                // Just {Rect {float h, float w}} => (h, w),  //型推論できるとしてジェネリック,and,プロパティ名 を除去してみた。だいぶHaskellに近くなった
+                Just<Shape> and {t: Circle c} => (c.radius, 0.0f),
+                Nothing => null
+            };
+            Console.WriteLine(shape);
+        }
+    }
 }

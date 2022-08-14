@@ -71,18 +71,11 @@ public class M
 {
     //Func<a,b> -> Func<List<a>,List<b>> List関手！
     public static Func<List<a>,List<b>> List_Functor<a,b>(Func<a,b> f) => list =>
-    {
-        switch(list.v)
-        {
-            case E_List.Empty :
-                return new List<b>{v = E_List.Empty};
-            case E_List.Cons :
-                a x = list.a_;
-                List<a> xs = list.l;
-                return new List<b>{v = E_List.Cons, a_ = f(x), l = List_Functor(f)(xs)};
-            default:
-                throw new Exception("non-exhaustive(List_Functor)");
-        }
+    list switch
+    {   
+        {v: E_List.Empty} => new List<b>{v = E_List.Empty},
+        {v: E_List.Cons} and {a_: a x} and {l: List<a> xs} 
+        => new List<b>{v = E_List.Cons, a_ = f(x), l = List_Functor(f)(xs)}
     };
     public static Maybe<int> ESum(Either<string, List<int>> eitherList)
     {

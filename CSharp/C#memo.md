@@ -148,7 +148,7 @@
                     `＄LitStruct＝⟪new ∫Struct∫(実引数¦default⟫`  //実引数追加
                 - タプル  
                     - 型  
-                        `＄Tuple＝❰＄recur＝❰(｡｡⟦, ┃2～⟧⟪｡❰∫Type∫ ＠｢『1』vari｣❱¦∫recur∫｡⟫｡｡)❱❱`  
+                        `＄Tuple＝❰＄recur＝❰＠❰var❱ (｡｡⟦, ┃2～⟧⟪｡❰＠❰∫Type∫❱ ＠｢『1』vari｣❱¦∫recur∫｡⟫｡｡)❱❱`  
                         `『『1』タプル型は型の中に識別子を持てるが、コンパイル時に消失するため属性で保持している`  
                         `『『1』を省略した場合、タプルの中の値を取得するには｢vari｣.Item⟪1～⟫となる`  
                         `『タプルはSystem.ValueTuple＠❰<⟦, ┃1～8⟧∫Type∫>❱最後は↑の記述で8個以上の時の入れ子のための型引数(1,2,..,7,8,..) == (1,2,..,7,(8,..))`  
@@ -433,8 +433,8 @@
                     `＄Pattern＝⟪∫Constant_P∫¦∫Property_P∫¦∫Positional_P∫¦∫Type_P∫¦∫Var_P∫¦∫Discard_P∫¦∫Relational_P∫¦∫Pattern_C_and_or∫¦∫Pattern_C_not∫¦∫Pattern_C_()∫⟫`
                     `＄Constant_P＝❰∫Lit∫❱`
                     `＄Property_P＝％❰∫Type∫❱❰｡{｡⟦,┃～⟧❰｢メンバ｣: ∫Pattern∫❱｡}｡❱`
-                    `＄Positional_P＝％❰∫Type∫❱❰｡(｡⟦,┃～⟧❰∫Pattern∫❱｡)｡❱`
-                    `＄Type_P＝❰∫Type∫ ＠❰｢変数定義｣❱❱      //Haskellでは型でパターンマッチするのは許されない。でも、これが直和型の代わりにはなりうる(レコード型が直和型にならないかな)`
+                    `＄Positional_P＝＠⟪var¦％∫Type∫⟫❰｡(｡⟦,┃～⟧❰∫Pattern∫❱｡)｡❱`
+                    `＄Type_P＝❰∫Type∫ ＠❰｢変数定義｣❱❱      //Haskellでは型でパターンマッチするのは許されない。でも、これが直和型の代わりにはなりうる(レコード型が直和型にならないかな(継承できれば直和型になる))`
                     `＄Var_P＝❰var ｢変数定義｣❱ //nullでも受けるので"v"はnullになりうる //多相変数的な`
                     `＄Discard_P＝⟪var _¦_⟫ //"var _"はis,caseのみ`
                     `＄Relational_P＝❰⟪<¦<=¦>¦>=⟫ ∫Pattern∫❱                     //ガード的な`
