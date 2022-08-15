@@ -6,6 +6,7 @@
     vimの画面は❰i❱で書き換えて❰:x❱で保存と終了してそのあとまたvimがでたり、vscode側で操作したりする。
 プッシュした直後に--amendしてプッシュしてコンフリクトを起こした場合、VSCodeのUI上ではMERGE_HEADをうまくコミットできなくなる
     (fatal: You have not concluded your merge. (MERGE_HEAD exists))ので、git commit -m "マージ終わって.."でコミットするか、git reset --mergeする
+MERGE_HEADとかvimとかで、git,vim,vscodeの間で今どういう状態なのかわけわからなくなる(vim操作が分からん)
 
     Vim ❰i❱:編集モード ❰Esc❱:通常モード ❰:w❱:保存 ❰:q❱:終了 ❰:q!❱:保存なしで終了 //❰:q❱の":"も入れる 
     ❰ZZ❱と❰:x❱:変更があれば保存して終了
@@ -109,6 +110,7 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         git resetはブランチに乗らないGitGraphでブランチの縁が灰色          hard: <HBC> - <S>+<W> = 0,    soft: <HBC> - 0 = <S>+<W>,    option無し: <HBC> - <S> = <W>
     git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HEAD状態になり注意が必要。-b <N>はブランチを作って乗る
         resetとcheckoutの違いは、resetは<B>に乗っていれば同時に移動する。あと、<S>と<W>の更新のされ方が違う(checkoutは<S>と<W>両方更新する(--hard)) あと checkoutはModifideでは飛べない
+        git checkout -- ｢相対パス｣ でステージングを戻すことができる
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
         -uを付けると<N>をupstream<B>にする
     git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合はマージコミットが作られる。
@@ -142,6 +144,7 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         [git stashの使い方](https://qiita.com/keisuke0508/items/4ad7caf544b1ad631fd7) (他のコミットからコピペ(ファイル単位で)のように使えるかも(コンフリクト注意))
         ちょっと試したことがある用: save(stash) -> apply -> 試す -> save -> pop 1 -> drop (うまくいかない場合がある。Cliborにコピーしておく)
             もう適当にコミットでいいかも: commit -> 試す -> reset --hard -> amend
+                add -> 試す -> git checkout -- ｢相対パス｣
         git stash (save ("コメント")): <W>と<S>を退避させる
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
@@ -153,6 +156,7 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         内部の動作が謎。指定した<BC>の直前の<BC>を親とした3-way-mergeだと思ったが違うみたい?
         指定した<BC>と直前の<BC>とのdiffを取り、後は通常の3-way-mergeをしてdiffで変更された部分だけ更新する?
         //いや、単純にHEADと<BC>とその分岐の親の<C>との3-way-mergeだと思う
+        //↑それだとmergeと同じだと思う: https://www.youtube.com/watch?v=KbuUDNFzOwU
     git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。 リベースとはhttps://youtu.be/CWhOG2mSjqQ?t=409 C:\Users\asreia\OneDrive\画像\スクリーンショット\rapture_20220815051133.png
         //[コミットメッセージの変更(git rebase -i HEAD~⟪1～⟫)(rewored.png)(git push --force)(git reabase --abort)](https://docs.github.com/ja/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/changing-a-commit-message)
         -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作は連続cherry-pickと同じらしい)
@@ -186,3 +190,5 @@ Git Graph
     <B>をダブルクリックでcheckout
     コミットを右クリックしてコンテキストメニューから<B>の作成、<B>の操作、分離HEADなど
     コミットを左クリックしてファイル名を右クリクでコンテキストメニューからdiff、ファイル開くなど
+ブランチ運用のガイドライン: https://www.youtube.com/watch?v=NxjTTIUl_Pw
+Learn_Git_Branching :https://learngitbranching.js.org/?locale=ja (ちょっとやったが面白そうw)
