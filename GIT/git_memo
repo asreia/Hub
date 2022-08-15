@@ -1,6 +1,9 @@
 
 
 !!!!!!!!!<Modified>のままにしておくとstashのdorpやclearや、変更を破棄か、何かの拍子で<Modified>が変更前に戻って消える可能性があるので注意
+    コンフリクトした場合はgitタブの"変更をマージ"の!を押す(自分HEAD か 他の人かどっちか選ぶ) メッセージが文字オーバーで"黄色く"なるので注意
+        Git: Rebasing(19/19)が終わるまで続く
+    vimの画面は❰i❱で書き換えて❰:x❱で保存と終了してそのあとまたvimがでたり、vscode側で操作したりする。
 プッシュした直後に--amendしてプッシュしてコンフリクトを起こした場合、VSCodeのUI上ではMERGE_HEADをうまくコミットできなくなる
     (fatal: You have not concluded your merge. (MERGE_HEAD exists))ので、git commit -m "マージ終わって.."でコミットするか、git reset --mergeする
 
@@ -99,26 +102,29 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
     git commit (--amend) (-m "コメント"): <S>にあるファイルを全てコミットする。--amendを付けると最新の<C>を新しい<C>で差し替える(ハッシュIDが変わる)(多分、reset HEAD~してからコミットするのと同じ)
          git commit -m "gitステージング済み個別コミット" -- MarkdonwTest.md
     git diff (<HBC>,<HBC>): 差分を表示、<HBC>指定なしは<S>から<W>の差、<HBC>１個はその<HBC>から<W>の差、<HBC> <HBC>はその<HBC>から<HBC>の差 (-abc +abc の様に両方におなじ行がある場合は、改行コードがある～ないの差)
+            VScodeのGitタブの<W>と<S>のdiffは、<W>は<S>との差、<S>は現在の<C>からの差===================
     git rm (-r) <F>: ファイル(-rを指定するとディレクトリ)の削除をステージする。コミットすると削除される。(手動で<W>で削除してコミットしても削除されない)
     git log (-p) <HBC>: Git Historyのようなコミットログが見られる。-pでdiffのような比較が見られる。
     git reset(--hard, --soft) <HBC>: 現在の{<H>or<H>と<B>}を指定した<HBC>に移動して<S>と<W>を更新する(更新するもの:: --hard:<S>と<W> --soft:無し option無し:<S>)
-                                            hard: <HBC> - <S>+<W> = 0,    soft: <HBC> - 0 = <S>+<W>,    option無し: <HBC> - <S> = <W>
+        git resetはブランチに乗らないGitGraphでブランチの縁が灰色          hard: <HBC> - <S>+<W> = 0,    soft: <HBC> - 0 = <S>+<W>,    option無し: <HBC> - <S> = <W>
     git checkout (-b <N>) <HBC>: <H>のみが指定の<HBC>に移動して乗る。コミットのみの所に移動すると分離HEAD状態になり注意が必要。-b <N>はブランチを作って乗る
-        resetとcheckoutの違いは、resetは<B>に乗っていれば同時に移動する。あと、<S>と<W>の更新のされ方が違う(checkoutは<S>と<W>両方更新する(--hard))
+        resetとcheckoutの違いは、resetは<B>に乗っていれば同時に移動する。あと、<S>と<W>の更新のされ方が違う(checkoutは<S>と<W>両方更新する(--hard)) あと checkoutはModifideでは飛べない
     git branch (-vv) (-D) (-u) <N>: 指定なしは現在存在する<B>を全て表示。ブランチ名を付けると<B>を作る(作るだけでまだ乗ってない)。-Dを付けると<B>削除。-vvをupstream<B>まで見れる
         -uを付けると<N>をupstream<B>にする
     git merge <HBC>: 現在の<HBC>と指定された<HBC>をマージし3-way-mergeの場合はマージコミットが作られる。
         ２つの<HBC>が指定された<HBC>上にある(一直線)の場合fast-forward(早送り)マージとなり現在の<HBC>が指定された<HBC>に移動するだけ、(多分 git reset --hard <HBC>)
         そうでない場合(分岐している)は２つの<HBC>とその共通の親のコミット間で3-way-mergeが実行され本当の行単位のマージが行われる(同じ領域の変更がある場合コンフリクトする)
-    git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。addはリモートへの参照を作る。rmはリモートへの参照を削除する
+    git remote ((add <N(origin)> <URL>), (rm <N(origin)>)): 指定なしは存在するリモートへの参照の確認。
+                                            addはリモートへの参照を作る(公開するのはpush -u)。rmはリモートへの参照を削除する
         origin/masterのようなリモート<B>は乗れない(読み取り専用?)。fetchでローカル側のorigin/masterを更新する
         git remote add origin <URL>はorigin = <URL>する。つまりorigin(リモート名)は<URL>で、origin/master == リモート名/ブランチ == <URL>/ブランチ 
             git remote -v は↓と出る
             origin  https://github.com/asreia/Hub.git (fetch)
             origin  https://github.com/asreia/Hub.git (push)
-    git push (-f) (--all (<origin>)) (<origin> (--delete) (<B>)) (-u <origin> <B>): 指定がない場合、現在の<B>のupstream<B>にプッシュする。まだ未公開の場合-uで公開できる。
+    git push (-f) (--all (<origin>)) (<origin> (--delete) (<B>)) (-u <origin> <B>): 指定がない場合、現在の<B>のupstream<B>にプッシュする。
+                                            まだ未公開の場合-uで公開できる(remoteを作るのはremote add)。
         --allで<origin>に対応する全てのローカルの<B>をプッシュします(多分)。--deleteでリモートリポジトリの<B>を削除できる。
-        -fはコンフリクトが発生しても強制上書きプッシュ。
+        -fはコンフリクトが発生しても強制上書きプッシュ。(最終奥義)
     git pull (<origin> (<B>)): リモートの<B>を全てfetchして、現在の<B>のupstream<B>とマージする
     git fetch: 全てのリモート追跡ブランチに対するリモートの<B>をダウンロードしてローカルのリモート追跡ブランチ(origin/~)を更新する
         pushとpullはupstreamまたは指定されたリモート追跡ブランチに対して行われる。fetchはfetchするだけ
@@ -133,9 +139,9 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         stashは<Modified>を退避させる。popなどで戻すときに<Modified>があるとマージして上書きされる(errorになる)のでコミットや退避や変更を破棄などして戻す。
         VScodeの"変更を破棄"はgit stash -> git drop ? stashを戻す(pop,apply)操作は差し替えではなくmergeしている?
         > -u は　--include-untracked の略です。新規作成ファイル(追跡対象に含まれていないファイル)も退避することができます。
-        [git stashの使い方](https://qiita.com/keisuke0508/items/4ad7caf544b1ad631fd7)
+        [git stashの使い方](https://qiita.com/keisuke0508/items/4ad7caf544b1ad631fd7) (他のコミットからコピペ(ファイル単位で)のように使えるかも(コンフリクト注意))
         ちょっと試したことがある用: save(stash) -> apply -> 試す -> save -> pop 1 -> drop (うまくいかない場合がある。Cliborにコピーしておく)
-            もう適当にコミットでいいかも: commit -> 試す -> save -> drop -> amend
+            もう適当にコミットでいいかも: commit -> 試す -> reset --hard -> amend
         git stash (save ("コメント")): <W>と<S>を退避させる
         git stash list: 今のstashのスタックのリストを見れる(コメントがあればそれも)
         git stash apply (<stash>) (--index): <stash>を戻す。指定がなければ直近を戻す
@@ -147,9 +153,10 @@ gitコマンド {"git ｢コマンド名｣ -h"と打つとコマンドの打ち
         内部の動作が謎。指定した<BC>の直前の<BC>を親とした3-way-mergeだと思ったが違うみたい?
         指定した<BC>と直前の<BC>とのdiffを取り、後は通常の3-way-mergeをしてdiffで変更された部分だけ更新する?
         //いや、単純にHEADと<BC>とその分岐の親の<C>との3-way-mergeだと思う
-    git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。
+    git rebase (-i) <BC>: -iを付けるか付けないかで全然別の動作になる。 リベースとはhttps://youtu.be/CWhOG2mSjqQ?t=409 C:\Users\asreia\OneDrive\画像\スクリーンショット\rapture_20220815051133.png
         //[コミットメッセージの変更(git rebase -i HEAD~⟪1～⟫)(rewored.png)(git push --force)(git reabase --abort)](https://docs.github.com/ja/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/changing-a-commit-message)
         -i無しは現在の<B>を指定した<BC>の先に、現在の<B>と指定した<BC>の親の<C>の次の現在の<B>上のある<C>から現在の<B>までの全ての<C>を繋げる。(繋げる動作は連続cherry-pickと同じらしい)
+            相手に影響を与える方なので注意
         -i有りは<BC>から現在の<B>までの全ての<C>に特殊な操作をする。その特殊な操作の一つに全ての<C>を一つに纏めることができる(squash)
     vscodeの同期は現在の<B>をpullしてからpushする。 
         リモートとローカルの両方で変更がある場合で手動でpush -> pullすると"参照仕様をリモートにプッシュできません。最初に'Pull'を実行して変更を統合してください。"とでて失敗する。

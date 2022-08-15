@@ -28,3 +28,4 @@
         Console.WriteLine(ListShow(List_Functor<int,int>(x => x * 2)(list_int)));
     }
 }
+//=
