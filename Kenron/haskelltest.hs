@@ -321,7 +321,7 @@ data List a = Empty | a :- (List a) deriving(Eq, Ord, Show, Read) -- 型引数�
 listFunctor :: (a -> b) -> List a -> List b
 listFunctor f Empty = Empty
 listFunctor f (x :- xs) = f x :- listFunctor f xs
-
+ 
 lFVal :: List Int
 lFVal = listFunctor (* 2) (1 :- 2 :- 3 :- 4 :- Empty)
 
