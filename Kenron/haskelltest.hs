@@ -325,6 +325,10 @@ listFunctor f (x :- xs) = f x :- listFunctor f xs
 lFVal :: List Int
 lFVal = listFunctor (* 2) (1 :- 2 :- 3 :- 4 :- Empty)
 
+listShow :: Show a => [a] -> String
+listShow [] = "."
+listShow (x:xs) = show x ++ "_" ++ listShow xs
+
 (+-+) :: List a -> List a -> List a
 Empty +-+ ys = ys
 (x :- xs) +-+ ys = x :- xs +-+ ys -- 1 :- (2 :- (..))という形になるので 1 :- (..) => (1 :- xs) という風にガッチする? 
@@ -485,6 +489,9 @@ tabunkiSagasu n (Node' a xs) = a == n || foldr ((||) . tabunkiSagasu n) False xs
 
 hatiWoSagasu :: Bool
 hatiWoSagasu = tabunkiSagasu 8 tabunki -- => True
+
+-- infixr 5 :
+-- data [] a = [] | a : [] a
 
 -- 引数再帰(万能?(自身の結果が出力の型と合わないとだめ))、外側再帰(fold出来るようなモノを外側にし、それと自身の結果を合わせて出力の型と合わないとだめ)、単位元、初期値、foldl、foldr 15
 -- 多相変数に何か演算しようと思うなら型制約をする

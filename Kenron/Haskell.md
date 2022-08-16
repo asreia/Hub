@@ -216,7 +216,7 @@ f x y = x + y          -- 関数の定義
     ```haskell
     f4 :: a -> Int
     f4 a = 1
-    -- f4 True = 2  -- "a"を特定の型にすることはできない
+    -- f4 True = 2  -- "a"を特定の型にすることはできない (Haskellはダウンキャスト禁止)
     -- f4 "abc" = 3   -- (==) :: a -> a -> Bool より a -> ❰Bool¦String❱ -> Bool となって(==)を評価できない
     ```
 5. **型クラス内の型**によるパターンマッチはできない
@@ -304,10 +304,10 @@ foldMap f xs = mconcat $ map f xs
 ### 代数的データ型
 
 - データ型は、Haskellの全ての型とその値を定義します。(値そのものを定義できます)
-- 型ですがC#のような関数もフィールドも持ちません。**定義しているのは値**です。int型やEnumを定義しているような感じです
+- 型ですがC#のような関数もフィールドも持ちません(**状態を持たない**)。**定義しているのは値の型**です。int型やEnumを定義しているような感じです
   - C#で直和型は作れませんが共用体(Union型)で作れそう(先頭アドレスにEnumを仕込み今なんの値か判定する)
 - 値コンストラクタはC#と比較して`new Struct(1,2,3) == Struct 1 2 3`のようなものですが、`Struct`は型ではなく値を作る関数です
-- 型は圏論でいう対象にあたります
+- 型は圏論でいう対象(点)にあたります
   - 型コンストラクタは対象の関手にあたります(射の関手はfmap)
 
 1. 最もシンプルなデータ型
@@ -649,6 +649,183 @@ IOから非IOを返す関数`IO a -> a`な関数が存在しないとすれば�
 - Func<>とラムダ式による高階関数は実は書きやすいかも
 [C#でHaskell](https://sharplab.io/#v2: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)
 
+### HaskellとC#のコードの比較
+
+1. リスト型 **[a]**の定義 (実際に書けるコードではないが、同じ構造をもつ型に書き換えることはできる)(組み込み構文の不正なバインディング)
+2. Haskellのmap関数を**listFunctor**(リスト関手(射))という名前で定義
+3. それを表示(String化)するshow関数を**listShow**として定義
+4. 最後にそれらを使用する関数(**lFVal**)(定数)を定義
+
+```haskell
+-- 1.[a]
+infixr 5 :
+data [a] = [] | a : [a]
+-- 2.listFunctor
+listFunctor :: (a -> b) -> [a] -> [b]
+listFunctor f [] = []
+listFunctor f (x : xs) = f x : listFunctor f xs
+-- 3.listShow
+listShow :: Show a => [a] -> [Char]  -- type String = [Char]
+listShow [] = ['.']
+listShow (x:xs) = show x ++ ['_'] ++ listShow xs
+-- 4.lFVal
+lFVal :: [Char]
+lFVal = listShow . listFunctor (* 2) $ (1 : 2 : 3 : 4 : 5 : [])
+```
+- ↑のHaskellの定義を**C#で定義**↓してみる。が、C#には**直和型がない**ので継承を利用して型スイッチしている
+```csharp
+using System;
+class M{
+    // 1.[a]
+    record List<a>();
+    record Cons<a>(a a_,List<a> l) : List<a>;
+    record Empty<a>() : List<a>;
+    // 2.listFunctor
+    static Func<List<a>,List<b>> List_Functor<a,b>(Func<a,b> f) => list =>
+    list switch
+    {
+        Empty<a> => new Empty<b>(),
+        Cons<a> and var (x, xs) => new Cons<b>(f(x), List_Functor(f)(xs))
+    };
+    //ジェネリック、delegate(Func)、ラムダ式、switch式、Deconstruct、再帰関数、expression-bodied、record
+    // 3.listShow
+    static string ListShow<a>(List<a> list) =>
+    list switch{
+        Empty<a> => ".",
+        Cons<a> and var (x, xs) => x.ToString() + "_" + ListShow(xs)
+    };
+    static void Main()
+    {   
+        // 4.lFVal
+        List<int> list_int =
+            new Cons<int>(1,
+            new Cons<int>(2,
+            new Cons<int>(3,
+            new Cons<int>(4,
+            new Cons<int>(5,
+            new Empty<int>(
+            ))))));
+        Console.WriteLine(ListShow(List_Functor<int,int>(x => x * 2)(list_int)));
+    }
+}
+```
+- **型と関数ごとに比較**してみる
+- **1.[a]**============================================================================================================================================
+```haskell
+data [a] = [] | a : [a]
+```
+```csharp
+      //[a]      //非関数型に直和型は無く、継承を利用して直和型を構成している。ポリモーフィズムでなく型を調べて条件分岐している場合は"型レベルの計算"をしている
+record List<a>();
+      //:    //a  //[a]         //Haskellは、a_ とか l の変数に当たるものはない (型自体が状態を持たない(関数の引数渡しに変数が現れるだけ))
+record Cons<a>(a a_,List<a> l) : List<a>;   
+      //[]
+record Empty<a>() : List<a>;
+```
+- **2.listFunctor**(`⸨⸩`で囲ってある部分はHaskellには現れない)================================================================================================
+```haskell
+listFunctor :: (a -> b) -> [a] -> [b]
+listFunctor f [] = []
+listFunctor f (x : xs) = f x : listFunctor f xs
+```
+```csharp
+        //[a] -> [b]        //listFunctor    //(a -> b)//⸨f⸩ //⸨⟪(x : xs)¦[]⟫⸩  //Haskellは引数の受け取りとパターンマッチが同時になっている
+static Func<List<a>,List<b>> List_Functor<a,b>(Func<a,b>  f) => list =>
+list switch
+{  //[]        //[]
+    Empty<a> => new Empty<b>(),
+    //:            //x//xs     //:       //f x  //listFunctor f  xs
+    Cons<a> and var (x, xs) => new Cons<b>(f(x), List_Functor(f)(xs))
+};
+//ジェネリック、delegate(Func)、ラムダ式、switch式、Deconstruct、再帰関数、expression-bodied(代入なし)、record、
+```
+- **3.listShow**============================================================================================================================================
+```haskell
+listShow :: Show a => [a] -> [Char]
+listShow [] = ['.']
+listShow (x : xs) = show x ++ ['_'] ++ listShow xs
+```
+```csharp
+      //[Char]//listShow  //[a] //⸨⟪(x : xs)¦[]⟫⸩
+static string ListShow<a>(List<a> list) =>  //"Show a =>"の"a"は"<a>"に当たりますがC#の全ての型は"Object"を継承し、"Object"が"show"にあたる"ToString"を提供している
+list switch{                                  //↑書くとしたら"where a : Object"で型制約(?)するが"CS0702:制約は特殊クラス 'object' にすることはできません"とエラーが出る
+    //[]     //['.']
+    Empty<a> => ".",
+    //:            //x//xs    //show x    //++//['_']//++//listShow xs
+    Cons<a> and var (x, xs) => x.ToString() +    "_"   +   ListShow(xs)
+};
+```
+- **4.lFVal**============================================================================================================================================
+```haskell
+lFVal :: [Char]
+lFVal = listShow . listFunctor (* 2) $ (1 : 2 : 3 : 4 : 5 : [])
+```
+```csharp
+//❰1 : 2 : 3 : 4 : 5 : []❱
+List<int> list_int =
+      //:       //1    
+    new Cons<int>(1,
+          //:       //2     
+        new Cons<int>(2,
+              //:        //3     
+            new Cons<int>(3,
+                  //:        //4     
+                new Cons<int>(4,
+                      //:        //5     
+                    new Cons<int>(5,
+                          //[]     
+                        new Empty<int>()
+                    )
+                )
+            )
+        )
+    );
+//❰listShow . listFunctor (* 2) $ (❰list_int❱)❱
+                //listShow//listFunctor        //(* 2)   //(❰list_int❱)
+Console.WriteLine(ListShow(List_Functor<int,int>(x => x * 2)(list_int)));
+```
+
+#### HaskellとC#の違い
+
+1. Haskellは関数の評価とマッチ時`func a b`のように`()`を書かない。結合的にだめな時に`()`を付けるだけ
+2. Haskellの型推論がすごすぎて**型を指定しなくてもいい**。C#も推論できるよう頑張っている
+3. Haskellの値を生成は**値構成子**(関数)に引数を並べるだけなので`new`とか特別なキーワードがない(Pythonもない)
+4. Haskellは**メンバアクセスがありません**。C#のように`obj.m`ではなくHaskellは`マッチ`を利用して変数からメンバの値を取り出している
+5. Haskellは標準で**直和型**を作れるよう設計されている。C#は直和型の構文がなく、ダウンキャストを利用して、その型にキャストできるかできないかで、処理を分岐している
+6. Haskellは**命名規則が厳しく**、型と関数は大文字から、多相変数と引数は小文字から、中置記法の演算子は記号文字、で書くよう制約している。
+    そのおかげで、`(),{},.,:`などの構文を入れなくても文字を並べただけで構文解析ができるようになっている
+7. Haskellにも**型クラス**というinterfaceの実装のようなものがある。それにより同じ関数でも型ごとに違う処理をする関数を書ける
+8. Haskellは**ダウンキャスト禁止**で多相型や型クラスから特定の型へマッチすることはできない
+9. Haskellは定数と関数を区別せず、関数にも**戻り値まで含む型**がある。C#は関数はシグネチャとして見ている
+
+#### 純粋関数型言語の教え
+
+**値**とは、1つまたは複数の**パターンを持つ**ものであり、
+`data Int = .. -2 | -1 | 0 |1 | 2 ..`
+**計算**とは、値を引数に取り、その引数の値の**パターンの組み合わせ**により**新しい値(パターン)**を返すものである(パターンマッチ)
+`add 0 0 = 0; add 0 1 = 1; add 1 0 = 1; add 1 1 = 2; ..`
+つまり、非純粋型も**条件分岐**は全て何らかの**計算**を表している。
+純粋関数型は、これら計算をする**関数の繋がり**(式木)**のみ**(状態を持たない)によって計算をしている
+
+一方、非純粋型は、代入という値のパターンを変更しそして保持する操作がある。
+このように`x`に代入を複数行うと
+`x = 1; x = 2; x = 3; x = 4;`
+`x`のパターンが1 -> 2 -> 3 -> 4と変化してしまう。
+この変化する変数を内部で参照する関数は、`x`による**計算(条件分岐)**により引数が同じでも呼び出しごとに値が変化しうる
+これにより、引数以外に現在の`x`の**状態**(パターン)を**考慮**するひつようがあり、その把握が困難で**殆どのバグがこの関数に隠された状態の更新**によるものである。
+
+そこで、非純粋型はクラスという枠組みを作り、せめて状態の更新をこのクラス内で留めるように`private`を付けたり、`readOnly`,`const`などで状態の更新を禁止する
+あと、ある関数が100行もあると、かなりの高確率で与えられた引数による計算以外の副作用をともなう処理をしていてとても良くない
+C#では、与えられた引数のみで計算するように関数本体には**式しか書けない構文**expression-bodiedがある。
+他にも状態の把握が難しくならないようにする**recode型やswitch式**など純粋関数型の考えを強く意識していると感じる
+UnityのECSもデータを関数の繋がりというパイプに流し込むイメージで並列処理を実現している
+そう、関数が状態を持たなければ呼び出す順序を気にする必要がなく並列処理が容易になる
+
+- ジェネリック
+- カリー化による高階関数
+
+継承構造をポリモーフィズムと見るか直和型(ダウンキャスト)と見
+
 ### 代数的データ型
 
 - **文脈による抽象化とそのマッチ演算(自然変換とか)**、**代数的データ型**、**式と関数**、**副作用とStateモナド**
@@ -746,7 +923,7 @@ IOから非IOを返す関数`IO a -> a`な関数が存在しないとすれば�
     - 射`a->b`: a ⇒ b (ならば)
     - 積`(a,b)`: a ∧ b (論理積)
     - 余積`a|b`: a ∨ b (論理和)
-      - に対応し、例えば、定義:`fd (Just (a, b)) = Just a`型:`Maybe (a,b) -> Maybe a` <=>
+      - に対応し、例えば、定義:`fd (Just (a, b)) = Just a`型:`Maybe (a,b) -> Maybe a` <=>     //a,bは多相型で全ての型を∧で繋げている様なもの(∀a)
         `(a,b)|c -> a|c`(c == Nothing) <=> `(a∧b)∨c ⇒ a∨c`は証明できるからコードが書けるとか言うやつ(coq(定理証明支援系)とかあったような)
   - haskellにおける圏論の関心事?
     - 関数合成`(.)`や関数適用によって関数の出力の**型をどう変化**させ、それらを**どう合成**するか?(合成可能性)
