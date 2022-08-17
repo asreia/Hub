@@ -2,6 +2,15 @@
 
 ## サイト
 
+- [圏論の教え](https://www.youtube.com/watch?v=I8LbkfSSR58&list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_)
+- [標準ライブラリのソースコード](https://hackage.haskell.org/package/base)
+- [Hask圏](https://scrapbox.io/mrsekut-p/%E5%9C%8F%E8%AB%96%E3%81%A8%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0)
+- [GHCup](https://www.haskell.org/ghcup/)
+- [GHCの４つの実行方法](https://haskell.jp/blog/posts/2017/08-ghc-4way-execution.html)
+- [ポイントフリースタイル入門](https://melpon.hatenadiary.org/entry/20111031/1320024473)
+- [ポイントフリーコンバータ](http://kar.s206.xrea.com/js/pointfree.html)
+- Erlang Elixir F#
+
 ## 構文
 
 ### 関数
@@ -29,6 +38,8 @@ f x y = x + y          -- 関数の定義
 ↓大体こんな感じです↓
 `｢関数名｣ :: ｢引数1の型｣ -> ｢引数2の型｣ -> ｢式の型｣`
 `｢関数名｣ ｢引数1｣ ｢引数2｣ = ｢式｣`
+
+![関数呼び出し付き式木](関数呼び出し付き式木.png)
 
 #### 式
 
@@ -67,7 +78,7 @@ f x y = x + y          -- 関数の定義
 
 - カリー化された関数とは、関数が必要とする**引数の数より少ない数の引数を渡す**と、残りの引数を必要とする**関数を返す関数**のことである(関数型ではこれが一般的)
   - 反対に関数が必要とする引数を同時に全て渡すのがアンカリー化された関数である(非関数型ではこれが一般的)
-  - 圏論では`Uncurry : X × A -> B, Curry : X -> B^A (Xを与えるとHom(A,B)から射を一つ取り出す)`である
+  - 圏論では`Uncurry : X × A -> B, Curry : X -> B^A (Xの要素を与えるとHom(A,B)から射を一つ要素を取り出す)`である
 
 - C#版とHaskell版のカリー化を比べてみる
   - C#版
@@ -330,7 +341,7 @@ foldMap f xs = mconcat $ map f xs
       ```haskell
       length_Type6 :: Type6 -> Int
       length_Type6 Nil = 0 
-      length_Type6 (A a) = 1 + f a
+      length_Type6 (A a) = 1 + length_Type6 a
       ```
 
 #### 主要なデータ型
@@ -620,17 +631,6 @@ IOから非IOを返す関数`IO a -> a`な関数が存在しないとすれば�
 - [「参照透明な言語は並列化可能なポイントを簡単に見分けることができる」](https://qiita.com/hiruberuto/items/26a813ab2b188ca39019)
 ![並列化](並列化.png)
 
-## Haskell環境セットアップ(VScode)
-
-(色々やったけどうまく言ったと思われるやつ)
-- VScodeの拡張機能から、Haskell v2.2.0をインストール 右下から"Project requires GHC but isn't installed"と言われてエラーが出たのでリンクをクリックし
-[GHCup](https://www.haskell.org/ghcup/)と言うやつに貼ってある
-`Set-ExecutionPolicy Bypass -Scope Process -Force;[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-WebRequest https://www.haskell.org/ghcup/sh/bootstrap-haskell.ps1 -UseBasicParsing))) -ArgumentList $true`
-を、VScodeのターミナル(powershell)に貼りEnterキーを押す
-最初に止めるか聞かれるので❰c❱を押した、その後デフォルトのパスにするか聞かれるので❰Enter❱を押した、後、色々インストールするけどいいか効いてくるでもよく分からないので適当に❰y❱を連打した
-すると色々がちゃがちゃ始まってVScodeのHaskellのインストールが終わった見たいだ(完)
-  - 他に(多分↑でインストールされるので**要らない**と思うが、)[native OS package manager](https://www.haskell.org/downloads/)の`Show Windows package`の`Chocolatey: GHC, cabal, Stack`をインストールした
-
 ## 純粋関数型と非関数型(C#)
 
 ### 状態(State)
@@ -649,17 +649,17 @@ IOから非IOを返す関数`IO a -> a`な関数が存在しないとすれば�
 - Func<>とラムダ式による高階関数は実は書きやすいかも
 [C#でHaskell](https://sharplab.io/#v2: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)
 
-### HaskellとC#のコードの比較
+### HaskellとC#のコードの比較(Haskellのmap関数)
 
-1. リスト型 **[a]**の定義 (実際に書けるコードではないが、同じ構造をもつ型に書き換えることはできる)(組み込み構文の不正なバインディング)
+1. リスト型 **[a]**の定義
 2. Haskellのmap関数を**listFunctor**(リスト関手(射))という名前で定義
 3. それを表示(String化)するshow関数を**listShow**として定義
 4. 最後にそれらを使用する関数(**lFVal**)(定数)を定義
 
 ```haskell
 -- 1.[a]
-infixr 5 :
-data [a] = [] | a : [a]
+infixr 5 :                                                                         -- data List a = Empty | a :- (List a)
+data [a] = [] | a : [a]         -- ←実際に書けるコードではないが、同じ構造をもつ型に書き換える↑ことはできる(エラー:組み込み構文の不正なバインディング)
 -- 2.listFunctor
 listFunctor :: (a -> b) -> [a] -> [b]
 listFunctor f [] = []
@@ -680,14 +680,13 @@ class M{
     record List<a>();
     record Cons<a>(a a_,List<a> l) : List<a>;
     record Empty<a>() : List<a>;
-    // 2.listFunctor
+    // 2.listFunctor        //ジェネリック、delegate(Func)、ラムダ式、switch式、Deconstruct、再帰関数、expression-bodied(代入なし)、record、
     static Func<List<a>,List<b>> List_Functor<a,b>(Func<a,b> f) => list =>
     list switch
     {
         Empty<a> => new Empty<b>(),
         Cons<a> and var (x, xs) => new Cons<b>(f(x), List_Functor(f)(xs))
     };
-    //ジェネリック、delegate(Func)、ラムダ式、switch式、Deconstruct、再帰関数、expression-bodied、record
     // 3.listShow
     static string ListShow<a>(List<a> list) =>
     list switch{
@@ -715,9 +714,9 @@ class M{
 data [a] = [] | a : [a]
 ```
 ```csharp
-      //[a]      //非関数型に直和型は無く、継承を利用して直和型を構成している。ポリモーフィズムでなく型を調べて条件分岐している場合は"型レベルの計算"をしている
+      //[a]      //非関数型に直和型は無く、継承を利用して直和型を構成している。ポリモーフィズムでなく型を見て条件分岐している場合は"型レベルの計算"をしている
 record List<a>();
-      //:    //a  //[a]         //Haskellは、a_ とか l の変数に当たるものはない (型自体が状態を持たない(関数の引数渡しに変数が現れるだけ))
+      //:    //a  //[a]         //Haskellは、a_ とか l の変数に当たるものはない (型自体が状態を持たない(関数の引数渡しに変数が現れるだけ)(C#のSystem.Int32の様なもの))
 record Cons<a>(a a_,List<a> l) : List<a>;   
       //[]
 record Empty<a>() : List<a>;
@@ -737,7 +736,6 @@ list switch
     //:            //x//xs     //:       //f x  //listFunctor f  xs
     Cons<a> and var (x, xs) => new Cons<b>(f(x), List_Functor(f)(xs))
 };
-//ジェネリック、delegate(Func)、ラムダ式、switch式、Deconstruct、再帰関数、expression-bodied(代入なし)、record、
 ```
 - **3.listShow**============================================================================================================================================
 ```haskell
@@ -790,19 +788,19 @@ Console.WriteLine(ListShow(List_Functor<int,int>(x => x * 2)(list_int)));
 1. Haskellは関数の評価とマッチ時`func a b`のように`()`を書かない。結合的にだめな時に`()`を付けるだけ
 2. Haskellの型推論がすごすぎて**型を指定しなくてもいい**。C#も推論できるよう頑張っている
 3. Haskellの値を生成は**値構成子**(関数)に引数を並べるだけなので`new`とか特別なキーワードがない(Pythonもない)
-4. Haskellは**メンバアクセスがありません**。C#のように`obj.m`ではなくHaskellは`マッチ`を利用して変数からメンバの値を取り出している
+4. Haskellは**メンバアクセスがありません**。C#のように`obj.m`ではなくHaskellは`マッチ`を利用して変数から位置でメンバの値を取り出している
 5. Haskellは標準で**直和型**を作れるよう設計されている。C#は直和型の構文がなく、ダウンキャストを利用して、その型にキャストできるかできないかで、処理を分岐している
 6. Haskellは**命名規則が厳しく**、型と関数は大文字から、多相変数と引数は小文字から、中置記法の演算子は記号文字、で書くよう制約している。
     そのおかげで、`(),{},.,:`などの構文を入れなくても文字を並べただけで構文解析ができるようになっている
 7. Haskellにも**型クラス**というinterfaceの実装のようなものがある。それにより同じ関数でも型ごとに違う処理をする関数を書ける
 8. Haskellは**ダウンキャスト禁止**で多相型や型クラスから特定の型へマッチすることはできない
-9. Haskellは定数と関数を区別せず、関数にも**戻り値まで含む型**がある。C#は関数はシグネチャとして見ている
+9. Haskellは定数と関数を区別せず、関数にも**戻り値まで含む型**がある(型推論の助けになっている)。C#は関数はシグネチャとして見ている
 
 #### 純粋関数型言語の教え
 
 **値**とは、1つまたは複数の**パターンを持つ**ものであり、
-`data Int = .. -2 | -1 | 0 |1 | 2 ..`
-**計算**とは、値を引数に取り、その引数の値の**パターンの組み合わせ**により**新しい値(パターン)**を返すものである(パターンマッチ)
+`data Int = .. -2 | -1 | 0 |1 | 2 ..` (Haskellは型を書く時、C#の様に変数をprivateで制限する以上に、変数そのものがなく、型は状態を持たない(C#のSystem.Int32の様なもの))
+**計算**とは、値を引数に取り、その引数の値の**パターンの組み合わせ**により**新しい値(パターン)**を返すものである(パターンマッチと戻り値の対応)
 `add 0 0 = 0; add 0 1 = 1; add 1 0 = 1; add 1 1 = 2; ..`
 つまり、非純粋型も**条件分岐**は全て何らかの**計算**を表している。
 純粋関数型は、これら計算をする**関数の繋がり**(式木)**のみ**(状態を持たない)によって計算をしている
@@ -820,15 +818,11 @@ C#では、与えられた引数のみで計算するように関数本体には
 他にも状態の把握が難しくならないようにする**recode型やswitch式**など純粋関数型の考えを強く意識していると感じる
 UnityのECSもデータを関数の繋がりというパイプに流し込むイメージで並列処理を実現している
 そう、関数が状態を持たなければ呼び出す順序を気にする必要がなく並列処理が容易になる
+ノードベースプログラミングは関数型
 
-- ジェネリック
-- カリー化による高階関数
+### ぐちゃぐちゃメモ
 
-継承構造をポリモーフィズムと見るか直和型(ダウンキャスト)と見
-
-### 代数的データ型
-
-- **文脈による抽象化とそのマッチ演算(自然変換とか)**、**代数的データ型**、**式と関数**、**副作用とStateモナド**
+- **文脈による抽象化とそのマッチ演算(自然変換とか)**、**代数的データ型**、**式とC#関数の違い**、**副作用とStateモナド**
 - delegate(Func<>)による高階関数、**Stateモナド**による状態管理
 - 抽象化のオーバーヘッドを喰らう可能性
 - 関手と自然変換
@@ -861,9 +855,10 @@ UnityのECSもデータを関数の繋がりというパイプに流し込むイ
   - あらゆる**抽象化をクラスの中に隠蔽**する(フレームを跨ぐ処理とか)
   - foldMap, foldr
   - 関数の構造の違い、再帰関数、**C#でhaskellの関数**を表現してみる試み、C#で**haskell互換なcode**をかけるか?
-  - haskellは、全public全static、関数は状態の更新を恐れる必要がない、オブジェクトのインスタンス化というのが無い
-
-- 関手の条件は、関手先でも関手元と同じ、単位律、推移律、を保っているか?
+  - haskellは、**全public全static、オーバーロード不可**、関数は状態の更新を恐れる必要がない
+  - C#のインスタンスメソッドの呼び出しは、その型のインタフェース(型クラス)メソッドの呼び出し(全て**staticメソッドに置き換える**ことが可能)
+  - **型引数,値引数,関数引数**
+  ![型推論?](型推論.png)
 
 ## 圏論とHaskell
 
@@ -924,21 +919,46 @@ UnityのECSもデータを関数の繋がりというパイプに流し込むイ
     - 積`(a,b)`: a ∧ b (論理積)
     - 余積`a|b`: a ∨ b (論理和)
       - に対応し、例えば、定義:`fd (Just (a, b)) = Just a`型:`Maybe (a,b) -> Maybe a` <=>     //a,bは多相型で全ての型を∧で繋げている様なもの(∀a)
-        `(a,b)|c -> a|c`(c == Nothing) <=> `(a∧b)∨c ⇒ a∨c`は証明できるからコードが書けるとか言うやつ(coq(定理証明支援系)とかあったような)
+        `(a,b)|c -> a|c`(c == Nothing) <=> `(a∧b)∨c ⇒ a∨c`は証明できるからコードが書けるとか言うやつ(coq(定理証明支援系)とかあったような)[自然演繹](自然演繹.png)
   - haskellにおける圏論の関心事?
     - 関数合成`(.)`や関数適用によって関数の出力の**型をどう変化**させ、それらを**どう合成**するか?(合成可能性)
     - 自然変換という、**内部の型に依存しない射**をどう作るか?(モナドのμ(join)とη(return)など)
     - システムに適した**代数的データ型**(`data`)をどう作るか?
 
-- Control.Category(圏論?), Control.Arrow(&&&とか)
+## Haskell環境セットアップ(VScode)
+
+(色々やったけどうまく言ったと思われるやつ)
+- VScodeの拡張機能から、Haskell v2.2.0をインストール 右下から"Project requires GHC but isn't installed"と言われてエラーが出たのでリンクをクリックし
+[GHCup](https://www.haskell.org/ghcup/)と言うやつに貼ってある
+`Set-ExecutionPolicy Bypass -Scope Process -Force;[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;Invoke-Command -ScriptBlock ([ScriptBlock]::Create((Invoke-WebRequest https://www.haskell.org/ghcup/sh/bootstrap-haskell.ps1 -UseBasicParsing))) -ArgumentList $true`
+を、VScodeのターミナル(powershell)に貼りEnterキーを押す
+最初に止めるか聞かれるので❰c❱を押した、その後デフォルトのパスにするか聞かれるので❰Enter❱を押した、後、色々インストールするけどいいか効いてくるでもよく分からないので適当に❰y❱を連打した
+すると色々がちゃがちゃ始まってVScodeのHaskellのインストールが終わった見たいだ(完)
+  - 他に(多分↑でインストールされるので**要らない**と思うが、)[native OS package manager](https://www.haskell.org/downloads/)の`Show Windows package`の`Chocolatey: GHC, cabal, Stack`をインストールした
 
 ## コンパイラ
 
+- ターミナル(powershell) [GHCの４つの実行方法](https://haskell.jp/blog/posts/2017/08-ghc-4way-execution.html)
+- `import ＠❰qualified❱『名前衝突回避(Data.List.∫LAny∫)』 ｢Data.List｣ ＠❰as ｢L｣❱『名前衝突回避の別名(L.∫LAny∫)』 ＠❰｡❰(｢nub｣, ｢sort｣)❱『特定の関数のみ指定できる』¦❰hiding (｢nub｣)❱『特定の関数を除く』｡❱`
+
 ### GHC
+
+- ソースコード(**.hs**)のコンパイルと実行
+  - コンパイル: `ghc ｢ファイルパス.hs｣`(相対パスをコピー)
+    - 出力されたexeの実行: `｢ファイルパス｣`
+  - **コンパイル&実行**: `runghc ｢ファイルパス.hs｣`
 
 ### GHCi
 
-- ====== =<<,タプル,リスト,GHCi,GHC,ラムダ式,オーバーロード不可?,型引数,値引数,関数引数,型と値は大文字,
-- プログラム運算,error関数
-- ,直和型(Union型,intもUnionと見ることもできる),非関数型は状態を持つ
-- ノードベースプログラミングは関数型
+- `terminal font size`を**14=>24**変更 **====================================================**
+- `GHCi`: PowerShellからGHCi起動(対話型インターフェースが起動する)
+- `x = x + 1`などを実行して無限再帰した場合は`ctrl + C`で`Interrupted.`と出て抜けれる
+- `:l ファイルパス.hs`(絶対パス か ghciを起動したパスからの相対パス)でロードできる(:l Kenron/haskellTest)
+- `:t`: 型を調べる
+- `:k`: カインドを調べる
+- `:info` 型、型クラスの情報を調べる
+- `:q` 終了
+- 複数行入力
+  - `:{`,`:}`の間
+  - `;`で一行で書く
+- インポート`:m + Data.List ＠⟦～⟧❰Data...❱`,デインポートは`:m - Data.List ＠⟦～⟧❰Data...❱`
