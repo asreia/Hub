@@ -15,7 +15,7 @@ GameObjectに`Destroy()`を呼んだ場合は、そのGameObjectに属してい�
 
 ## メソッド
 
-- `LoadScene(❰string sceneName¦int sceneBuildIndex❱, ❰LoadSceneMode.Single¦LoadSceneMode.Additive❱)` `[UnityEngine]`
+- `LoadScene(＄Scene＝⟪string sceneName¦int sceneBuildIndex⟫, ⟪LoadSceneMode.Single¦LoadSceneMode.Additive⟫)` `[UnityEngine]`
   - LoadSceneは**Sceneをロード**します(詳細は概要)
   - Sceneをスクリプトからロードするには、Editorの ファイル -> ビルド設定…(**Build Settings**が開く) -> "ビルドに含まれるシーン" にSceneファイル **(.unity)をD&Dで設定**する必要がある
   - **ロードするScene**をメソッドで**指定**するには.unityの**ファイル名**(`string sceneName`) か "ビルドに含まれるシーン"の右端に書いてある数字(`int sceneBuildIndex`)を指定します
@@ -23,7 +23,7 @@ GameObjectに`Destroy()`を呼んだ場合は、そのGameObjectに属してい�
     - **Single**は、現在ロードされている全てのSceneを**アンロードし**、指定されたSceneを**ロード**します
     - **Additive**は、現在ロードされている全てのSceneを**アンロードせず**、指定されたSceneを**追加でロード**します
 
-- `UnloadSceneAsync(❰string sceneName¦int sceneBuildIndex¦Scene scene❱)` `[UnityEngine]`
+- `UnloadSceneAsync(⟪∫Scene∫¦Scene scene⟫)` `[UnityEngine]`
   - UnloadSceneAsyncは、Sceneを非同期でアンロードします(詳細は概要)
   - 注意
     - Sceneをアンロードする前に、そのSceneに**属する全てのGameObjectと全てのComponent**に対する**参照を外して**ください([Unityでの複数シーンを使ったゲームの実装方法とメモリリークについて](https://madnesslabo.net/utage/?page_id=11109))
@@ -52,7 +52,7 @@ GameObjectに`Destroy()`を呼んだ場合は、そのGameObjectに属してい�
     - rootCount
       - >このシーンのルートtransformの数。
   - Public 関数
-    - GetRootGameObjects
+    - **GetRootGameObjects**
       - >シーン内のすべてのルートゲームオブジェクトを返します。
     - IsValid
       - >これが有効なシーンであるかどうか。たとえば、存在しないシーンを開こうとした場合、シーンが無効になる可能性があります。

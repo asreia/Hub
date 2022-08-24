@@ -6,15 +6,7 @@
 
 ## Hideflags
 
-## シリアライザ OnAfterDeserialize() OnAfterDeserialize()
-
-## ScriptableObject
-
-## MonoBehaviour
-
 ## Instantiate
-
-## AssetDataBase
 
 ## UnityのC#コードの扱い方 (別ファイル)
 
@@ -36,8 +28,18 @@
 
 ## CustomEditor (別ファイル)
 
-## UnityObjectがファイルに保存されるかされないか。Dirty (別ファイル)
-
 ## プロジェクトフォルダ内の削除 (別ファイル)
 
 ## Doxygen
+
+## 書いた=========================================================================
+
+## シリアライザ OnAfterDeserialize() OnAfterDeserialize()
+
+## AssetDataBase
+
+## UnityObjectがファイルに保存されるかされないか。Dirty (別ファイル)
+
+## ScriptableObject (コールバックとかまだ)
+
+## MonoBehaviour (コールバックとかまだ)

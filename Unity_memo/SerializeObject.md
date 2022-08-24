@@ -1,16 +1,16 @@
 # SerializedObjectとISerializationCallbackReceiver
 
-## SerializedObject
+## SerializedObject `[UnityEditor]`
 
 ### 概要
 
-- SerializedObjectは、**C++Object内のシリアライズデータ**を**C#のSerializedObject型**でコピーして編集し、またC++Objectへコピーできる様な型で、
-C++Object内のシリアライザを**C#の参照型で編集**するための機能です
+- SerializedObjectは、**C++Object内のシリアライズデータ**を**C#のSerializedObject型**にコピーして編集し、またC++Objectへコピーできる様な型で、
+  C++Object内のシリアライザを**C#の参照型で編集**するための機能です
 - **Editor拡張**は**SerializedObject**を通して**UnityObjectを編集**します
 
 ### メソッド
 
-- `new SerializedObject(UnityObject)`
+- `new SerializedObject(｢UnityObject｣)`
   - コンストラクタで**UnityObject**から**SerializedObject**を生成します。
   これによって、UnityObjectの対の**C++Object内**から**シリアライズデータ**を**コピー**し**SerializedObject型**として格納します。
   - SerializedObjectはUnityEngine.Object **(UnityObject)を継承しません**。そしてコンストラクタで生成しているという事から、

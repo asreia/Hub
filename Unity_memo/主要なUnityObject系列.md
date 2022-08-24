@@ -7,9 +7,9 @@
 - Objectは、**System.Objectではなく**、**それを継承**した**UnityEngin.Object**である。UnityEngin.Objectは名前が長いので個人的に**UnityObject**と呼ぶことにする
 - UnityObjectは**Unityのシステムの中**に **(各部分に)シングルトン**として生成され、そのインスタンスの**対**として**C++側のオブジェクト**が生成される
 - そのC++側のオブジェクト(以後**C++Object**)とその**UnityObject(instance)**の間の通信は、
-UnityObjectのフィールドの**m_CachedPtr**: UnityObject(instance) -> C++Object
-C++Objectのフィールドの**GCHandle**: C++Object -> UnityObject(instance)
-で通信している。と思われる
+  UnityObjectのフィールドの**m_CachedPtr**: UnityObject(instance) -> C++Object
+  C++Objectのフィールドの  **GCHandle**   : C++Object -> UnityObject(instance)
+  で通信している。と思われる
 - **C++Object**は、UnityObject以外にも**Assetファイル**への通信(AssetDatabase)と、**SerializeObject**への通信をしている
 - C++Objectには、**Assetデータ**、**シリアライズデータ**、**InstanceID**、などがある
 - UnityObjectは全て、**Inspectorに表示可能**である(多分)

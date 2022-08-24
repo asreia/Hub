@@ -1,12 +1,12 @@
-# AssetDataBase
+# AssetDatabase `[UnityEditor]`
 
 ## 概要
 
-- AssetDataBaseは、**C++Object**の**Assetデータ**と**Serializeデータ**を**ディスクに保存**するために、**Asset**と言う形式で保存します
+- AssetDatabaseは、**C++Object**の**Assetデータ**と**Serializeデータ**を**ディスクに保存**するために、**Asset**と言う形式で保存します
 - 主に**Scene内**のオブジェクト(**メモリ側**)と**Projectフォルダ**(**ディスク側**)の間で**Assetのセーブとロードを管理**します
 - Assetは2つのファイルで構成され、Assetデータは**Assetデータファイル(各拡張子)**に保存、Serializeデータは**Serializeデータファイル(.meta)**に保存される
 - SceneファイルやScriptableObjectなど**Unity固有**の生成ファイルは**Assetデータファイル側**にも**Serializeデータ**が**保存**されることもある
-- AssetDataBaseの**スクリプトによる操作以外**にEditorのProjectフォルダのフォルダを開くなどで**Assetがロード**される事もあります
+- AssetDatabaseの**スクリプトによる操作以外**にEditorのProjectフォルダのフォルダを開くなどで**Assetがロード**される事もあります
 
 ## メソッド
 
@@ -14,7 +14,7 @@
   - 概要の説明の通り、**C++Object**の**Assetデータ**と**Serializeデータ**を**ディスクに保存**します
     保存するために引数には**ファイル名 と 拡張子**も必要です
 
-- `LoadAssetAtPath<｢出力型｣>(∫Path∫)`
+- `UnityObject LoadAssetAtPath<｢出力型｣>(∫Path∫)`
   - Assetファイルから**Assetデータ**と**Serializeデータ**を**C++Object**へ**ロード**します
     SubAssetの名前でロードはできない`nullが返る`とでる
 
