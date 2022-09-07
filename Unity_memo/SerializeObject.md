@@ -24,6 +24,13 @@
 - `ApplyModifiedProperties()`
   - このメソッドにより、**C#のSerializedObject**を**C++Object内のシリアライズデータ**へコピーします
 
+## シリアライズ可能な型
+
+- UnityObject
+- [System.Serializable]がついたクラス、構造体
+- int,string,
+- ![ドメインリロードインスタンス再構築](画像/ドメインリロードインスタンス再構築.png)
+
 ## ISerializationCallbackReceiver
 
 ### 概要
