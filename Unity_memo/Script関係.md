@@ -2,7 +2,12 @@
 
 ## 補足
 
-- private void Update() の様なコールバックは**Unityが**privateでも**関数ポインタ**として登録し**呼び出し**ている(多分)
+- private void Update() の様なコールバックは**Unityが**privateでも**関数ポインタ**として登録し**呼び出し**ている(多分Cecilがやってる)
+- 定義可能なモノのリスト
+  - .unity (Scene)
+  - Prefab (GameObject)
+  - MonoBehaviour (Component)
+  - ScriptableObject (Asset)
 
 ## MonoBehaviour
 
@@ -27,6 +32,8 @@ ScriptableObjectは、**ScriptableなObject**であり**Unityのシステムの�
 - **注意事項**
   - ファイル名とクラス名が**同じでない**とCreateAsset時警告がでる
   No script asset for ScrObj. Check that the definition is in a file of the same name and that it compiles properly.
+
+### コールバック
 
 ### メソッド
 

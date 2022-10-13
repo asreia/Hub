@@ -29,6 +29,7 @@
 - UnityObject
 - [System.Serializable]がついたクラス、構造体
 - int,string,
+- [SerializeReference]を付けると派生クラスは基底クラスに暗黙アップキャストされず派生クラスとしてシリアライズできる(確か)
 - ![ドメインリロードインスタンス再構築](画像/ドメインリロードインスタンス再構築.png)
 
 ## ISerializationCallbackReceiver
@@ -41,7 +42,8 @@
 というよう変換を差し込みます
 - このコールバックを使うことで**シリアライズ,デシリアライズ**の**タイミングを知る**ことができる
 - その結果、
-  - Unityは**UnityObject**が**Inspectorに表示**(**Inspector**はUnityObjectのC++Objectにある**シリアライズデータ**をプロパティとして**表示**します)
+  - Unityは**UnityObject**が**Inspectorに表示**(**Inspector**はUnityObjectのC++Objectにある**シリアライズデータ**をプロパティとして**表示**します(追記: 正確には
+    さらに、そのシリアライズデータをInspectorを表示している**SerializedObjectへUpdate関数で更新**していると思う。Update関数の中でシリアライズを実行しているかもしれない))
     されている間、`OnBeforeSerialize()`を**呼び続け**、
     **UnityObjectのシリアライズ可能な変数**から**C++Objectのシリアライズデータ**を更新し続け、Inspectorに表示されているUnityObjectの**最新のプロパティの状態を表示**します
     - Inspectorを表示せず**UnityObjectのシリアライズ可能な変数**のみをスクリプトなどで**変更**しても`OnBeforeSerialize()`は呼ばれないので、
