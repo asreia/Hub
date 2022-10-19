@@ -26,11 +26,11 @@
 - `string name { get; set; }`
   - UXML上のnameと同じ
 
-- `void SetEnabled(bool value);`
+- `void SetEnabled(bool value);`                                  ==試す=ok=
   - VisualElement の**有効状態を変更**します。無効化されたVisualElementはほとんどの**イベントを受信しません**。
-    - (多分GameObjectやComponentのEnableの様に有効,無効を切り替えると思われる)
+    - falseにすると、(this)Element以下の**子孫**がNotEditableの様に**灰色になり操作不能**になる
 
-- `VisualTreeAsset visualTreeAssetSource { get; }`
+- `VisualTreeAsset visualTreeAssetSource { get; }`                                  ==試す==
   - 生成された要素(this)が**VisualTreeAsset**から**クローン**されたものである場合、アセットリファレンス **(VisualTreeAsset?)を格納**する。
     - (多分、`VisualTreeAsset.CloneTree(VisualElement ve)`のveに**VisualTreeAsset**がセットされる(クローン元のVisualTreeAssetを保持しておく?))
 
@@ -47,7 +47,7 @@
 
 - **Hierarchy**
   - **親を取得**
-    - `VisualElement parent { get; }`
+    - `VisualElement parent { get; }`                                  ==試す=ok=
       - 階層構造における**この(this)Element**の物理的な**親**。
 
   - **子の操作**
@@ -55,7 +55,7 @@
       - `VisualElement this[int key] { get; }`
         - (恐らくthisがコンテナでその**子Elementのインデクサ**)
 
-      - `IEnumerable<VisualElement> Children();`                                  ==試す==
+      - `IEnumerable<VisualElement> Children();`
         - コンテナに含まれるElementを返します。
           - (多分、**子Elementのイテレータを取得**する)
 
@@ -100,14 +100,14 @@
 
 ##### owner(ルート?)へのStyleSheets操作
 
-- `VisualElementStyleSheetSet styleSheets { get; }`
+- `VisualElementStyleSheetSet styleSheets { get; }`                                  ==試す==
   - この(this)Elementに付属する**StyleSheetsを操作**する**VisualElementStyleSheetSetを返します**。
     - (VisualElement(owner(ルート?))へのStyleSheetの追加削除操作ができるみたい。多分**StyleSheetはコードで生成不可**、USSファイルからのみロードして生成可能)
 
 ##### **.Class操作**
 
 - **取得**
-  - `IEnumerable<string> GetClasses();`
+  - `IEnumerable<string> GetClasses();`                                  ==試す==
     - この(this)Elementに対応する **.Classのイテレータを取得**します。
 
   - `bool ClassListContains(string cls);`
@@ -139,64 +139,114 @@
 - `string tooltip { get; set; }`
   - (多分カーソルをHoverすると説明が出てくるやつ)
 
-- `bool visible { get; set; }`
-  - このElementをレンダリングするか否かを示す。
-    - (Styleのdisplayと違う?)
+- `bool visible { get; set; }`                                  ==試す=ok=
+  - この(this)Elementをレンダリングするか否かを示す。
+    - `(this)Element.style.visibility.value`が`Hidden`になる(子孫には影響受けないが**親がHiddenだと子孫も非表示**になる)
 
 - `void MarkDirtyRepaint();`
   - 次のフレームでVisualElementの再描画をトリガーします。
 
 #### CallbackEventHandler
 
-- `bool HasBubbleUpHandlers()`                                  ==試す==
+- `bool HasBubbleUpHandlers()`                                  ==試す=ok=
   - この(this)Elementにイベント伝搬 BubbleUp フェーズのイベントハンドラ がアタッチされている場合、true を返す。
-    - (BubbleUpのCallbackが登録されているならtrue?)
+    - **BubbleUp**の**Callbackが登録**されているなら**true**(恐らく、何のイベントか,いくつ登録されるか、は関係ない)
 
 - `bool HasTrickleDownHandlers()`
   - (this)ElementがTrickleDownフェーズのイベントハンドラを持つ場合、Trueを返します。
-    - (TrickleDownのCallbackが登録されているならtrue?)
+    - **TrickleDown**の**Callbackが登録**されているなら**true**(恐らく、何のイベントか,いくつ登録されるか、は関係ない)
 
 - `void RegisterCallback<TEventType>(EventCallback<TEventType> callback, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown) where TEventType : EventBase<TEventType>, new()`
   - この(this)Elementに**TEventType**のイベントを**受信**した時に実行する**callbackを登録**する。**useTrickleDown**でBubbleUp(NoTrickleDown)かTrickleDownか選べる
 
 - `void RegisterCallback<TEventType, TUserArgsType>(EventCallback<TEventType, TUserArgsType> callback, TUserArgsType userArgs, TrickleDown useTrickleDown = TrickleDown NoTrickleDown) where TEventType : EventBase<TEventType>, new()`
   - 通常のイベント受信時のコールバック**登録** + ユーザー定義引数(**TUserArgsType**)付き
-
+                                  ==試す=ok=
 - `UnregisterCallback<TEventType>(EventCallback<TEventType> callback, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown) where TEventType : EventBase<TEventType>, new()`
   - この(this)Elementに**TEventType**のイベントを**受信**した時に実行する**callbackを登録解除**する。**useTrickleDown**でBubbleUp(NoTrickleDown)かTrickleDownか選べる
 
 - `void UnregisterCallback<TEventType, TUserArgsType>(EventCallback<TEventType, TUserArgsType> callback, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown) where TEventType : EventBase<TEventType>, new()`
   - 通常のイベント受信時のコールバック**登録解除** + ユーザー定義引数(**TUserArgsType**)付き
 
-- `virtual void ExecuteDefaultAction(EventBase evt)`
-  - イベントターゲットに登録されたコールバックが実行された後にロジックを実行します。ただし、イベントがデフォルトの動作を防止するようにマークされている場合はこの限りではありません。EventBase{T}.PreventDefault.
-    - (**イベントディスパッチ動作の終了直前**(最後のBubbleUpの直後)で実行される?(オーバーライドする必要があり、evtを**evt.eventTypeId**で調べて今なんのイベントか知る必要がある))
+- `protected virtual void ExecuteDefaultAction(EventBase evt)`                                  ==試す=ok=
+  - >イベントターゲットに登録されたコールバックが実行された後にロジックを実行します。ただし、イベントがデフォルトの動作を防止するようにマークされている場合はこの限りではありません。EventBase{T}.PreventDefault.
+    - (**イベントディスパッチ動作の終了直前**(最後のBubbleUpの直後)で実行される(オーバーライドする必要があり、evtを**evt.eventTypeId**で調べて今なんのイベントか知る必要がある))
+    - 追記:現在実行中の**ディスパッチ動作の終了の直前**に呼ばれる (何のイベントでも受信する)(↑`if(!(evt is ChangeEvent<bool> ce)) return;`でもイケる)
+      - ↑コントロールしか試していない
 
-- `virtual void ExecuteDefaultActionAtTarget(EventBase evt)`                                  ==試す==
-  - イベントターゲットに登録されたコールバックが実行された後にロジックを実行します。ただし、そのイベントがデフォルトの動作を防止するようにマークされている場合を除きます。EventBase{T}.PreventDefault.
-    - (**イベントディスパッチ動作のtargetの直後**で実行される?(オーバーライドする必要があり、evtを**evt.eventTypeId**で調べて今なんのイベントか知る必要がある))
+- `protected virtual void ExecuteDefaultActionAtTarget(EventBase evt)`                                  ==試す=ok=
+  - >イベントターゲットに登録されたコールバックが実行された後にロジックを実行します。ただし、そのイベントがデフォルトの動作を防止するようにマークされている場合を除きます。EventBase{T}.PreventDefault.
+    - (**イベントディスパッチ動作のtargetの直後**で実行される(オーバーライドする必要があり、evtを**evt.eventTypeId**で調べて今なんのイベントか知る必要がある))
+    - 追記:**ディスパッチ動作のtarget段階**であり現在受信しているイベントの**全てのRegisterCallback<~>(~)を呼んだ後**に呼ばれる(何のイベントでも受信する)(↑`if(!(evt is ChangeEvent<bool> ce)) return;`でもイケる)
+      - ↑コントロールしか試していない
 
-- `abstract void SendEvent(EventBase e)`                                  ==試す==
-  - イベントハンドラへイベントを送信する。
+- `abstract void SendEvent(EventBase e)`                                  ==試す=ok=
+  - イベントハンドラ(**IEventHandler?**)へ**イベントを送信**する。
+  - 以下の三種類の方法で試したが**無反応**だった
+    - `vE_0.SendEvent(m_CacheEvt);`
+    - [SynthesizeAndSendKeyDownEvent(vE_0.panel, KeyCode.A);](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Events-Synthesizing.html)
+    - `vE_0.panel.visualTree.SendEvent(new KeyDownEvent(){target = vE_0});`
 
 #### Focusable
 
-- `bool focusable { get; set; }`
+- `bool focusable { get; set; }`                                  ==試す=ok=
   - (this)Elementが**Focus可能**であればtrue
-    - (設定もできる?)
+  - **true**に設定すると**Focusでき**、**false**に設定すると**Focus不能**になる
 
-- `virtual bool canGrabFocus { get; }`
-  - (this)Elementに**Focusを当てることができる場合は true** を返す。
+- `virtual bool canGrabFocus { get; }`                                  ==試す=ok=
+  - >(this)Elementに**Focusを当てることができる場合は true** を返す。
+  - **Focusできる**場合は**true**。focusableのgetとの違いは多分**もともとのElement**が**Focus可能か?**と言うのが論理積される?
 
-- `int tabIndex { get; set; }`
-  - FocusリングのFocusタビリティをソートするために使用される整数。0以上でなければならない。
+- `int tabIndex { get; set; }`                                  ==試す=ok=
+  - >FocusリングのFocusタビリティをソートするために使用される整数。0以上でなければならない。
+    - Focusの**優先順位(0が高い)**。**負の数**だとTabキーで**Focusされない**。tabIndexが**同列の場合**、多分**Focusリングアルゴリズムに従う**(デフォルトは0)
   - [Focusリング](..\画像\Focusリング.png)
 
-- `virtual void Blur();`
+- `virtual void Blur();`                                  ==試す=ok=
   - (this)Elementに**Focusを外す**ように指示する。
 
-- `virtual void Focus();`
+- `virtual void Focus();`                                  ==試す=ok=
   - この(this)Elementに**Focusを当てる**ようにする。
+
+## BindableElement
+
+### 概要
+
+後で
+
+### メンバ
+
+- `public IBinding binding { get; set; }`
+  - >更新されるバインディング・オブジェクト。(とりあえず翻訳)
+- `public string bindingPath { get; set; }`
+  - >バインドする対象プロパティのパス。(とりあえず翻訳)
+
+## BaseField\<TValueType>
+
+### 概要
+
+- `BaseField\<TValueType>`は、UIに**表示する時**、左側に`Label`、右側に`INotifyValueChanged<TValueType>`を表現するUIを表示する
+- クラスの定義: `abstract class BaseField<TValueType> : BindableElement, INotifyValueChanged<TValueType>, IMixedValueSupport`
+- `abstract`なので継承して実装される必要がある
+- クラスの型引数に`TValueType`を取り`INotifyValueChanged<TValueType>`を実装している
+  - `INotifyValueChanged<TValueType>`は`ChangeEvent<T>`を**発生**させる
+- メンバに`Label labelElement { get; }`を持つ
+
+### メンバ
+
+- **Label**
+  - `Label labelElement { get; }`
+    - UIの左側に表示される`Label`
+
+  - `string label { get; set; }`
+    - 恐らく`labelElement.text`と同じ
+
+- **INotifyValueChanged\<TValueType>**
+  - `virtual TValueType value { get; set; }`
+    - setすると`ChangeEvent<TValueType>`が**発生する**
+
+  - `virtual void SetValueWithoutNotify(TValueType newValue)`
+    - `ChangeEvent<~>`を**発行しない**でvalueを更新する
 
 ## イベント(evt)
 
@@ -206,7 +256,8 @@
   UXMLの**root**からEventBase.**target**へ**イベント(evt)** を**必要とするノード**へ**ディスパッチ(送信)** して行きます
   - **必要とするノード**とは、UXMLのノードに**登録**されている`RegisterCallback<TEventType>`の`TEventType`が`typeof(TEventType) == evt.GetType`であり
     かつ [**enum TrickleDown**が合っている または **target**] の時、そのノード(Element)は**イベント(evt)を受信**します。(Callbackに**evtを引数に取る**)
-- イベント(evt)の継承構造は、**EventBase** -> **EventBase<T>** -> ..各イベント(evt)のクラス列.. となっている
+  - Callbackを**登録する条件**は、**どのElementに登録するか**, **どのイベントを受信するか**, **どのタイミングで受信するか(enum TrickleDown)**、によって決まります。
+- イベント(evt)の継承構造は、**EventBase** -> **EventBase\<T>** -> ..各イベント(evt)のクラス列.. となっている
 - >UI Toolkit は、オペレーティングシステムやスクリプトからのイベントをリッスンし、EventDispatcher でこれらのイベントをElementにディスパッチします。
 - >UI Toolkit のイベントは、HTML イベントに似ています。
 
@@ -214,62 +265,74 @@
 
 #### EventBase
 
-- `long timestamp { get; }`
-  - イベントが作成された時刻。
+- **target**
+  - `IEventHandler target { get; set; }`
+    - このイベントを受信したターゲットのビジュアル要素です。currentTargetとは異なり、このターゲットはイベントが伝搬経路上の他の要素に送信される際に変更されません。
+      - **目標のIEventHandler**(各Elementにキャスト可能)
 
-- `bool dispatch { get; }`
-  - >イベントがビジュアル要素にディスパッチされているかどうかを示します。
-    >イベントは、ディスパッチされている間は再ディスパッチすることができません。
-    >イベントを再帰的にディスパッチする必要がある場合は、イベントのコピーを使用することを推奨します。
-    - (イベントが**伝搬中ならばtrue?**)
+  - `virtual IEventHandler currentTarget { get; internal set; }`
+    - >イベントの現在のターゲットです。イベントハンドラが現在実行されている伝搬経路のVisualElementです。
+      - **現在のIEventHandler**(各Elementにキャスト可能)
 
-- `IEventHandler target { get; set; }`
-  - このイベントを受信したターゲットのビジュアル要素です。currentTargetとは異なり、このターゲットはイベントが伝搬経路上の他の要素に送信される際に変更されません。
-    - **目標のIEventHandler**(各Elementにキャスト可能)
+- `Stop＠❰Immediate❱Propagation()`と`PreventDefault()` と**その確認**
+  - **Propagation**
+    - `void StopPropagation()`                                  ==試す=ok=
+      - >このイベントの伝搬を停止します。伝搬経路上の他の要素にイベントは送信されません。このメソッドは、他のイベントハンドラが現在のターゲット上で実行されるのを**防ぐことはありません**。
+        - 現在ディスパッチしている**イベントの伝播経路のIEventHandler**で**そのIEventHandlerの全ての登録されたCallback(イベントの種類とタイミングは同じ)**を**全て実行し**、それ以降の
+          **登録されたCallback**を実行しない(`ExecuteDefaultAction＠❰AtTarget❱`は呼ぶ)
+        - `evt.StopPropagation()`を呼び出すと即時に`evt.isPropagationStopped`がtrueになる
 
-- `virtual IEventHandler currentTarget { get; internal set; }`
-  - >イベントの現在のターゲットです。イベントハンドラが現在実行されている伝搬経路のVisualElementです。
-    - **現在のIEventHandler**(各Elementにキャスト可能)
+    - `bool isPropagationStopped { get; }`                                  ==試す=ok=
+      - >このイベントに対して `StopPropagation()`が呼び出されたかどうか。
+      - `evt.StopPropagation()`を呼び出すと即時に`evt.isPropagationStopped`が**true**になる
 
-- `PropagationPhase propagationPhase { get; }`
-  - 現在のプロパゲーションフェーズです。(enum)
-    - (`PropagationPhase`(実行順): `None`, `TrickleDown`, `AtTarget`, `DefaultActionAtTarget`, `BubbleUp`, `DefaultAction`)
-      - `None`以外は`dispatch`がtrue?
+  - **ImmediatePropagation**
+    - `void StopImmediatePropagation()`                                  ==試す=ok=
+      - >イベントの伝搬を即座に停止します。イベントは伝搬経路上の他の要素には送られません。このメソッドは、他のイベントハンドラが現在のターゲット上で実行されるのを**防ぎます**。
+        - 現在ディスパッチしている**イベントの伝播経路のIEventHandler**で**現在実行している登録されたCallback**を**実行し**、それ以降の
+          **登録されたCallback**を実行しない(`ExecuteDefaultAction＠❰AtTarget❱`は呼ぶ)
 
-- `bool isDefaultPrevented { get; }`
-  - このイベントに対してデフォルトアクションを実行しない場合はtrueを返す。
-    - (`PreventDefault()`が呼ばれていたら**true**?)
+    - `bool isImmediatePropagationStopped { get; }`                                  ==試す=ok=
+      - >このイベントに対して `StopImmediatePropagation()`が呼び出されたか否かを示す。
+      - `evt.StopImmediatePropagation()`を呼び出すと即時に`evt.isImmediatePropagationStopped`を**true**にする
 
-- `bool isImmediatePropagationStopped { get; }`
-  - このイベントに対して `StopImmediatePropagation()`が呼び出されたか否かを示す。
+  - **DefaultPrevented**
+    - `void PreventDefault()`                                  ==試す=ok=
+      - >このイベントに対して、デフォルトのアクションが実行されないようにするかどうかを示す。
+      - `evt.PreventDefault()`を実行すると即時に`evt.isDefaultPrevented`が`true`になり、`ExecuteDefaultAction＠❰AtTarget❱`を呼ばなくなる
+        - (そのイベントが**キャンセル可能な場合**)(`ExecuteDefaultActionAtTarget`をキャンセルする場合、**TrickleDownフェーズ**で`evt.PreventDefault()`を実行する必要がある)
 
-- `bool isPropagationStopped { get; }`
-  - このイベントに対して `StopPropagation()`が呼び出されたかどうか。
+    - `bool isDefaultPrevented { get; }`                                  ==試す=ok=
+      - このイベントに対してデフォルトアクションを実行しない場合はtrueを返す。
+      - `evt.PreventDefault()`を実行すると即時に`evt.isDefaultPrevented`が`true`になり、`ExecuteDefaultAction＠❰AtTarget❱`を呼ばなくなる
+        - (そのイベントが**キャンセル可能な場合**)(`ExecuteDefaultActionAtTarget`をキャンセルする場合、**TrickleDownフェーズ**で`evt.PreventDefault()`を実行する必要がある)
 
-- `bool tricklesDown { get; protected set; }`
-  - TrickleDown フェーズにおいて、このイベントがイベント伝搬路に送信されるかどうかを返す。
-    - (このイベントの種類(型)が`TrickleDown`で受信されるか? (イベントの種類によってはtargetのみ送られるイベントもある))
+- 現在の**evtの状態**
+  - `PropagationPhase propagationPhase { get; }`
+    - 現在のプロパゲーションフェーズです。(enum)
+      - (`PropagationPhase`(実行順): `None`, `TrickleDown`, `AtTarget`, `DefaultActionAtTarget`, `BubbleUp`, `DefaultAction`)
+        - (多分、`propagationPhase.None` <=> `dispatch:False`?)
 
-- `bool bubbles { get; protected set; }`
-  - BubbleUp フェーズにおいて、このイベントがイベント伝搬路に送信されるかどうかを返す。
-    - (このイベントの種類(型)が`BubbleUp`で受信されるか? (イベントの種類によってはtargetのみ送られるイベントもある))
+  - `bool dispatch { get; }`                                  ==試す=ok=
+    - >イベントがElementにディスパッチされているかどうかを示します。
+      >イベントは、ディスパッチされている間は再ディスパッチすることができません。
+      >イベントを再帰的にディスパッチする必要がある場合は、イベントのコピーを使用することを推奨します。
+      - **現在伝搬中であるか**チェックし**伝搬中ならtrue**になる。(多分、`propagationPhase.None` <=> `dispatch:False`?)
+
+- そのフェーズで**受信するか?**[リンク先の表で、"BlurEvent"は"バブルアップ (上昇) 伝播"では受信しない為"bubbles"は"false"になる](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Focus-Events.html)
+  - `bool tricklesDown { get; protected set; }`                                  ==試す=ok=
+    - >TrickleDown フェーズにおいて、このイベントがイベント伝搬路に送信されるかどうかを返す。
+      - evtの**イベントの型**がもともと**TrickleDown**で**受信**する場合は**true**
+
+  - `bool bubbles { get; protected set; }`                                  ==試す=ok=
+    - BubbleUp フェーズにおいて、このイベントがイベント伝搬路に送信されるかどうかを返す。
+      - evtの**イベントの型**がもともと**BubbleUp**で**受信**する場合は**true**
 
 - `bool pooled { get; set; }`
   - >イベントがイベントのプールから割り当てられたかどうか。
 
-- `void PreventDefault()`
-  - >このイベントに対して、デフォルトのアクションが実行されないようにするかどうかを示す。
-    (呼ぶと`ExecuteDefaultAction＠❰AtTarget❱`を実行しない?)
-
-- `void StopImmediatePropagation()`
-  - >イベントの伝搬を即座に停止します。イベントは伝搬経路上の他の要素には送られません。このメソッドは、他のイベントハンドラが現在のターゲット上で実行されるのを**防ぎます**。
-    - (多分、今ディスパッチしている**イベントの伝播経路の中**で現在実行している**登録されたCallback**以降、
-      **登録されたCallback**を実行しない(`ExecuteDefaultAction＠❰AtTarget❱`は呼ぶ))
-
-- `void StopPropagation()`
-  - >このイベントの伝搬を停止します。伝搬経路上の他の要素にイベントは送信されません。このメソッドは、他のイベントハンドラが現在のターゲット上で実行されるのを**防ぐことはありません**。
-    - (多分、今ディスパッチしている**イベントの伝播経路の中**で現在実行している**IEventHandlerの全ての登録されたCallback**以降、
-      **登録されたCallback**を実行しない(`ExecuteDefaultAction＠❰AtTarget❱`は呼ぶ))
+- `long timestamp { get; }`
+  - イベントが作成された時刻。
 
 #### EventBase\<T>
 
@@ -290,12 +353,13 @@
 ## [Focusイベント (実行順)](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Focus-Events.html)
 
 - `relatedTarget`は`target`の対となる、`target`の**逆のFocus状態**のElement
+  - 試したが、コントロールの**奥のElement**をFocusしてイベントを呼んでいるせい?か`name`がうまく出なかった
 
 - `FocusInEvent`
   - ElementがFocusを**得る前**に送信されます
   - `target`: Focusを得るElement
   - `relatedTarget`: Focusを失うElement
-- `FocusEvent`
+- `FocusEvent`                                  ==試す=ok=
   - ElementがFocusを**得た後**に送信されます
   - `target`: Focusを得たElement
   - `relatedTarget`: Focusを失ったElement
@@ -317,7 +381,7 @@
   - `SetValueWithoutNotify()`で`ChangeEvent<T>`を**発生させずにvalueを変更**することが可能
   - **バインディングシステム**のリンク処理でも`ChangeEvent<T>`が**内部的に使用**されているらしい (UI -> シリアライズObj?のみ?)
 
-### メソッド
+### イベント
 
 - `ChangeEvent<T>`
   - `target`: 状態(value)の変更が発生するElement
@@ -332,7 +396,7 @@
   - 例えば、`Toggle`コントロールの実装では、`ClickEvent`を使用して、チェックマークを表示または非表示にし、コントロールの**値(value)を変更**します。
 - `ClickEvent`の基底クラスは、`PointerEventBase`です。
 
-### メソッド
+### イベント
 
 - `ClickEvent`
   - `target`: **クリックが発生**したときの**マウス**またはポインティングデバイスの**下にあるElement**
@@ -362,27 +426,50 @@
   - `localMousePosition`: `target`となるElementに対し**ローカル座標**を返します
   - `mouseDelta`: **前**のマウスイベント時のポインターと、**現在**のマウスイベント時のポインターの**位置の差**
 
-## IPanelイベント
+## [IPanelイベント](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Panel-Events.html)
 
-子を持てるVisualElemntは実際にはIPanelがそのVisualElemntを持っていて
-実際にはIPanelが子への参照を持っている?(EventDispatcherをフィールドに持っている)
-VisualElemnt :: IPanel panel { get; } 概要: この VisualElement が貼り付けられているパネル。
-パネルイベントは、パネルとの関係が変化するときにビジュアル要素で発生します。例えば、ビジュアル要素をパネルに加えるとき (AttachToPanelEvent)、またはパネルから削除するとき (DetachFromPanelEvent) などです。
-パネルイベントは、パネルの変更の発生時に直接影響を受ける階層内のビジュアル要素とその子孫にのみ送信されます。(つまり、変更したパネル以下全てにイベント送信)
-AttachToPanelEvent	要素 (またはその親) がパネルに接続された直後に送信されます。
-DetachFromPanelEvent	要素 (またはその親) がパネルから離される直前に送信されます。
-originPanel: originPanel には、DetachFromPanelEvent 特有のデータが含まれています。(そのイベントのみ有効なプロパティ?)パネル変更時にビジュアル要素が切り離されるソースパネルが示されています。
-destinationPanel: destinationPanel には、AttachFromPanelEvent 特有のデータが含まれています。データは、ビジュアル要素が現在接続しているパネルを示します。
+### IPanelとは
+
+- `IPanel`は、UXML(**Element**)の木構造(**ツリー**)の**ルートに存在**していて、`IPanel.visualTree`は**Elementのツリー**の**ルートのElement**を参照している(セットされていれば)
+- Elementのツリーの**各ノード**の**element.panel**は、ルートに存在している**同じIPanelを参照**している
+- **あるelement**のツリーに**別のelement**のツリーを `あるelement.Add(別のelement)`した場合、
+  **別のelement.panel**は、**あるelement.panel**に更新される(**ルートのIPanelが更新**される)
+- `IPanel`には`EventDispatcher`などUIとして機能させる機能がある
+- >パネルは、UI 階層の可視インスタンスを表します。パネルは、ビジュアルツリーの階層の中で、要素の動作イベントのディスパッチを処理します。
+  >階層のルートのビジュアル要素への参照を維持します。ランタイム UIでは、UGUI の Canvas に相当します。
+- >VisualElement :: IPanel panel { get; } 概要: この VisualElement が貼り付けられているパネル。
+
+### 概要
+
+>IPanelイベントは、**IPanelとの関係が変化**するときにElementで**発生**します。
+>IPanelイベントは、IPanelの変更(Add,Removeなど)の発生時に**直接影響を受けるElement**と**その子孫**にのみ送信されます。(**親Element**はイベントを**受信しない**)
+
+### イベント
+
+- **イベント**
+  - `AttachToPanelEvent`
+    - >Element(またはその親) がパネルに接続(`Add`)された直後に送信されます。
+  - `DetachFromPanelEvent`
+    - >Element(またはその親) がパネルから離される(`Remove`)直前に送信されます。
+- **プロパティ**
+- `originPanel`
+  - >`DetachFromPanelEvent`特有のデータが含まれています。パネル変更時にElementが切り離される(`Remove`)ソースパネルが示されています。
+    - `DetachFromPanelEvent`のみ有効なプロパティ (`AttachToPanelEvent`で参照したら`.visualTree`が`null`だった)
+- `destinationPanel`
+  - >`AttachToPanelEvent`特有のデータが含まれています。データは、Elementが現在接続(`Add`)しているパネルを示します。
+    - `AttachToPanelEvent`のみ有効なプロパティ (`DetachFromPanelEvent`で参照したら`.visualTree`が`null`だった)
 
 ## UQuery
 
-概要: Query&lt;T&gt;.Build().First() の短縮形である便利なオーバーロードです。
-e: セレクタが適用されるルート VisualElement。
-name: 指定された場合、この名前を持つ要素を選択します。
-className: 指定された場合、指定されたクラス（Typeと混同しないように）を持つ要素を選択します。
-//型かnameか.class[]か
-❰VisualElement¦T¦UQueryBuilder<❰VisualElement¦T❱>❱ ❰Q＠❰T❱¦Query＠❰T❱❱(this VisualElement e, string name = null, params string[] classes)＠❰where T : VisualElement❱;
-❰VisualElement¦T¦UQueryBuilder<❰VisualElement¦T❱>❱ ❰Q＠❰T❱¦Query＠❰T❱❱(this VisualElement e, string name = null, ❰params string[] classes¦string className = null❱)＠❰where T : VisualElement❱;
-ルートビジュアルエレメント上で実行される選択ルール群を構築するユーティリティオブジェクトです。
-    (さらに絞り込むまたは、子をForEachで処理する用の中間Query?)
-UQueryBuilder<T>
+- 戻り値: `❰VisualElement¦T¦UQueryBuilder<❰VisualElement¦T❱>❱`
+  本体: `❰Q＠❰<T>❱¦Query＠❰<T>❱❱` 引数:`(this VisualElement e, string name = null, params string[] classes)`
+  型制約: `＠❰where T : VisualElement❱`
+  - UQueryで検索する**条件**
+    - Elementの**型**:`<T>`
+    - Elementの**name**:`name`
+    - Elementに追加している **.Class**:`classes`
+  - 恐らく `element.Q<T>(~)` <=> `element.Query<T>(~)＠❰.Build()❱.First()`
+    - >`Q<T>`は`Query<T>.Build().First()` の短縮形である便利なオーバーロードです。
+  - `UQueryBuilder<T>`
+    - >ルートビジュアルエレメント上で実行される**選択ルール群を構築**するユーティリティオブジェクトです。
+      - (さらに絞り込むまたは、子をForEachで処理する用の中間Query?)
