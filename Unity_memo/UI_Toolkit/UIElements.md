@@ -208,18 +208,41 @@
 - `virtual void Focus();`                                  ==試す=ok=
   - この(this)Elementに**Focusを当てる**ようにする。
 
-## BindableElement
+## SerializedObjectデータバインディング(BindableElement(IBindable) と BindingExtensions)
 
 ### 概要
 
-後で
+- `INotifyValueChanged<TValueType>.value`と、`SerializedProperty`をリンクし**同期**させます
 
 ### メンバ
 
-- `public IBinding binding { get; set; }`
-  - >更新されるバインディング・オブジェクト。(とりあえず翻訳)
-- `public string bindingPath { get; set; }`
-  - >バインドする対象プロパティのパス。(とりあえず翻訳)
+- **BindableElement**
+  - `IBinding binding { get; set; }`
+    - >更新されるバインディング・オブジェクト。(とりあえず翻訳)
+    - >//bindingはBindしたSerializedObjectがある場所だと思ったけどnullだった
+      - 追記(試してない): `IBinding`(`IBindable`と見間違えた)は、`SerializedProperty` => `value`への`＠❰Pre❱Update`関数があり実行すると`value`を**更新**すると思われる
+        `Release()`は`Unbind()`の様なものと思われる
+  - `string bindingPath { get; set; }`
+    - >バインドする対象プロパティのパス
+    - `bindingPath`が設定されているElementよりも**祖先**で実行し、引数に取る`SerializedObject`と、その中の`SerializedProperty`の**名前**が設定されている**子孫**の`bindingPath`を
+      対応させ、`bindingPath`が設定されているElementの`value`と、その`SerializedProperty`で**バインディング**し同期します
+- **BindingExtensions**
+  - `void Bind(SerializedObject obj);`
+    - `bindingPath`が設定されているElementよりも**祖先**で実行し、引数に取る`SerializedObject`と、その中の`SerializedProperty`の**名前**が設定されている**子孫**の`bindingPath`を
+      対応させ、`bindingPath`が設定されているElementの`value`と、その`SerializedProperty`で**バインディング**し同期します
+    - この`Bind(~)`関数は`bindingPath`が**設定し終わった後**に実行し**バインドする**と公式マニュアルに書いてあったが、試したところ**設定前でも機能した**。が、一応マニュアルに従った方が良い
+    - `CustomEditor`,`PropertyDrawer`の場合は`return`する**Element**に自動的で`Bind(~)`が呼び出されるようなので**呼ぶ必要はない**(多分、逆に呼ぶと階層間で**二重にバインド**し**挙動が怪しく**なるかも?)
+      - `Unbind()`は**閉じた時に呼ばれる**
+  - `void BindProperty(SerializedProperty property);`
+    - `SerializedProperty`を直接設定することで、このElementの`value`がその`SerializedProperty`と**バインディング**し同期します
+  - `void TrackPropertyValue(SerializedProperty property, Action<SerializedProperty> callback = null);`
+    - 引数に渡された`SerializedProperty`を監視し、変更があった時、第二引数の`callback`を呼び出します(`SerializedProperty`と`callback`の**バインディング**と言える?)
+    - >//追跡(Track)先が、追跡先の初期値に変化するとCallbackを呼ばない(謎) //TrackPropertyValue,Unbindを繰り返したら、直った(謎)
+      >//追跡(Track)先が、追跡先の初期値では無い状態で、so_bindData_0の任意のPropertyが変化するとCallbackを実行してしまう(仕様?)
+  - `void TrackSerializedObjectValue(SerializedObject obj, Action<SerializedObject> callback = null);`
+    - 引数に渡された`SerializedObject`を監視し、(任意の`SerializedProperty`の)変更があった時、第二引数の`callback`を呼び出します(`SerializedObject`と`callback`の**バインディング**と言える?)
+  - `void Unbind();`
+    - `Unbind()`は↑の4つの**バインディング状態**を**解除**します(つまり、↑の**呼び出し前の状態**と同じになる)
 
 ## BaseField\<TValueType>
 
