@@ -30,9 +30,10 @@
   - VisualElement の**有効状態を変更**します。無効化されたVisualElementはほとんどの**イベントを受信しません**。
     - falseにすると、(this)Element以下の**子孫**がNotEditableの様に**灰色になり操作不能**になる
 
-- `VisualTreeAsset visualTreeAssetSource { get; }`                                  ==試す==
-  - 生成された要素(this)が**VisualTreeAsset**から**クローン**されたものである場合、アセットリファレンス **(VisualTreeAsset?)を格納**する。
-    - (多分、`VisualTreeAsset.CloneTree(VisualElement ve)`のveに**VisualTreeAsset**がセットされる(クローン元のVisualTreeAssetを保持しておく?))
+- `VisualTreeAsset visualTreeAssetSource { get; }`                                  ==試す=ng=
+  - 生成されたElement(this)が**VisualTreeAsset**から**クローン**されたものである場合、アセットリファレンス **(VisualTreeAsset?)を格納**する。
+    - (多分、`TemplateContainer tc = vta.CloneTree();`のtcに**VisualTreeAsset**がセットされる(クローン元のVisualTreeAssetを保持しておく?))
+      - 追記: `TemplateContainer tc = vta.CloneTree();`しても`tc.visualTreeAssetSource == null`が**true**と出てしまったので**良く分からない**
 
 ##### Hierarchy操作
 
@@ -98,27 +99,29 @@
   - `override int GetHashCode();`
     - Hierarchyの**ハッシュ化**
 
-##### owner(ルート?)へのStyleSheets操作
+##### StyleSheets操作
 
-- `VisualElementStyleSheetSet styleSheets { get; }`                                  ==試す==
-  - この(this)Elementに付属する**StyleSheetsを操作**する**VisualElementStyleSheetSetを返します**。
-    - (VisualElement(owner(ルート?))へのStyleSheetの追加削除操作ができるみたい。多分**StyleSheetはコードで生成不可**、USSファイルからのみロードして生成可能)
+- `VisualElementStyleSheetSet styleSheets { get; }`
+  - **このElement**に付属する`StyleSheet`の**取得追加削除**を操作
+  - (`StyleSheet`は**コードで生成不可**、**USSファイルからのみロード**して生成可能)
 
-- **メモ**
-  - IStyleの1要素毎の**セレクターの適用条件**(たぶん、100*2 + 10*0 + 1*4 + 2(階層) = 206)
-    - セレクターの単一要素の優先度 
-      - **❰1❱セット(10000), ❰2❱名前(#name)(1000), ❰3❱クラス(.class)(100), ❰3❱状態(:state)(100), ❰4❱型(Type)(10), ❰5❱デフォルト(0), ❰5❱ユニバーサルセレクタ(*)(0)**
-      - **子がデフォルト**の場合その**親**のデフォルト以外**の設定**は**子をオーバーライド**する
-      - セレクターの複数要素の優先度 (And(❰word❱❰word❱), 子(❰word❱ > ❰word❱), 子孫(❰word❱ ❰word❱), or(❰word❱,❰word❱), ユニバーサルセレクタ(*))
-        - orは、`スタイルセレクタには、❰*_-.#>,❱文字、数字のみ使用できます。`と出て`,`は使えるはずなのに使えないので`or`をすることが**できない**
-    - Element階層間でのセレクター適用優先度(子:セレクタ適用,親:直接適用 とか)
-
-    - Element階層間でのUSSロード(override,優先順序)//まだ
+- **VisualElementStyleSheetSet**
+  - `bool Contains(StyleSheet styleSheet);`
+    - 引数の`StyleSheet`が、**このElement**に含まれているか
+  - `int count { get; }`
+    - **このElement**に`Add(StyleSheet)`された**数**
+  - `void Add(StyleSheet styleSheet);`
+    - **このElement**に引数の**StyleSheetを適用**する(このElement以下に影響を与える)
+    - このメソッドは**各Element毎に設定でき**、そのElementと**子孫のElementに影響**を与える。
+  - `bool Remove(StyleSheet styleSheet);`
+    - 引数のStyleSheetを**このElementから削除**する
+  - `void Clear();`
+    - このElementに適用いる**全てのStyleSheet**を**このElementから削除**(これだけまだ試してない)
 
 ##### **.class操作**(.classは単なるタグ。USSはセレクタで類別しているのであって、.classはセレクタの要素の一種。.classはUSSの適用以外にQueryの検索にも使う)
 
 - **取得**
-  - `IEnumerable<string> GetClasses();`                                  ==試す==
+  - `IEnumerable<string> GetClasses();`                                  ==試す=ok=
     - この(this)Elementに対応する **.Classのイテレータを取得**します。
 
   - `bool ClassListContains(string cls);`
@@ -144,6 +147,25 @@
 ##### この(this)ElementのStyleへの参照(Styleの操作ができる)
 
 - `IStyle style { get; }`
+
+  - **StyleKeyword**(`IStyle.｢Style項目｣.keyword)`
+    - `Undefined = 0`
+      - >そのプロパティに定義されたキーワードがないことを意味する。
+      - 値(`T value`)を**設定すると**`Undefined`になった
+    - `Null = 1`
+      - >IStyleからのインラインスタイルが、値やキーワードを持たないことを意味します。
+      - 恐らく、UI Builderの**unset**と同じ
+    - `Auto = 2`
+      - >スタイルプロパティが「auto」を受け付ける場合。
+      - 恐らく、UI BuilderのStyle項目に設定する**auto**と同じ
+        - **auto**は、他の`｢Style項目｣`によって計算し**算出される**
+    - `None = 3`
+      - >スタイルプロパティで「none」を選択した場合。
+      - UI Builderで**none**を設定するStyle項目はあるのか?
+    - `Initial = 4`
+      - >スタイルプロパティの初期値（またはデフォルト値）
+      - 恐らく、UI BuilderのStyle項目に設定する**Initial**と同じ
+        - だが、**Initial**が何かは分からない
 
 ##### その他
 
