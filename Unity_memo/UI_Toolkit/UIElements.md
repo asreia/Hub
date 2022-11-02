@@ -86,6 +86,18 @@
       - `void RemoveAt(int index);`
         - 引数の**index番目の子Element**をこの(this)Elementのコンテナから**削除**する。
 
+- **Elementの位置**(↓適当)
+  - **Rect**
+    - `Rect localBound { get; }`
+      - **親**のElementの位置から**このElement**の相対位置?
+    - `Rect worldBound { get; }`
+      - **ルート**のElementの位置から**このElement**の相対位置?
+    - `Rect contentRect { get; }`
+      - **こ(this)**のElementの位置から**IStyleのSizeが覆う**の相対位置?
+  - **ITransform**
+    - `ITransform transform { get; }`
+      - 多分**IStyleのTransform**?(違うかもしれない)
+
   - **比較**
     - `bool Equals(Hierarchy other);`
       - Hierarchy型の**Equals比較**(HierarchyのElementの木構造が同じかチェックする?)
@@ -303,6 +315,264 @@
 
   - `virtual void SetValueWithoutNotify(TValueType newValue)`
     - `ChangeEvent<~>`を**発行しない**でvalueを更新する
+
+## ScrollView
+
+## 概要
+
+- スクロールバーが右側(垂直)と下側(平行)に付いたコンテナElement
+
+### メンバ
+
+- `ScrollViewMode mode { get; set; }`
+  - >ScrollViewがユーザーにコンテンツのスクロールを許可する方法を制御します。ScrollViewMode
+  - Enumが`Vertical`, `Horizontal`, `VerticalAndHorizontal`からなり、スクロールバーを出すか出さないかを決める
+    `Horizontal`にすると`ScrollView.Add(Element)`した時、**水平に追加(Add)**される
+
+- `Vector2 scrollOffset { get; set; }`
+  - >現在のスクロール位置。
+  - `ScrollView(正確にはScrollView.contentContainer?)`内の**左上の角**の座標(`Vector2`)
+  - 追加(Add)位置が一番下で`scrollView.scrollOffset = new Vector2(scrollView.scrollOffset.x, float.MaxValue)`とすれば追加位置に自動スクロールする
+    (AddされたElementは`localBound`がすぐ設定されない)
+    - `scrollView.scrollOffset = VisualElement.localBound.position` //localBoundは親のElementからの相対座標
+
+- **ScrollerVisibility**
+  - `ScrollerVisibility horizontalScrollerVisibility { get; set; }`
+    - >水平スクロールバーが**表示されているかどうか**を指定する。
+    - `Auto(デフォルト)`, `AlwaysVisible`, `Hidden`からなり、
+      `Auto`:スクロールが必要な時に表示, `AlwaysVisible`:常に表示, `Hidden`:常に隠す
+
+  - `ScrollerVisibility verticalScrollerVisibility { get; set; }`
+    - >垂直スクロールバーが**表示されているかどうか**を指定する。
+    - `Auto(デフォルト)`, `AlwaysVisible`, `Hidden`からなり、
+      `Auto`:スクロールが必要な時に表示, `AlwaysVisible`:常に表示, `Hidden`:常に隠す
+
+- **content**
+  - `override VisualElement contentContainer { get; }`
+    - >完全なコンテンツが含まれ、部分的に表示される可能性があります。
+      - `ScrollView.Add(Element)`の追加先と同じだった。つまり`ScrollView.Add(Element)`⇔`ScrollView.contentContainer.Add(Element)`
+        [contentContainer](../画像/contentContainer.png)
+
+  - `VisualElement contentViewport { get; }`
+    - >contentContainerの可視部分を表します。
+      - `contentContainer`の親の`VisualElement`。追加(Add)すると`contentContainer`の右横に表示される
+        [contentViewport](../画像/contentViewport.png)
+
+- **PageSize**(速度)
+  - `float verticalPageSize { get; set; }`(デフォルト:-1)
+    - >垂直スクロールの**スクロール速度**を制御する。(ページ表示サイズではない)
+    - 垂直スクロールバーをクリックした時の**スクロール量**
+
+  - `float horizontalPageSize { get; set; }`(デフォルト:-1)
+    - >水平スクロールの**スクロール速度**を制御する。(ページ表示サイズではない)
+    - 水平スクロールバーをクリックした時の**スクロール量**
+
+- **Scroller**
+  - `Scroller verticalScroller { get; }`
+    - >垂直スクロールバー。
+
+  - `Scroller horizontalScroller { get; }`
+    - >水平方向のスクロールバーです。
+
+- `NestedInteractionKind nestedInteractionKind { get; set; }`
+  - >スクロールがネストしたScrollViewの限界に達したときに使用する動作です。
+  - >`NestedInteractionKind`: UIが実行されるコンテキストに応じて、自動的に動作が選択されます。(使用されるプラットフォームなどで自動的に設定され切り替わる?)
+
+- **タッチ操作用**
+  - `TouchScrollBehavior touchScrollBehavior { get; set; }`
+    - >ユーザーが**タッチ操作**(端末用?)で ScrollView のコンテンツの境界を越えてスクロールしようとしたときに使用する動作です。
+    - `Clamped(デフォルト)`:普通に末端で止まる, `Elastic(ｴﾗｽﾃｨｯｸ)`:末端で跳ねる?, `Unrestricted`にするとスクロールバーが末端に到達してもスクロールする
+  - `float elasticity { get; set; }`
+    - >ユーザーがスクロールビューの境界を越えてスクロールしようとしたときに使用する弾力性の量。(試してない)
+  - `float scrollDecelerationRate { get; set; }`
+    - >タッチ操作でスクロールした後に、スクロールの動きが遅くなる速度を制御する。(試してない)
+
+## BaseVerticalCollectionView
+
+### 概要
+
+- >スクロールビュー内で仮想化された垂直コンテンツを表示するコントロールの基底クラスです。
+- このclassの継承先に**ListView**と**TreeView**があるみたい。(`itemsSource`が`IList`なのに**List**でなく**Tree**を作れるのか?)
+- **ListView**しか確認してないが、**表示されている分**だけ`makeItem`で**Elementがつくられ**表示されている範囲で**使い回される**(プール)
+
+### メンバ
+
+- **itemsSource**
+  - `public IList itemsSource { get; set; }`
+    - >コレクションアイテムのデータソースです。
+    - これが`BaseVerticalCollectionView`(ListViewかTreeView?)で扱われる(**UIを通して表示と操作**される)**IList**
+
+- **Rebuild, Refresh**
+  - `public void Rebuild();`
+    - >コレクションビューをクリアし、すべての可視ビジュアルエレメントを再作成し、すべてのア イテムを再バインドします。
+    - **unbindItem => destroyItem => makeItem => bindItem** と実行し表示されるElementから**完全に作り直す**
+
+  - `public void RefreshItems();`, `public void RefreshItem(int index);`
+    - **unbindItem => bindItem**(再bind)し、**表示側Element**と**itemsSource**を再リンクさせる(**itemsSource**を手動で**追加削除**した場合はこれで直る)
+    - `RefreshItems`は表示分全て再bind、`RefreshItem`は`index`だけ再bind
+
+- **selection**
+//ボタンを押したら選択状態が剥げて空になるかなっと思ったけど、
+青が選択状態じゃなく**薄い灰色が選択状態**であり**ボタンを押しても選択状態が剥がれていなかった**ため、
+ボタンを連続で押しても選択状態を維持し、選択状態への参照をすることができた
+  - **選択の仕方の設定**
+    - `public SelectionType selectionType { get; set; }`
+      - >選択タイプを制御します。
+      - `None`:選択**なし**, `Single`:**一つだけ**選択可能(デフォルト), `Multiple`:**複数**選択可能
+
+  - **選択状態の取得**
+    - `public IEnumerable<object> selectedItems { get; }`, `public object selectedItem { get; }`
+      - >データソースから選択された項目を返します。項目が選択されていない場合、または単一の項目が選択されている場合でも、常に enumerable を返します。
+      - 選択されたElementに対応する**itemsSourceの要素**を**取得**する(`selectedItems`で複数選択の場合は複数ある)
+
+    - `public IEnumerable<int> selectedIndices { get; }`, `public int selectedIndex { get; set; }`
+      - >データソースで選択された項目のインデックスを返します。選択されている項目がない場合や、選択されている項目が1つの場合でも、常に enumerable を返します。
+      - 選択されたElementに対応する**インデックス**を**取得**する(`selectedIndices`で複数選択の場合は複数ある)
+
+  - **選択状態の設定**
+    - `public void SetSelection(IEnumerable<int> indices);`, `public void SetSelection(int index);`, `public void SetSelectionWithoutNotify(IEnumerable<int> indices);`
+      - >現在選択されている項目を設定します。
+      - `indices`を**選択状態**にする(`SetSelectionWithoutNotify`はイベントなし)
+
+    - `public void AddToSelection(int index);`
+      - 既に選択状態にあるElementが存在しさらに、**選択状態を追加**できる
+
+    - `public void RemoveFromSelection(int index);`
+      - >選択されたアイテムのコレクションからアイテムを削除します。
+      - 選択状態にある複数のElementの中から`index`の**選択を解除**する
+
+    - `public void ClearSelection();`
+      - **全て**の選択状態を**選択解除**する
+
+  - **選択時のCallback**
+    - `public event Action<IEnumerable<object>> onSelectionChange;`
+      - 選択状態になった時、選択された`IEnumerable<object>`(**itemsSourceの要素**)(0個や複数の場合もある)を引数に取る**Callbackを実行**する
+    - `public event Action<IEnumerable<int>> onSelectedIndicesChange;`
+      - 選択状態になった時、選択された`IEnumerable<int>`(**インデックス**)(0個や複数の場合もある)を引数に取る**Callbackを実行**する
+
+- **スクロール**
+  - `public void ScrollToItem(int index);`
+    - `index`まで**スクロール**して、それを表示する
+  - `public bool horizontalScrollingEnabled { get; set; }`
+    - **水平方向のスクロールバー**を表示範囲内に収まらない時、表示する
+
+- **リオーダブル**
+  - `public bool reorderable { get; set; }`
+    - >ユーザーがリスト項目をドラッグして並べ替えられるかどうかを示す値を取得または設定します。
+    - trueにすると、**リオーダブル(順番入れ替え)が出来る**ようになる(itemsSourceも並び替わっている)
+
+  - [BaseListView] `public ListViewReorderMode reorderMode { get; set; }`
+    - `reorderable`が**trueの時**、**Animated**にするとインスペクターのReorderableListのように**アニメーション**する！
+
+  - `public event Action<int, int> itemIndexChanged;`
+    - **順番を入れ替えた**時、入れ替え**前**と入れ替え**後**の`index`、を引数にする**Callbackを呼ぶ**
+
+- **外観**
+  - **Elementの高さ**
+    - `public CollectionVirtualizationMethod virtualizationMethod { get; set; }`
+      - >スクロールバーが表示されているときに、このコレクションに使用する仮想化方法です。CollectionVirtualizationMethod enumから値を取ります。
+      - `FixedHeight`: `fixedItemHeight`の間隔で整列される(デフォルト)
+      - `DynamicHeight`: 普通に**Elementの大きさのまま**FlexDirection.Columnしたように整列される(`fixedItemHeight`の値は**無視**される)(負荷は重いらいし)
+
+    - `public float fixedItemHeight { get; set; }`
+      - **表示側Elementの高さ**をピクセル単位で指定する(`virtualizationMethod`が`DynamicHeight`の時、無視される)
+
+  - `public bool showBorder { get; set; }`
+    - >_このプロパティを有効にすると、コレクション・ビューの周囲にボーダーが表示されます。
+    - trueにするとListViewの**List部分の枠**に**ボーダーが付く**
+
+  - `public AlternatingRowBackground showAlternatingRowBackgrounds { get; set; }`
+    - >このプロパティは、コレクション・ビューの行の背景色が交互に表示されるかどうかを制御します。AlternatingRowBackground enumから値を取ります。
+    - たぶん、良くある、背景のグレーの濃いと薄いを交互させるヤツだと思うが、全てのenumを試しても**何も変わらなかった**
+
+- **nullだった**
+  - `public override VisualElement contentContainer { get; }`
+    - >BaseVerticalCollectionView のコンテンツコンテナを返します。BaseVerticalCollectionViewコントロールは、*自動的にコンテンツを管理*するため、これは**常にnull**を返します。
+    - 試した所nullだった。↑も今気がついて**常にnull**と書いてある..*自動的にコンテンツを管理*とあるが、`makeItem`の事か?
+
+## BaseListView
+
+### 概要
+
+- 主に**HeaderとFooter**と**BaseListViewController**と**追加削除時のCallback**(信用度(低))。
+- >リストビューの基本クラスで、項目のリストにリンクし、表示する垂直方向にスクロール可能な領域です。
+
+### メンバ
+
+- **HeaderとFooter**
+  - **Header**
+    - `bool showFoldoutHeader { get; set; }`
+      - trueにすると**Headerが付き**ListViewの**List部分が折りたたみ可能**になり、以下(↓)の機能が使える
+
+    - `string headerTitle { get; set; }`
+      - Headerに**タイトルを付ける**
+
+    - `bool showBoundCollectionSize { get; set; }`
+      - `itemsSource`のSizeが表示され**減少方向**に編集可能。減少させるとそのSizeに`itemsSource`も**変わる**
+
+  - **Footer**
+    - `bool showAddRemoveFooter { get; set; }`
+      - >このプロパティは、リストビューにフッターを追加するかどうかを制御します。
+      - **[+ -]**と言う、要素をListに追加削除するFooterが付くが、**+**はうまく**機能しない**
+
+- **リオーダブル**
+  - [BaseVerticalCollectionView] `bool reorderable { get; set; }`
+    - >ユーザーがリスト項目をドラッグして並べ替えられるかどうかを示す値を取得または設定します。
+    - trueにすると、**リオーダブル(順番入れ替え)が出来る**ようになる(itemsSourceも並び替わっている)
+
+  - `ListViewReorderMode reorderMode { get; set; }`
+    - `reorderable`が**trueの時**、**Animated**にするとインスペクターのReorderableListのように**アニメーション**する！
+
+  - [BaseVerticalCollectionView] `event Action<int, int> itemIndexChanged;`
+    - **順番を入れ替えた**時、入れ替え**前**と入れ替え**後**の`index`、を引数にする**Callbackを呼ぶ**
+
+- ListViewへの**追加削除時のCallback**(信用度(低))
+  - `event Action<IEnumerable<int>> itemsAdded;`
+    - >//**一度も実行されていない**(フッタの[+]を押すとエラー。[+]を押した時の挙動の設定も不明)
+  - `event Action<IEnumerable<int>> itemsRemoved;`
+    - >//[+ -]のフッタの **[-]の押下時**とBaseListViewController.**RemoveItem(❰int¦List<int>❱ ind❰ex¦ices❱)**しか実行されていない
+
+- `BaseListViewController viewController { get; }`
+  - >BaseListViewControllerとしてキャストされた、このビューのビューコントローラです。
+  - **class BaseListViewController**
+    - Listの要素の**追加,削除,移動**
+      - `virtual void AddItems(int itemCount);`
+        - >//itemsSourceの数を4以下にしてから実行してもエラーよく分からん
+      - `virtual void RemoveItem(int index);`, `virtual void RemoveItems(List<int> indices);`, `RemoveItem(❰int¦List<int>❱ ind❰ex¦ices❱)`
+        - `ind❰ex¦ices❱`のListの**要素を削除**する。`itemsRemoved`**Callbackも実行**される
+      - `virtual void Move(int index, int newIndex);`
+        - `index`から`newIndex`へ**要素を移動**する
+    - `virtual bool NeedsDragHandle(int index);`
+      - >このアイテムがアニメーションドラッグモードで**ドラッグハンドルを必要とするかどうか**を返します。
+      - `ListViewTest`のセッティングではtrue
+
+## ListView
+
+### 概要
+
+- **任意のElementを縦に並べたList**のViewを作くり、そのListに**対応するIList**を設定することができる
+  - 表示側は**Elementとindex**を持ち、それに`IList itemsSource`を対応させる
+- ListViewのライフサイクルは、**makeItem => bindItem => [ListView使用] => unbindItem => destroyItem** となる
+- `itemsSource`の型が**IList**なので取得するとき**objectからキャストして取り出す**必要がある
+  - 表示側の**Element**も`VisualElement`なので取得するとき**VisualElementからキャストして取り出す**必要がある
+- `itemsSource`を**スクリプトで操作**する方法は、
+  `RemoveItem(int index)`(`itemsRemoved`Callbackを呼ぶ) か
+  `itemsSource`の要素を**直接操作**し、その後、`RefreshItems()`を呼び表示側Elementを**再bind**する
+
+### メンバ
+
+- `Func<VisualElement> makeItem { get; set; }`
+  - ListViewに表示する**Elementを生成するCallback**を設定する
+  - ListViewのListの**表示領域分のElementを生成**する。表示領域が縮小しても破棄(`destroyItem`)されない。
+- `Action<VisualElement, int> bindItem { get; set; }`
+  - ListViewに表示する**Elementとそのindex**を`itemsSource`の**IList**に**対応**させる
+  - indexが**表示範囲内に入った**時に呼ばれる
+- `Action<VisualElement, int> unbindItem { get; set; }`
+  - bindItemの対応関係が終わるとき呼ばれ、表示側,`itemsSource`側、**各種後処理**をする
+  - indexが**表示範囲内に出た**時に呼ばれる
+- `Action<VisualElement> destroyItem { get; set; }`
+  - ListViewに表示する**Element**が**破棄される直前**に呼ばれ、**Elementの後処理**をする
+  - `Rebuild()`でListViewが作り直される時に呼ばれることを確認。それ以外見てない
 
 ## イベント(evt)
 
