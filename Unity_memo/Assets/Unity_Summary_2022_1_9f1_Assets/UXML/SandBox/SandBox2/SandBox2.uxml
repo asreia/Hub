@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    <ui:Toggle label="Toggle" />
+    <ui:ScrollView>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    </ui:ScrollView>
+    <ui:Scroller high-value="100" direction="Horizontal" value="42" />
+    <ui:Slider picking-mode="Ignore" label="Slider" value="42" high-value="100" />
+    <ui:MinMaxSlider picking-mode="Ignore" label="Min/Max Slider" min-value="10" max-value="12" low-limit="-10" high-limit="40" />
+    <ui:SliderInt picking-mode="Ignore" label="SliderInt" value="42" high-value="100" />
+    <ui:Vector3Field label="Vec3 Field" />
+    <ui:IMGUIContainer />
+    <uie:ObjectField label="Object Field" />
+    <ui:ListView focusable="true" />
+    <ui:Foldout text="Foldout">
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Foldout text="Foldout">
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        </ui:Foldout>
+    </ui:Foldout>
+    <uie:ObjectField label="Object Field" type="UnityEngine.AnimationClip, UnityEngine.AnimationModule" />
+    <ui:EnumField label="Enum" type="UnityEngine.TextAlignment, UnityEngine.TextRenderingModule" value="Center" />
+    <ui:TextField picking-mode="Ignore" label="Text Field" value="filler text" text="filler text" />
+    <ui:BoundsField label="Bounds" />
+    <ui:RectField label="Rect" />
+    <uie:TagField label="Tag" value="Player" />
+    <uie:LayerMaskField label="LayerMask" />
+    <uie:Toolbar />
+    <uie:ToolbarToggle focusable="false" label="Toggle" />
+    <uie:ColorField label="Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" />
+    <uie:CurveField label="Curve" />
+    <uie:GradientField label="Gradient" />
+    <ui:ProgressBar title="my-progress" />
+</ui:UXML>

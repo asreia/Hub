@@ -1,5 +1,10 @@
 # UIElementsリファレンス
 
+- [コントロールリファレンス](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Controls-Reference.html)
+- [MaterialEditor(まだ読んでない)](https://www.klab.com/jp/blog/creative/2020/ui-elements-ui-builder.html)
+- [UI ToolKitを導入して効率よくUIを構築する](https://forpro.unity3d.jp/unity_pro_tips/2022/04/21/3629/)
+- [UIElements と UI Builder で Editor拡張を作ろう](https://www.youtube.com/watch?v=5UTiLOIU8TE&t=8s)
+
 ## VisualElement、Focusable、CallbackEventHandler (コンテナ)
 
 ### 概要
@@ -316,11 +321,15 @@
   - `virtual void SetValueWithoutNotify(TValueType newValue)`
     - `ChangeEvent<~>`を**発行しない**でvalueを更新する
 
+- `bool showMixedValue { get; set; }`
+  - >trueに設定すると、フィールドに複数の異なる値を編集しているような外観を与える。(まだ試してない)
+
 ## ScrollView
 
 ## 概要
 
 - スクロールバーが右側(垂直)と下側(平行)に付いたコンテナElement
+- >//box_Scroll.hierarchy.Clear();してその後Add(～)しても何故か何も表示されなくなるので、VisualElementを噛ませると解消される
 
 ### メンバ
 
@@ -402,14 +411,15 @@
     - >コレクションアイテムのデータソースです。
     - これが`BaseVerticalCollectionView`(ListViewかTreeView?)で扱われる(**UIを通して表示と操作**される)**IList**
 
-- **Rebuild, Refresh**
+- **Rebuild, RefreshItems**
   - `public void Rebuild();`
     - >コレクションビューをクリアし、すべての可視ビジュアルエレメントを再作成し、すべてのア イテムを再バインドします。
     - **unbindItem => destroyItem => makeItem => bindItem** と実行し表示されるElementから**完全に作り直す**
 
   - `public void RefreshItems();`, `public void RefreshItem(int index);`
     - **unbindItem => bindItem**(再bind)し、**表示側Element**と**itemsSource**を再リンクさせる(**itemsSource**を手動で**追加削除**した場合はこれで直る)
-    - `RefreshItems`は表示分全て再bind、`RefreshItem`は`index`だけ再bind
+    - `RefreshItems`は表示分全て再bind、`RefreshItem`は`index`だけ再bind(じゃなかった↓)
+      - 追記:`RefreshItem`は`bindItem`しか呼ばなかった(バグ?)のでCallbackが累積して登録され、おかしくなる。ので、手動で`RefreshItem`後`unbindItem`を呼ぶ必要がある
 
 - **selection**
 //ボタンを押したら選択状態が剥げて空になるかなっと思ったけど、
@@ -551,13 +561,15 @@
 ### 概要
 
 - **任意のElementを縦に並べたList**のViewを作くり、そのListに**対応するIList**を設定することができる
-  - 表示側は**Elementとindex**を持ち、それに`IList itemsSource`を対応させる
+  - 表示側は**Element**を持ち、それに`IList itemsSource[`**index**`]`を対応させる
 - ListViewのライフサイクルは、**makeItem => bindItem => [ListView使用] => unbindItem => destroyItem** となる
+  - `bindItem = (element, index) => {～}`で呼ばれた場合必ず、**同じ(element, index)の組み合わせ**で`unbindItem = (element, index) => {}`が呼ばれる
 - `itemsSource`の型が**IList**なので取得するとき**objectからキャストして取り出す**必要がある
   - 表示側の**Element**も`VisualElement`なので取得するとき**VisualElementからキャストして取り出す**必要がある
 - `itemsSource`を**スクリプトで操作**する方法は、
   `RemoveItem(int index)`(`itemsRemoved`Callbackを呼ぶ) か
   `itemsSource`の要素を**直接操作**し、その後、`RefreshItems()`を呼び表示側Elementを**再bind**する
+  - 自作機能:`All＠❰Un❱bindItems`を使う
 
 ### メンバ
 
@@ -565,10 +577,12 @@
   - ListViewに表示する**Elementを生成するCallback**を設定する
   - ListViewのListの**表示領域分のElementを生成**する。表示領域が縮小しても破棄(`destroyItem`)されない。
 - `Action<VisualElement, int> bindItem { get; set; }`
-  - ListViewに表示する**Elementとそのindex**を`itemsSource`の**IList**に**対応**させる
+  - ListViewに表示する**Element**をIListの`itemsSource[`**index**`]`に**対応**させる
+    - 基本的には**Element**が`itemsSource[`**index**`]`を**参照**する
   - indexが**表示範囲内に入った**時に呼ばれる
 - `Action<VisualElement, int> unbindItem { get; set; }`
   - bindItemの対応関係が終わるとき呼ばれ、表示側,`itemsSource`側、**各種後処理**をする
+    - 基本的には**Element**が`itemsSource[`**index**`]`を**参照解除**する
   - indexが**表示範囲内に出た**時に呼ばれる
 - `Action<VisualElement> destroyItem { get; set; }`
   - ListViewに表示する**Element**が**破棄される直前**に呼ばれ、**Elementの後処理**をする

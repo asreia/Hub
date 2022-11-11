@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="Items" style="width: 50%; height: 1000%; flex-grow: 1; align-items: center; justify-content: flex-start;">
+        <ui:Label tabindex="-1" text="Choose An Option" display-tooltip-when-elided="true" class="menu-label" />
+        <ui:Button tabindex="-1" text="Start" display-tooltip-when-elided="true" class="menu-button" />
+        <ui:Button tabindex="-1" text="Options" display-tooltip-when-elided="true" name="Options" class="menu-button" />
+        <ui:VisualElement name="OptionsContainer" style="width: 100%;">
+            <ui:SliderInt picking-mode="Ignore" label="Volume" value="42" high-value="100" name="VolumeSlider" style="font-size: 28px; color: rgb(176, 214, 112); -unity-font: none;" />
+        </ui:VisualElement>
+        <ui:Button tabindex="-1" text="Quit" display-tooltip-when-elided="true" class="menu-button" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="ButtonTemplate" src="project://database/Assets/UXML/Template/ButtonTemplate.uxml?fileID=9197481963319205126&amp;guid=7d44fd65235288e43aee8184368426fb&amp;type=3#ButtonTemplate" />
+    <ui:Template name="LabelTemplate" src="project://database/Assets/UXML/Template/LabelTemplate.uxml?fileID=9197481963319205126&amp;guid=4ac00f56bb67ba84dbd69119d8884039&amp;type=3#LabelTemplate" />
+    <ui:Instance template="ButtonTemplate" style="justify-content: flex-start; align-items: stretch;">
+        <AttributeOverrides element-name="label-test" text="This override a text" />
+        <AttributeOverrides element-name="button-test" text="This override a button text" />
+    </ui:Instance>
+    <ui:Instance template="LabelTemplate" name="LabelTemplate" />
+    <CustomElement />
+</ui:UXML>

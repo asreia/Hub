@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UXML/SandBox1/SandBox1.uss?fileID=7433441132597879392&amp;guid=4eb630f45116e8c4fa9a7e8204ba5e97&amp;type=3#SandBox1" />
+    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: column; align-items: stretch;">
+        <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" class="Button" />
+        <ui:ListView focusable="true" />
+        <uie:GradientField label="Gradient" />
+        <uie:CurveField label="Curve" style="height: 33px; flex-direction: row; justify-content: flex-start;" />
+        <uie:TagField label="Tag" value="Player" />
+        <uie:MaskField label="Mask" choices="System.Collections.Generic.List`1[System.String]" />
+        <uie:LayerField label="Layer" />
+        <uie:LayerMaskField label="LayerMask" />
+        <uie:Toolbar>
+            <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" />
+        </uie:Toolbar>
+        <uie:ToolbarMenu tabindex="-1" display-tooltip-when-elided="true">
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        </uie:ToolbarMenu>
+        <uie:ToolbarButton tabindex="-1" text="Button" display-tooltip-when-elided="true" />
+        <uie:ToolbarSpacer />
+        <uie:ToolbarToggle focusable="false" label="Toggle" />
+        <uie:ToolbarBreadcrumbs />
+        <uie:ToolbarSearchField focusable="true" />
+        <uie:ToolbarPopupSearchField focusable="true" />
+        <uie:ObjectField label="Object Field" type="UnityEngine.Texture2D, UnityEngine.CoreModule" />
+        <uie:PropertyField />
+        <ui:TextField picking-mode="Ignore" label="Text Field" value="filler text" text="filler text" />
+        <ui:Vector2Field label="Vec2 Field" />
+        <ui:MinMaxSlider picking-mode="Ignore" label="Min/Max Slider" min-value="10" max-value="12" low-limit="-10" high-limit="40" />
+        <ui:VisualElement style="color: rgb(219, 113, 82);">
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        </ui:VisualElement>
+        <ui:Toggle label="Toggle" style="align-items: stretch;" />
+    </ui:VisualElement>
+</ui:UXML>

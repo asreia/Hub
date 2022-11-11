@@ -1,0 +1,77 @@
+:root {
+    --accent-color: rgb(85, 180, 152);
+    background-color: rgba(212, 142, 119, 0.47);
+}
+
+.menu-button {
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    width: 100%;
+    height: 50px;
+    font-size: 30px;
+    -unity-font-style: bold;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 4px;
+    border-bottom-width: 4px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background-color: rgb(204, 204, 204);
+    background-image: none;
+    -unity-slice-left: 16;
+    -unity-slice-top: 16;
+    -unity-slice-right: 16;
+    -unity-slice-bottom: 16;
+    scale: 1 1;
+    color: var(--accent-color);
+}
+
+.menu-button {
+    background-color: rgb(178, 51, 51);
+}
+
+.menu-button:hover {
+    scale: 1.2 1.2;
+    background-color: rgb(255, 255, 255);
+}
+
+.menu-button:active {
+    translate: 0 2px;
+    scale: 0.8 0.8;
+    background-color: rgb(150, 243, 127);
+    transition-duration: 1s;
+}
+
+.hide {
+    display: none;
+}
+
+.menu-label {
+    -unity-text-align: upper-center;
+    color: var(--accent-color);
+    font-size: 30px;
+    -unity-font-style: bold;
+}
+
+Button.yellow:hover Label#foo {
+}
+
+Button {
+    background-color: rgba(188, 212, 83, 255);
+    color: rgba(80, 20, 123, 255);
+}
+
+:hover {
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 4px;
+    border-bottom-width: 4px;
+    border-left-color: rgba(132, 176, 80, 255);
+    border-right-color: rgba(132, 176, 80, 255);
+    border-top-color: rgba(132, 176, 80, 255);
+    border-bottom-color: rgba(132, 176, 80, 255);
+}

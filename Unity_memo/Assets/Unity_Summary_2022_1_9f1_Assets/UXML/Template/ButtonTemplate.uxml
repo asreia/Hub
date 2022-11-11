@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:Label text="Label base" name="label-test" />
+  <ui:Button text="Button base" name="button-test" />
+</ui:UXML>

@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="RootSerializedObjectView">
+        <ui:VisualElement>
+            <ui:Button tabindex="-1" text="Get UnityObject form ListView" display-tooltip-when-elided="true" name="Get_UnityObject" />
+            <ui:Button tabindex="-1" text="new SerializedObject(UnityObject)" display-tooltip-when-elided="true" name="new_SerializedObject" />
+            <uie:ObjectField label="UnityObject" name="ScrObj" type="ScrObj, Assembly-CSharp" />
+            <ui:TextField picking-mode="Ignore" label="fieldData" value="filler text" text="filler text" name="U_fieldData" />
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:Button tabindex="-1" text="↑ApplyModifiedProperties" display-tooltip-when-elided="true" name="ApplyModifiedProperties" style="flex-grow: 1;" />
+                <ui:Button tabindex="-1" text="↓Update" display-tooltip-when-elided="true" name="Update" style="width: 50%;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="SerializedObject" style="background-color: rgb(26, 55, 91);" />
+        <ui:TextField picking-mode="Ignore" label="fieldData" value="filler text" text="filler text" name="S_fieldData" />
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="FindProperty_get" display-tooltip-when-elided="true" name="FindProperty_get" style="width: 50%;" />
+            <ui:Button tabindex="-1" text="FindProperty_set" display-tooltip-when-elided="true" name="FindProperty_set" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

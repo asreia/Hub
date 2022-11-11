@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="RootSceneManagement">
+        <ui:VisualElement name="VisualElement" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="LoadScene_Single" display-tooltip-when-elided="true" name="LoadScene_Single" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="LoadScene_Additive" display-tooltip-when-elided="true" name="LoadScene_Additive" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="UnloadSceneAsync" display-tooltip-when-elided="true" name="UnloadSceneAsync" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="SaveScene" display-tooltip-when-elided="true" name="SaveScene" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

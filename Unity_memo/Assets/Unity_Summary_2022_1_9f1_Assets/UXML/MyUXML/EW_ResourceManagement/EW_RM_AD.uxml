@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="RootAssetDatabase">
+        <ui:TextField picking-mode="Ignore" label="CreateAsset Folder" value="Assets/" text="Assets/ScrObj/" name="CreateAsset_Folder" />
+        <ui:VisualElement name="AssetDatabase_OperateElements">
+            <ui:TextField picking-mode="Ignore" value="filler text" text="filler text" name="AssetPath" />
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:Button tabindex="-1" text="ImportAsset" display-tooltip-when-elided="true" name="ImportAsset" style="flex-grow: 1;" />
+                <ui:Button tabindex="-1" text="AddObjectToAsset" display-tooltip-when-elided="true" name="AddObjectToAsset" style="flex-grow: 1;" />
+                <ui:Button tabindex="-1" text="GUIDFromAssetPath" display-tooltip-when-elided="true" name="GUIDFromAssetPath" style="flex-grow: 1;" />
+                <ui:Button tabindex="-1" text="DeleteAsset" display-tooltip-when-elided="true" name="DeleteAsset" style="flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="SaveAssets" display-tooltip-when-elided="true" name="SaveAssets" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="Refresh" display-tooltip-when-elided="true" name="Refresh" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

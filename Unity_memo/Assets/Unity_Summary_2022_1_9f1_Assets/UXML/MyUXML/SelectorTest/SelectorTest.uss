@@ -1,0 +1,55 @@
+#Container_1 #PlayStation {
+    color: rgba(132, 164, 55, 255);
+}
+
+.class0 > #Container_1 .class2 {
+    color: rgba(85, 96, 74, 255);
+}
+
+#Container_1 .class2 {
+    color: rgba(78, 23, 178, 255);
+}
+
+#Container_1 > .class2 {
+    color: rgba(28, 241, 108, 255);
+}
+
+#PlayStation.class2 {
+    color: rgba(26, 67, 29, 255);
+}
+
+#PlayStation {
+    color: rgba(0, 14, 255, 255);
+}
+
+.class0 > .class1 .class2 {
+    color: rgba(65, 11, 11, 255);
+}
+
+.class1 > Label.class2 {
+    color: rgba(61, 171, 54, 255);
+}
+
+.class0 .class2 {
+    color: rgba(212, 155, 55, 255);
+}
+
+Label.class2 {
+    color: rgba(255, 74, 0, 255);
+}
+
+.class1 > * {
+    color: rgba(149, 0, 139, 255);
+}
+
+.class2 {
+    color: rgba(255, 245, 0, 255);
+}
+
+:hover {
+    color: rgba(0, 255, 31, 255);
+}
+
+Label {
+    color: rgba(0, 0, 0, 255);
+}

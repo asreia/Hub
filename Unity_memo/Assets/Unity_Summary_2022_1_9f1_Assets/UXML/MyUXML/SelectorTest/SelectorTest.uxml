@@ -1,0 +1,67 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Container_0" class="class0" style="width: 300px; height: 200px;">
+        <ui:VisualElement name="Container_1" class="class1" style="left: 50px; top: 50px; width: 200px; height: 100px;">
+            <ui:Label tabindex="-1" text="▲●✖■" display-tooltip-when-elided="true" name="PlayStation" class="class2" style="font-size: 30px; top: 30px; left: 40px; width: 120px; -unity-text-outline-width: 4px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label tabindex="-1" text="#Container_0 Add" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="Container_0_Add" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="#Container_0 Remove" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="Container_0_Remove" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label tabindex="-1" text="#Container_1 Add" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="Container_1_Add" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="#Container_1 Remove" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="Container_1_Remove" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label tabindex="-1" text="#PlayStation Add" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="PlayStation_Add" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="#PlayStation Remove" display-tooltip-when-elided="true" />
+        <ui:VisualElement name="PlayStation_Remove" style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="uss_A" display-tooltip-when-elided="true" name="uss_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_B" display-tooltip-when-elided="true" name="uss_B" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="uss_C" display-tooltip-when-elided="true" name="uss_C" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label tabindex="-1" text="#PlayStation Add/Remove .classA_B_C" display-tooltip-when-elided="false" enable-rich-text="false" />
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="A_A" display-tooltip-when-elided="true" name="A_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="A_R" display-tooltip-when-elided="true" name="A_R" enable-rich-text="false" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="B_A" display-tooltip-when-elided="true" name="B_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="B_R" display-tooltip-when-elided="true" name="B_R" enable-rich-text="false" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="C_A" display-tooltip-when-elided="true" name="C_A" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="C_R" display-tooltip-when-elided="true" name="C_R" enable-rich-text="false" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement>
+        <ui:Label tabindex="-1" text="#PlayStation Set StyleColor" display-tooltip-when-elided="true" />
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:Button tabindex="-1" text="Color.magenta" display-tooltip-when-elided="true" name="Set" style="flex-grow: 1;" />
+            <ui:Button tabindex="-1" text="Null" display-tooltip-when-elided="true" name="Null" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

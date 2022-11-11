@@ -1,0 +1,8 @@
+#PlayStation {
+    color: rgba(0, 255, 12, 255);
+    background-color: rgba(115, 106, 69, 255);
+}
+
+.classC {
+    -unity-text-outline-color: rgba(255, 0, 230, 255);
+}

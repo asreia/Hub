@@ -1,0 +1,92 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UXML/SandBox.uss?fileID=7433441132597879392&amp;guid=443d053cf812a064681188e9711dc01c&amp;type=3#SandBox" />
+    <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" name="botan" style="-unity-text-align: middle-center; white-space: nowrap; height: 20px; width: 100%;" />
+    <ui:Label tabindex="-1" text="ラベル&#10;_Label" display-tooltip-when-elided="true" name="_LabelName" view-data-key="_ViewDataKey" tooltip="_Tooltip" usage-hints="DynamicColor" focusable="true" enable-rich-text="true" style="min-width: auto; min-height: auto; max-width: none; max-height: none; position: relative; left: 50px; top: auto; height: 50px; width: 50px; right: auto; bottom: auto; cursor: url(&apos;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=4584671053970592468&amp;guid=60887a8f20fdd8c43917b77920aa29c7&amp;type=3#console.warnicon&apos;); padding-left: 0; padding-right: 0;" />
+    <ui:Vector3IntField label="Vector3Int" />
+    <ui:VisualElement style="flex-basis: 50px; flex-wrap: wrap;">
+        <ui:Label tabindex="-1" text="A" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="BB" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="CCC" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="DDDD" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="EEEEEE" display-tooltip-when-elided="true" />
+    </ui:VisualElement>
+    <ui:ScrollView style="flex-basis: 100px; flex-direction: column; flex-wrap: nowrap;">
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:MinMaxSlider picking-mode="Ignore" label="Min/Max Slider" min-value="10" max-value="12" low-limit="-10" high-limit="40" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:RectField label="Rect" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:BoundsField label="Bounds" />
+        <ui:Label tabindex="-1" text="belLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabelbelLabelLabel" display-tooltip-when-elided="true" style="width: 600px;" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Hash128Field label="Hash128 Field" value="885eea9fcca73bdadde4ecd6a3af1312" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Toggle label="Toggle" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Scroller high-value="100" direction="Horizontal" value="42" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:TextField picking-mode="Ignore" label="Text Field" value="filler text" text="filler text" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Foldout text="Foldout">
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+            <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" />
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        </ui:Foldout>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:ProgressBar title="my-progress" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:DropdownField label="Dropdown" index="-1" choices="abc, def">
+            <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" />
+            <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        </ui:DropdownField>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:EnumField label="Enum" type="Newtonsoft.Json.DateParseHandling, Newtonsoft.Json" include-obsolete-values="false" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:RadioButtonGroup label="Radio Button Group" value="-1">
+            <ui:RadioButton label="Radio Button" />
+            <ui:RadioButton label="Radio Button" />
+            <ui:RadioButton label="Radio Button" />
+            <ui:RadioButton label="Radio Button" />
+            <ui:RadioButton label="Radio Button" />
+        </ui:RadioButtonGroup>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:RadioButton label="Radio Button" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    </ui:ScrollView>
+    <ui:RadioButton label="Radio Button" />
+    <ui:GroupBox text="_Text" style="flex-basis: 60px; height: 58px; width: 217px; flex-wrap: wrap; flex-direction: column;">
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" />
+    </ui:GroupBox>
+    <ui:VisualElement style="flex-direction: row; justify-content: space-around; align-items: flex-start; width: auto;">
+        <ui:Button tabindex="-1" display-tooltip-when-elided="true" class="_button" />
+        <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" class="_button" />
+        <ui:Button tabindex="-1" text="Button" display-tooltip-when-elided="true" class="_button" />
+    </ui:VisualElement>
+    <uie:ObjectField label="Object Field" />
+    <uie:ColorField label="Color" value="RGBA(0.000, 1.000, 1.000, 1.000)" />
+</ui:UXML>

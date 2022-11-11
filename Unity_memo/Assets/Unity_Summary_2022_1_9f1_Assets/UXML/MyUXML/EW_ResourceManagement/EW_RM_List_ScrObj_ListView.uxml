@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="root">
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:TextField picking-mode="Ignore" label="name" value="filler text" text="filler text" name="name" style="width: 48%;" />
+            <ui:TextField picking-mode="Ignore" label="Set_FieldData" value="filler text" text="filler text" name="Set_FieldData" style="flex-direction: row; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:EnumField label="HideFlags" type="UnityEngine.HideFlags, UnityEngine.CoreModule" name="HideFlags" />
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-direction: row;">
+                <ui:Button tabindex="-1" text="CreateAsset(～)" display-tooltip-when-elided="true" name="CreateAsset" />
+                <ui:Button tabindex="-1" text="DestroyImmediate(～)" display-tooltip-when-elided="true" name="DestroyImmediate" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
