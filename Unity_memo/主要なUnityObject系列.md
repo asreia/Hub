@@ -4,6 +4,10 @@
 
 ### 概要
 
+[UnityObject操作](\画像\UnityObject操作.drawio.png)
+[UnityObject_Destroy](\画像\UnityObject_Destroy.drawio.png)
+[ドメインリロード](画像\ドメインリロード.drawio.png)
+
 - Objectは、**System.Objectではなく**、**それを継承**した**UnityEngin.Object**である。UnityEngin.Objectは名前が長いので個人的に**UnityObject**と呼ぶことにする
 - UnityObjectは**Unityのシステムの中**に **(各部分に)シングルトン**として生成され、そのインスタンスの**対**として**C++側のオブジェクト**が生成される
 - そのC++側のオブジェクト(以後**C++Object**)とその**UnityObject(instance)**の間の通信は、

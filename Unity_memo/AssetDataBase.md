@@ -2,6 +2,8 @@
 
 ## 概要
 
+[UnityObject操作](\画像\UnityObject操作.drawio.png)
+
 - AssetDatabaseは、**C++Object**の**Assetデータ**と**Serializeデータ**を**ディスクに保存**するために、**Asset**として保存します
 - 主に**Scene内**のオブジェクト(**メモリ側**)と**Projectフォルダ**(**ディスク側**)の間で**Assetのセーブとロードを管理**します
 - Assetは2つのファイルで構成され、Assetデータは**Assetデータファイル(各拡張子)**に保存、Serializeデータは**Serializeデータファイル(.meta)**に保存される

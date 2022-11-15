@@ -4,6 +4,8 @@
 
 ### 概要
 
+[UnityObject操作](\画像\UnityObject操作.drawio.png)
+
 - SerializedObjectは、**C++Object内のシリアライズデータ**を**C#のSerializedObject型**にコピーして編集し、またC++Objectへコピーできる様な型で、
   C++Object内のシリアライザを**C#の参照型で編集**するための機能です
 - **Editor拡張**は**SerializedObject**を通して**UnityObjectを編集**します

@@ -5,6 +5,10 @@
 - [UI ToolKitを導入して効率よくUIを構築する](https://forpro.unity3d.jp/unity_pro_tips/2022/04/21/3629/)
 - [UIElements と UI Builder で Editor拡張を作ろう](https://www.youtube.com/watch?v=5UTiLOIU8TE&t=8s)
 
+[セレクタ優先度](\..\画像\セレクタ優先度.drawio.png)
+[UI_BuilderのIStyle説明](\..\画像\UI_BuilderのIStyle説明.drawio.png)
+[UIElement継承関係](\..\画像\UIElement継承関係.drawio.png)
+
 ## VisualElement、Focusable、CallbackEventHandler (コンテナ)
 
 ### 概要
@@ -261,6 +265,8 @@
 ## SerializedObjectデータバインディング(BindableElement(IBindable) と BindingExtensions)
 
 ### 概要
+
+[SerializedObjectデータバインディング](\..\画像\SerializedObjectデータバインディング.drawio.png)
 
 - `INotifyValueChanged<TValueType>.value`と、`SerializedProperty`をリンクし**同期**させます
 
@@ -560,6 +566,8 @@
 
 ### 概要
 
+[ListView](\..\画像\ListView.drawio.png)
+
 - **任意のElementを縦に並べたList**のViewを作くり、そのListに**対応するIList**を設定することができる
   - 表示側は**Element**を持ち、それに`IList itemsSource[`**index**`]`を対応させる
 - ListViewのライフサイクルは、**makeItem => bindItem => [ListView使用] => unbindItem => destroyItem** となる
@@ -591,6 +599,8 @@
 ## イベント(evt)
 
 ### 概要
+
+[UI_Toolkit妄想](\..\画像\UI_Toolkit妄想.drawio.png)
 
 - UI Toolkitのイベントシステムは、**GUI操作,UIの内部状態の変化** などを**検知**し、
   UXMLの**root**からEventBase.**target**へ**イベント(evt)** を**必要とするノード**へ**ディスパッチ(送信)** して行きます

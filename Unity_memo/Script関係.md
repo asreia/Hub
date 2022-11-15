@@ -1,5 +1,7 @@
 # Script関係
 
+[Objectライフサイクル](\画像\Objectライフサイクル.drawio.png)
+
 ## 補足
 
 - private void Update() の様なコールバックは**Unityが**privateでも**関数ポインタ**として登録し**呼び出し**ている(多分Cecilがやってる)
