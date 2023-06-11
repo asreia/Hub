@@ -155,6 +155,7 @@ print("End")
 [Tex記法](https://qiita.com/shepabashi/items/27b7284d1f0007af533b)
 [KaTex記法](https://www.suzu6.net/posts/102-katex-math-functions/)
 "\$"で囲む
+"\_"は下で"^"は肩に乗る?
 $\left( \sum_{k=1}^n a_k b_k \right)^{\!\!2} \leq\left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$
 $_{124} ABCD _{3333}EFG_{abc}$
 $_{23}$ //\_{..}_{..}は不可
