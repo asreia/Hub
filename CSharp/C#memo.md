@@ -145,7 +145,7 @@
                         `＄Readonly_ref_Struct＝【∫Readonly_Struct∫∠readonly ref ⸨struct⸩】`  
                         `【∫Readonly_ref_Struct∫∠＄Readonly_ref_Struct_name＝⸨｢name｣⸩】`  
                 - リテラル  
-                    `＄LitStruct＝⟪new ∫Struct∫(実引数¦default⟫`  //実引数追加
+                    `＄LitStruct＝⟪new ∫Struct∫(実引数)¦default⟫`  //実引数追加
                 - タプル  
                     - 型  
                         `＄Tuple＝❰＄recur＝❰＠❰var❱ (｡｡⟦, ┃2～⟧⟪｡❰＠❰∫Type∫❱ ＠｢『1』vari｣❱¦∫recur∫｡⟫｡｡)❱❱`  
@@ -187,7 +187,7 @@
                         `＄Anonymous＝❰__Anonymous~❱`  
                     - リテラル  
                         `＄LitAnonymous＝❰new{⟦, ┃1～⟧⟪｢vari｣¦｢vari｣ = ∫Lit∫⟫}❱ 『｢vari｣でアクセスする。メソッド内で完結。new[]{~}と組合せるといい`  
-                        `『var ano = ∫LitAnoymous∫というふうにvarしかないのでメッソドの戻り値にできない。あとILコードがToStringとかのメソッド定義ですごい長い`  
+                        `『var ano = ∫LitAnonymous∫というふうにvarしかないのでメッソドの戻り値にできない。あとILコードがToStringとかのメソッド定義ですごい長い`  
                         `『ILで、[1] class '<>f__AnonymousType~のnewobjなので普通に値型も参照型もヒープにコピーされる`
             - [参照型]インターフェース
                 - 型
@@ -310,7 +310,7 @@
                         - interfaceアクセス  
                             `＄interfaceアクセス＝【∫アクセス∫∠％⸨public⸩┃∠✖⸨％❰private❱⸩private】`  
                             - インターフェース普通のメソッド  
-                                `＄Interface_normal_method＝【∫Method∫∠✖⸨∫アクセス∫⸩∫interfaceアクセス∫┃∠✖⸨∫仮/イ/静∫⸩∫仮/イ/静/s∫∸❰override❱｡┃∠✖⸨＠❰readonly❱⸩｡｡❱】`
+                                `＄Interface_normal_method＝【∫Method∫∠✖⸨∫アクセス∫⸩∫interfaceアクセス∫┃∠✖⸨∫仮/イ/静∫⸩∫仮/イ/静/s∫∸❰override❱｡┃∠✖⸨＠❰readonly❱⸩】`
                             - インターフェース明示的実装  
                                 `＄Interface_explicit_method＝【∫method∫∠✖⸨∫アクセス∫⸩┃∠⸨∫仮/イ/静∫⸩⊃＠❰abstract❱┃∠✖⸨＠❰readonly❱⸩┃∠⟪＃定義元のInterface名＃⟫.⸨｢name｣⸩】`
     - ローカル  
@@ -352,7 +352,7 @@
             `＄配列生成＝⟪❰｡｡｡new ⟪｡｡∫Type∫[｢index｣]¦＠❰∫Type∫❱[]{⟦, ┃1～⟧∫Lit∫}｡｡⟫｡｡｡❱｡¦｡{⟦, ┃1～⟧∫Lit∫}⟫`  
     - メンバアクセス  
         `＄Instance＝❰｢vari｣❱ = ∫Use_ctor∫;` 
-        `＄メンバアクセス＝❰⟪○∫Instance∫¦∫Complex∫¦∫Lit∫⟫.【❰∫Member∫❱∠〖｢name｣〗】`  
+        `＄メンバアクセス＝❰⟪○∫Instance∫¦∫Complex∫¦∫Lit∫⟫.【❰∫Member∫❱∠〖｢name｣〗】❱`  
     - メソッド  
         - ラムダ式  
             `＄Use_ラムダ式＝⟪○∫ラムダ式変数∫(∫実引数∫)｡¦｡(｡｡(∫Type∫⊃∫Delegate∫)｡(∫ラムダ式∫)｡｡)｡(∫実引数∫)⟫`『キャストして戻り値と引数の型が分かれば名前が無くても呼べる❰((Action)(()=>{}))();❱
@@ -505,6 +505,7 @@
   - 構造体  
       ref構造体はスタック直下であるがマネージ型も持てるためアンマネージ型でない場合もある
       [構造体](https://sharplab.io/#v2:C4LglgNgNAJiDUAfAAgJgIwFgBQA7AhgLYCmAzgA74DGxABAMrABOArlcAPqH7AD2JAbxy0RtZAGZaYXMGJMAZtToBJAAwCAvhKky5imrWXpNw0dtLM2wBuo2mR2tLQDCqgPQAqEPVUe3mtzdAactAAgTAZXlAewZSYnwIYhhAVQZAGIZAMwZAEQZAaIZ7MUkLVnYGEE9XKD81KCMBQMB6hkBLhkBOhkAghkBM30B/I0BYOUB75UAgBmlZBSUIwCxNQFnEts7AX4CACkBahkBjhnrACYZAITMIwB2GQGGGavrANGVAGQZAd1jAWQYMgEps0VpAvtpcVVoAXloATgBuQKHAMCVAQAZAVH1AB1NAFYMgHUGQDNDIBnhiWtWqgH6GCKAVYZAMUMgB+GQDXDIBJhkASQyAHoZALcMgFwlQD45jtAJoMGUAdgyAcwZAIcM4MACwyASE1/oBrBiJO0AJAqYwDHcoBTRUpR0BaQulxFosugUAiYTOADEtHQqgAdPdABEMgCiGGDERQsCDAQAWDLhiAB3KanTGALmVAKRKZMA0XLMtUAkHsXhMTGAHxVAJ4MGUAG5bMwGq77ChySG64dCvcVuQC6DOTAGtyzMatMZ/15bMBgEsGQBOQYBQBkBgDYlQAgvntAMeRgBM05IZbqBnI6azkdQAc2IwFeGkCoUi9RhW2ZgFkvQB+DEkKZTAOMMyJhgFaGQAlDIAuhgi6AAbHTJ4tAKdygGg5PaAAHNAJYJVe0TBiMF4uAgAE8a7QmKpXlXAtp6CaAsFwuSHWDIYtoXCZXbAMYMKSRNEsTxNkyV1NJADEGQB9KwmSlAC+1QAs7WSdIsmwMVqwfG5CFOIQ0PQ0Q7wAVhNd43GcHx0AADkokBAAtFFJyUAjFEz2QAnJVVQBlfRSQBIhkHPtKWAAALMBSCmalAF6GDZ0QAflNQB/eUACQZBSrS5Q0eWhCFIwBkwigLStIBQAhBlVCEoVhCJ6MYlFmPpck2UxQBK/0ATaVAA25QBFBl41D8NEOt1M0tsX2kkzP1hclG2AABaY8z0AdYZcUARYZADGGRFAA8GcleTEyT0VOCI6Q2GZwUABoZ4UAcoYgOZQAXt0AUuNeTJFTRCvXzSIPfAjxPU8IiCr9yUAfwY2UmQEqUAKQZXLqhxiNOUj6PYrikkABwYPU8sU7Dw0VHAAFjEcaTBW2hluyRxUBcWhcPQtBDpOryGFoUh7ieA1DQYEjAiY9EQOJUartIdB1Pux7CImwJDNVcyUmmlJkMyD7kHQZ4pgAEgAIhukBjpuhVQw0KBUcVOtMexhUrw0BGJqhmH4aR1QUYEL70fQPHqfQBVcaxhmCdUImSZ2y5lu5nANCAA==)  
+        - [C# 10よりnew ∫Type∫()『通常』と default(∫Type∫)『ゼロ初期化』を区別により引数なしctorとフィールド初期化代入ができる](https://ufcpp.net/study/csharp/resource/rm_struct/#parameterless-ctor)
       [構造体はメンバのrefを返せない](https://sharplab.io/#v2:C4LglgNgNAJiDUAfABK5ABATARgLACgB6QgA3QGYNsA2ZAJwFMAzZMAO2GQGVg6BXAMbAA+oybCAhnQDmACjHdkAZwCUAb3QB2es2UA6NnwC2AbgC+xJb0HBAdgxjApuaB9BkBBDLduBaOUDVcYCSGMYHMGQBX4wG0GQGiGEgJiAAtgYAAHJRBiPiYBOLiDBmBCKz4YAE9CASUoqTicuNFmPRijCAB+OIBeTGRiMR9AwE0GAl78AjYJIwYlOIkBBm5rISqmNQI0ZAW0CipaLGQAUQAPYA1KdBoMABYt3YAlZkkZAB4AFQA+WWAosCUdFjvkAHsVZAB3KIMRjIL4gZTTThqMxmZaLNqEQDKDIAYhkA9gyAUiVbIB5VUAMhn1D7+LA+QCEdl1ABYMgF2lQDSRoBrBkAqgmAMQZAFUMgDWGQAdDIByhkA9QyACYYaV1AFEMgH+zQASDIBIhmRoVsPkATGmABQZ6rIsLYXm9UYwJDBvmwIPkVH1FqsrPwhNx9h9FJcRKqlPJdFwMOgbX8mg8Legna8lCZDZR2JwlNtzHD4aGw+GI5Go4tiABhLgADmwmgADCAPTbUYAsBKlNMzgAMGQCBDIAgBhDqw2seQ83w4dW/uQAiDId9J2QAFlZH9q9GHe8msg2Ax/txOyZm2GFA66H2LUo9FbhDa7SxVD60HPA8h+8cfZWBFuB0PkLHRw29I2Dzvx6HiIBkwlvtkAbU6AQZsfIBGKK6TkLxpsgBe3QDQcrYgCHDIAzwyAAsMgB+DE4qKAFeBXjPF6siACQKgDR6ioKiooAQ8qAOaOy4qJ0wSAFYMgAiDIA0XI0oA6gxOKWNbRgigCo+oADqaADK+gCMrvmZKobYOHEhRgDXDIAPwx8f4gCR2oAFoqEThgDcRgKSGANIMgDNDCBgCLDIAJQyAJcMgAyDIAgwwcoAwwxcv4gCyDKENF0WgxCALoMLjWYAgAw/kIKpeppYiEbYqLIDaB6DsOXCjl0oRkgpgArDAJmmAO6xiKhHJYqyIA+P/6rRoZmBGxCAImEKRpHEICANOWgAECYAyvKAKGK/iorZgCrDIAxQxCYAkwy2IAtVGAP4MgAfZkZthfjStmAPnaqI2ppOGAI5GxE0oRgDGDIAZgzERBXRmWgKXmQiagbtsl7mKiACSAAypW2WoADaKYALrIAAbhIEB8Fk+RxJMPAmiIYh6L2KWulWEAwBA3wCBIejvCmgBwDIARQw1YANwyAJ0M72APAMsJJQtFmEFubpqO9Ah6GAxx6McL1I1YTDvawHDkK0d02LMT0gCAhhGClZJjZNoTXuZxBcupYO2IALBqABAqqLIx9X16Jg/1Ie9siAEsMAmAOsMgAeDNx2EqNDtMTcRDP9LDxBGpCUz3ea9amBglAKPWVpGJ2r0KKYKXEK98ZJqm47lq0x4QBISjvDrHDIHrqyGx7xum265vBrDcMIjhKFi5LKjAeBssEaEEcS4RYpgwpks+IAOUaAIoM40uOLEsxYAUkqACZpgCqDMiJGJSHMaEGHtiAJ2mmmAP/agC+KppgDuqcRX62ahWHYShNKc4A8QxhB1AGxyEJGImSlFOHFBAw5YmtcOaGpajq+QWvWACaiMWsIZ0XQwB2HUH1eyLGADEyAJnoKYqKv2q6h8qJOPmD/rxC90+EBgC9DHpNWAA1lQAsvL+HfrqSi40ZSAG0IwAIW4hQErKYi/hlb5kzvmUaTgQyL3umaQA1ESADv5QAfxmAAVtXBgBgokAA7k3sGCakfvkQAjuTIFwTJJC5CKE+2AIwneZtdD73OpdY+QcgA===)  
       - thisの型  
           構造体`ref Struct this` (メソッド呼び出し時: `ref Struct this = ref str`)  

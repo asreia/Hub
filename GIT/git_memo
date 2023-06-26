@@ -21,6 +21,7 @@ MERGE_HEADとかvimとかで、git,vim,vscodeの間で今どういう状態な�
     gitのHEAD^とHEAD~の違い:https://qiita.com/chihiro/items/d551c14cb9764454e0b9
     pull は本当に fetch + merge なの？:https://qiita.com/Teloo/items/95a860ae276b49edb040
     Gitを使ったクローン、プルリク、マージの流れについて解説:https://www.youtube.com/watch?v=JispFS6zeDw
+    Learn Git Branching https://learngitbranching.js.org/?locale=ja (まだ触ってない)
     その他ブックマーク参照:抜き取り/git
     
 
