@@ -4,7 +4,7 @@
 
 ### 概要
 
-[UnityObject操作](\画像\UnityObject操作.drawio.png)
+![UnityObject操作](\画像\UnityObject操作.drawio.png)
 
 - SerializedObjectは、**C++Object内のシリアライズデータ**を**C#のSerializedObject型**にコピーして編集し、またC++Objectへコピーできる様な型で、
   C++Object内のシリアライザを**C#の参照型で編集**するための機能です
@@ -30,9 +30,12 @@
 
 - UnityObject
 - [System.Serializable]がついたクラス、構造体
-- int,string,
+- int,float,string,..などC#のプリミティブ型
 - [SerializeReference]を付けると派生クラスは基底クラスに暗黙アップキャストされず派生クラスとしてシリアライズできる(確か)
+  - 互換性を保つためダセェけど付けないといけない(確か)(基底クラスに暗黙アップキャストされるかされないかで挙動が変わる可能性がある)
 - ![ドメインリロードインスタンス再構築](画像/ドメインリロードインスタンス再構築.png)
+- [SerializeField]は`private`でもシリアライズ可能にする
+- [System.NonSerialized]がついたフィールドメンバ変数はシリアライズを不能にする
 
 ## ISerializationCallbackReceiver
 

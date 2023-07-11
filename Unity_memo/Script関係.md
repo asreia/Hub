@@ -1,6 +1,6 @@
 # Script関係
 
-[Objectライフサイクル](\画像\Objectライフサイクル.drawio.png)
+![Objectライフサイクル](\画像\Objectライフサイクル.drawio.png)
 [Unity スクリプト実行順の謎](https://ameblo.jp/sugawara-monolizm/entry-11889665729.html)
 
 ## 補足

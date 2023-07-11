@@ -42,7 +42,7 @@ using Unity.Collections;
                                             これを呼ばなくてもBehaviourUpdateの後でJobが実行していた
                                       ScheduleBatchedJobsを何回呼んでもエラーは無い
             bool CheckFenceIsDependencyOrDidSyncFence(j0Handle, j1Handle): j1Handleはj0Handleに依存しているか?(j1Handle = job.Schedule(,j0Handle)) または
-                                                                                j0Handleは完了しているか?(j0Handle.Complete())
+                                                                                j0Handleは完了しているか?(j0Handle.Complete()) (追記:完了していたら依存関係があったか分からない?)
                                                                            //●CheckFenceIsDependencyOrDidSyncFenceはIsCompleteに無関係で
                                                                                 j0Handleとj1Handleの依存関係が直近でなく間が空いていても有効、
                                                                                 自分自身はtrueになる(jobHandle0, jobHandle0)
@@ -76,9 +76,9 @@ using Unity.Collections;
             void Complete(): JobHandleのList<JobHandle>を底から深さ探索的に、IJobを各スレッドで実行しIsCompleteをtrueにしていく?
                              一度呼んだら(IsCompleteがtrue)また実行(Execute)されることはない
                              ScheduleしてからCompleteを呼ばなくてもエラーにならない、Completeを何回呼んでもエラーは無い
-                             IsCompleteはComplete()の実行によってtrueになる訳では無い!!IsCompleteはただJobが実行されればtrueになります。
+                             IsCompleteはComplete()の実行によってtrueになる訳では無い!!IsCompleteはただJobが実行されればtrueになります。(追記:IsComplete()はそのJobの実行が終わったか?だっけ?)
                              Complete()はJobの実行が終わったあとNativeContainerにMainThreadから安全にアクセスするために実行する。そして最後にMainThreadからDispose()で必ず開放する。
-                             つまりComplete()は、 [Jobの実行(IsCompleteをtrue)] -> [MainThreadからNativeContainerへのアクセスを許可] をする。
+                             つまりComplete()は、 [Jobの実行(IsCompleteをtrue)] -> [MainThreadからNativeContainerへのアクセスを許可] をする。(追記:Complete()はアクセスを許可まで実行)
                              Complete()をする前にNativeContainerにアスセスするとInvalidOperationExceptionになる。Dispose()も同じ
                              Dispose()をしないとA Native Collection has not been disposed,~になる
                              NativeContainerの使う流れは、 [Complete()] -> [NativeContainerへアスセス] -> [Dispose()] となる。

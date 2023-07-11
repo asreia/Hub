@@ -6,7 +6,7 @@
 
 - AssetDatabaseは、**C++Object**の**Assetデータ**と**Serializeデータ**を**ディスクに保存**するために、**Asset**として保存します
 - 主に**Scene内**のオブジェクト(**メモリ側**)と**Projectフォルダ**(**ディスク側**)の間で**Assetのセーブとロードを管理**します
-- Assetは2つのファイルで構成され、Assetデータは**Assetデータファイル(各拡張子)**に保存、Serializeデータは**Serializeデータファイル(.meta)**に保存される
+- Assetは2つのファイルで構成され、Assetデータは**Assetデータファイル(各拡張子)** に保存、Serializeデータは**Serializeデータファイル(.meta)** に保存される
 - SceneファイルやScriptableObjectなど**Unity固有**の生成ファイルは**Assetデータファイル側**にも**Serializeデータ**が**保存**されることもある
 - AssetDatabaseの**スクリプトによる操作以外**にEditorのProjectフォルダのフォルダを開くなどで**Assetがロード**される事もあります
 
@@ -79,6 +79,8 @@
 
 - [AssetDatabase V2とは](https://www.youtube.com/watch?v=ldpu3pzUsaM)
   ![AssetDatabaseV2_Import](画像\AssetDatabaseV2_Import.png)
+
+- ![Import_Activity](\画像\Import_Activity.png)
 
 - 過去のメモ
   - AssetDatabaseV2

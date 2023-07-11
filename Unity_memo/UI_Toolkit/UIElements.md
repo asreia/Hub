@@ -4,10 +4,17 @@
 - [MaterialEditor(まだ読んでない)](https://www.klab.com/jp/blog/creative/2020/ui-elements-ui-builder.html)
 - [UI ToolKitを導入して効率よくUIを構築する](https://forpro.unity3d.jp/unity_pro_tips/2022/04/21/3629/)
 - [UIElements と UI Builder で Editor拡張を作ろう](https://www.youtube.com/watch?v=5UTiLOIU8TE&t=8s)
+- Unity_Summary_2022_1_9f1を見る
+- EditorWindow
+  - ![EditorWindow](\..\画像\EditorWindow.png)
+- CustomEditor(SerializeObject),PropertyDrawer(SerializedProperty)
+  - ![CustomEditor,PropertyDrawer](\..\画像\Custom.png)
+- MonoBehaviour
+  - ![MonoBehaviour](\..\画像\MonoBehaviour.png)
 
-[セレクタ優先度](\..\画像\セレクタ優先度.drawio.png)
-[UI_BuilderのIStyle説明](\..\画像\UI_BuilderのIStyle説明.drawio.png)
-[UIElement継承関係](\..\画像\UIElement継承関係.drawio.png)
+![セレクタ優先度](\..\画像\セレクタ優先度.drawio.png)
+![UI_BuilderのIStyle説明](\..\画像\UI_BuilderのIStyle説明.drawio.png)
+![UIElement継承関係](\..\画像\UIElement継承関係.drawio.png)
 
 ## VisualElement、Focusable、CallbackEventHandler (コンテナ)
 
@@ -254,7 +261,7 @@
 - `int tabIndex { get; set; }`                                  ==試す=ok=
   - >FocusリングのFocusタビリティをソートするために使用される整数。0以上でなければならない。
     - Focusの**優先順位(0が高い)**。**負の数**だとTabキーで**Focusされない**。tabIndexが**同列の場合**、多分**Focusリングアルゴリズムに従う**(デフォルトは0)
-  - [Focusリング](..\画像\Focusリング.png)
+  - ![Focusリング](..\画像\Focusリング.png)
 
 - `virtual void Blur();`                                  ==試す=ok=
   - (this)Elementに**Focusを外す**ように指示する。
@@ -266,7 +273,7 @@
 
 ### 概要
 
-[SerializedObjectデータバインディング](\..\画像\SerializedObjectデータバインディング.drawio.png)
+![SerializedObjectデータバインディング](\..\画像\SerializedObjectデータバインディング.drawio.png)
 
 - `INotifyValueChanged<TValueType>.value`と、`SerializedProperty`をリンクし**同期**させます
 
@@ -342,7 +349,7 @@
 - `ScrollViewMode mode { get; set; }`
   - >ScrollViewがユーザーにコンテンツのスクロールを許可する方法を制御します。ScrollViewMode
   - Enumが`Vertical`, `Horizontal`, `VerticalAndHorizontal`からなり、スクロールバーを出すか出さないかを決める
-    `Horizontal`にすると`ScrollView.Add(Element)`した時、**水平に追加(Add)**される
+    `Horizontal`にすると`ScrollView.Add(Element)`した時、**水平に追加(Add)** される
 
 - `Vector2 scrollOffset { get; set; }`
   - >現在のスクロール位置。
@@ -366,12 +373,12 @@
   - `override VisualElement contentContainer { get; }`
     - >完全なコンテンツが含まれ、部分的に表示される可能性があります。
       - `ScrollView.Add(Element)`の追加先と同じだった。つまり`ScrollView.Add(Element)`⇔`ScrollView.contentContainer.Add(Element)`
-        [contentContainer](../画像/contentContainer.png)
+        ![contentContainer](../画像/contentContainer.png)
 
   - `VisualElement contentViewport { get; }`
     - >contentContainerの可視部分を表します。
       - `contentContainer`の親の`VisualElement`。追加(Add)すると`contentContainer`の右横に表示される
-        [contentViewport](../画像/contentViewport.png)
+        ![contentViewport](../画像/contentViewport.png)
 
 - **PageSize**(速度)
   - `float verticalPageSize { get; set; }`(デフォルト:-1)
@@ -566,7 +573,7 @@
 
 ### 概要
 
-[ListView](\..\画像\ListView.drawio.png)
+![ListView](\..\画像\ListView.drawio.png)
 
 - **任意のElementを縦に並べたList**のViewを作くり、そのListに**対応するIList**を設定することができる
   - 表示側は**Element**を持ち、それに`IList itemsSource[`**index**`]`を対応させる
@@ -600,7 +607,7 @@
 
 ### 概要
 
-[UI_Toolkit妄想](\..\画像\UI_Toolkit妄想.drawio.png)
+![UI_Toolkit妄想](\..\画像\UI_Toolkit妄想.drawio.png)
 
 - UI Toolkitのイベントシステムは、**GUI操作,UIの内部状態の変化** などを**検知**し、
   UXMLの**root**からEventBase.**target**へ**イベント(evt)** を**必要とするノード**へ**ディスパッチ(送信)** して行きます
@@ -669,7 +676,7 @@
       >イベントを再帰的にディスパッチする必要がある場合は、イベントのコピーを使用することを推奨します。
       - **現在伝搬中であるか**チェックし**伝搬中ならtrue**になる。(多分、`propagationPhase.None` <=> `dispatch:False`?)
 
-- そのフェーズで**受信するか?**[リンク先の表で、"BlurEvent"は"バブルアップ (上昇) 伝播"では受信しない為"bubbles"は"false"になる](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Focus-Events.html)
+- そのフェーズで**受信するか?** [リンク先の表で、"BlurEvent"は"バブルアップ (上昇) 伝播"では受信しない為"bubbles"は"false"になる](https://docs.unity3d.com/ja/2022.2/Manual/UIE-Focus-Events.html)
   - `bool tricklesDown { get; protected set; }`                                  ==試す=ok=
     - >TrickleDown フェーズにおいて、このイベントがイベント伝搬路に送信されるかどうかを返す。
       - evtの**イベントの型**がもともと**TrickleDown**で**受信**する場合は**true**

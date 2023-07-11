@@ -27,6 +27,7 @@ GameObjectに`Destroy()`を呼んだ場合は、そのGameObjectに属してい�
   - **LoadSceneMode**は列挙型であり、**ロードする時の挙動**を変えます
     - **Single**は、現在ロードされている全てのSceneを**アンロードし**、指定されたSceneを**ロード**します
     - **Additive**は、現在ロードされている全てのSceneを**アンロードせず**、指定されたSceneを**追加でロード**します
+      - **async/await?とusingステートメント**でusingの時LoadしDisposeの時Unloadし参照を外すとかいいかも？
 
 - `UnloadSceneAsync(⟪∫Scene∫¦Scene scene⟫)` `[UnityEngine]`
   - UnloadSceneAsyncは、Sceneを非同期でアンロードします(詳細は概要)

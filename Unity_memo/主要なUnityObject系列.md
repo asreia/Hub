@@ -4,9 +4,9 @@
 
 ### 概要
 
-[UnityObject操作](\画像\UnityObject操作.drawio.png)
-[UnityObject_Destroy](\画像\UnityObject_Destroy.drawio.png)
-[ドメインリロード](画像\ドメインリロード.drawio.png)
+![UnityObject操作](\画像\UnityObject操作.drawio.png)
+![UnityObject_Destroy](\画像\UnityObject_Destroy.drawio.png)
+![ドメインリロード](画像\ドメインリロード.drawio.png)
 
 - Objectは、**System.Objectではなく**、**それを継承**した**UnityEngin.Object**である。UnityEngin.Objectは名前が長いので個人的に**UnityObject**と呼ぶことにする
 - UnityObjectは**Unityのシステムの中**に **(各部分に)シングルトン**として生成され、そのインスタンスの**対**として**C++側のオブジェクト**が生成される
@@ -21,7 +21,7 @@
   - nullなのにnullじゃない問題
   UnityObjectを引数にDestroy＠❰Immediate❱を呼び**Destroyが実行**されると即座に**C++Objectが破棄**されますが、
   UnityObjectであるC#側に**C#の参照関係**が残っているとC#の**GCの対象にならない**為そのUnityObjectを**破棄してくれません**そして、
-  UnityObjectで**オーバーライドされた等価演算子(!=,==)**で、`UnityObject(instance) == null`は、**false**が返ってしまいます(参照関係がないと見える)
+  UnityObjectで**オーバーライドされた等価演算子(!=,==)**で、`UnityObject(instance) == null`は、**true**が返ってしまいます(参照関係がないと見える)
   そのUnityObjectが大きいオブジェクト(テクスチャなど)を参照していた場合は**C#の参照関係**が残っているので**破棄されません**
 
 ### メソッド
