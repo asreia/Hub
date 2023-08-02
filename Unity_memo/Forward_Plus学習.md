@@ -1,0 +1,123 @@
+# Forward_Plus学習
+
+- Editor
+  - Camera
+  - MeshFilter
+  - MeshRenderer
+    - Material (バリアント)
+- C#
+  - UniversalRenderPipeline : ScriptableRenderPipeline
+    - UniversalRenderPipelineAsset : ScriptableRenderPipelineAsset
+    - ForwardRenderer : ScriptableRenderer
+      - ForwardRendererData : ScriptableRendererData
+      - CustomPass : ScriptableRenderPass
+        - CustomFeature : ScriptableRenderFeature
+- ShaderLab
+  - Shader
+    - Properties
+    - SubShader
+      - Tags
+        - RenderPipeline
+      - Pass
+        - Tags
+          - LightMode
+        - HLSL
+- HLSL
+  - SimpleLitForwardPass.hlsl
+  - SpaceTransforms.hlsl //座標変換系
+  - Color.hlsl
+  - Lighting.hlsl
+  - Shadows.hlsl
+  - ShaderVariablesFunctions.hlsl //便利メソッド
+  - UnityShaderUtilityLibrary? //UnityCG.incのURP版
+- ライティング
+  - 直接光
+    - 反射光
+    - 拡散光
+  - シャドウ
+  - 環境光
+    - ライトマップ
+    - ライトプローブ
+    - リフレクションプローブ
+
+- Forward+進め方
+  - C#クラス
+    - Component
+      - Camera
+      - Light
+      - MeshFilter
+      - MeshRenderer
+    - Asset
+      - Mesh
+      - Texture
+      - Shader
+        - ShaderLab //言語表現
+      - Material //バリアント
+    - SRP
+      - ●URP //URPPackageにDoxygen
+        - ●RenderingData
+        - ●Forward+Renderer
+    - 低レベル操作
+      - データ
+        - メッシュ
+          - Mesh
+        - テクスチャ
+          - Texture
+          - RenderTexture
+        - スカラーとベクトルと行列
+          - float
+          - Vector⟪2～4⟫
+          - Matrix
+      - 描画API
+        - CommandBuffer
+        - LowLevelAPI
+          - Graphics
+          - GL
+  - ●HLSL //言語表現
+    - [Direct3D でのグラフィックスの概念](https://learn.microsoft.com/ja-jp/windows/uwp/graphics-concepts/)
+    - [Unity でレンダリングパイプラインとライティングを設定する](https://docs.unity3d.com/ja/2022.2/Manual/BestPracticeLightingPipelines.html)
+    - [空間とプラットフォームの狭間で](https://tech.drecom.co.jp/knowhow-about-unity-coordinate-system/)
+    - データ
+      - Pos(V3),Normal,Tangent,UV(V2),Color(V4),Motion(V3) と 頂点インデックス
+      - RGBADS //D:Depth, S:Stencil
+    - シェーダーステージ
+      - Vertex(3D空間) -> Tessellation\[Hull,Tessellator,Domain] -> Geometry -> Culling -> //Vector処理
+      Rasterize -> PreZTest -> Fragment(スクリーン空間) -> ZTest -> StencilTest -> AlphaTest -> AlphaBlending //Raster処理
+    - 座標系と座標変換
+      - MVP変換
+        - UnityではM(Transform)とVP(Camera)変換が良く使われる?
+        - ⟪モデル¦ワールド¦ビュー¦プロジェクション,クリッピング(\[-1,-1,1]～\[1,1,0](Unityは1がNear))¦ビューポート(\[-1,-1]～\[1,1])¦スクリーン(\[0,0]～\[RT解像度])⟫空間
+    - プローブ
+      - ⟪ライト¦アンビエント(IBL?)¦リフレクション⟫プローブ
+    - シャドウ
+      - カスケードシャドウ
+    - ShaderLabの書き方(言語表現)
+      - 教科書1に書いてあるので参考にする
+      - レンダリングステート
+        - ZClip, ZTest, ZWrite, Cull, Conservative, Offset(Zファイティング回避), ColorMask, Blend, AlphaToMask, centroid(ある?)
+          - ZClip:
+          >深度クリップモードを固定に設定します。ニアクリップ面よりも近いフラグメントは、正確にアクリップ面に配置され、ファークリップ面よりも遠いフラグメントは正確にファークリップ面に配置されます。
+          - Conservative:
+          >慎重なラスタライズ(Conservative)とは、覆われる度合い(ピクセル中心点?)にに関係なく、**三角形で部分的に覆われているピクセルをラスタライズ**することです。
+          >これは、オクルージョンカリング、GPU の衝突検出、可視性検出を行う場合など、確実性が求められる場合に役立ちます。
+          - AlphaToMask
+          >アルファテストで破棄された箇所の境界線を滑らかにします。(MSAAのアルファ版?)(教科書1_P43)
+          - [centroid](https://wgld.org/d/webgl2/w013.html)
+          ![centroid](\画像\centroid.png)
+        - ステンシル (あるモノでマスクを作り、そのマスクで別のモノを描画(基本的にWriteしてRead))
+          - Comp(ref & ReadMask, Ref & ReadMask)//特定のビットを比較, ⟪Pass¦Fail¦ZFail⟫(StencilBuffer & WriteMask)//Writeするビットを指定 かな?
+          - 初期値: ReadMask:11111111, WriteMask:11111111, Comp:Always, ⟪Pass¦Fail¦ZFail⟫:Keep
+    - [ラスター化ルール](https://learn.microsoft.com/ja-jp/windows/uwp/graphics-concepts/rasterization-rules)
+      - ![ラスター化ルール](\画像\ラスター化ルール.png)
+    - ライブラリ
+      - SimpleLitForwardPass.hlsl
+      - SpaceTransforms.hlsl //座標変換系
+      - Color.hlsl
+      - Lighting.hlsl
+      - Shadows.hlsl
+      - ShaderVariablesFunctions.hlsl //便利メソッド
+      - UnityShaderUtilityLibrary? //UnityCG.incのURP版
+  - デバッガー
+    - FrameDebugger
+    - RenderingDebugger
+    - RenderDoc,PIX //ここまでは使わないかも

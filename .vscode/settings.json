@@ -1,7 +1,9 @@
 {
     "cSpell.words": [
+        "AGBA",
         "choco",
         "doruti",
+        "Doxygen",
         "fmap",
         "foldl",
         "foldr",
@@ -11,6 +13,7 @@
         "Haward",
         "kaduki",
         "Lambek",
+        "MSAA",
         "namae",
         "Ningen",
         "nyanco",
@@ -19,9 +22,11 @@
         "runghc",
         "Sagasu",
         "Scroller",
+        "Skybox",
         "struct",
         "tabunki",
         "takasa",
+        "Tessellator",
         "Waybe",
         "Yousei"
     ]
