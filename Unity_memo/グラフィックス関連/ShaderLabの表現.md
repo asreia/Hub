@@ -93,7 +93,7 @@
 』
 
 『==============================================================================================================================================================================
-Shader ｢ShaderName｣
+Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層を作れる
 {
     Properties
     {
@@ -139,6 +139,10 @@ Shader ｢ShaderName｣
 
         ∮RENDERING_STATE∮『ここでのRENDERING_STATE定義はこのSubShader内の全てのPassに適用される(Passと設定項目が被ったらそのPassの設定で上書きされる?)
 
+        CGINCLUDE『SubShader内に記述できる特殊なスペニット([Shader{}にも書けるみたい](https://light11.hatenadiary.com/entry/2018/02/03/141958))
+        『ここに記述された文字列は全てのPassの∮SHADER_CODE∮に同じ文字列が書かれたように振る舞うらしいがあまり推奨されて無さそう
+        ENDCG
+
         ⟦∫LRetInd∫┃1～⟧『Passの定義
         ❰
             ⟪『Passの種類
@@ -146,8 +150,9 @@ Shader ｢ShaderName｣
                 {
                     ∮DEFINE_PASS∮
                 }
-                ¦✖❰GrabPass{＠❰"｢UniformTextureName｣"❱}❱
-                ¦UsePass "｢ShaderPassName｣"
+                ¦✖❰GrabPass{＠❰"｢UniformTextureName｣"❱}❱『{}が空だとsampler2D _GrabTextureにフレームバッファがコピーされる。今(SRP)では使われない
+                ¦UsePass "｢ShaderName｣/｢｢ShaderPassName｣の大文字化｣"『多分、指定したPassがそのまま展開される
+            ⟫
 
                 ＃DEFINE_PASS＝≪『Passの実装
                     ❰『Passの名前とタグ付け
@@ -247,12 +252,25 @@ Shader ｢ShaderName｣
 
                     ≫SHADER_CODE_終わり
                 ≫『Passの実装_終わり(＃DEFINE_PASS)
-            ⟫『Passの種類_終わり(⟪Pass¦✖❰GrabPass❱¦UsePass⟫)
         ❱『Passの定義_終わり(⟦∫LRetInd∫┃1～⟧)
     }❱『SubShader_終わり
 
-    FallBack "｢ShaderPassName｣"
+    『多分、全てのSubShaderの実行が失敗した場合、指定した｢ShaderName｣のSubShaderを実行する。Offにすると全てのSubShaderが失敗しても警告も出さずFallBackもしない(描画されない?)
+    FallBack ⟪"｢ShaderName｣"¦Off⟫
 
-    CustomEditor "｢EditorName｣"
+    CustomEditor "｢EditorName｣"『｢EditorName｣はShaderGUIの派生クラス。今はUIElementでエディタ拡張できるはず。(UIElementからMaterial(.mat)のシリアライズ経由でPropertiesの操作かな?)
 }『Shader_終わり
+```
+
+- Category
+```shaderlab
+    ⟦∫LRetInd∫┃1～⟧❰Category『ShaderCode内にスコープを設定するために使われる。主に複数のSubShaderに同一の∮RENDERING_STATE∮を適用するため。らしいが、汎用性が低く公式も推奨していないみたい
+    {
+        ∮RENDERING_STATE∮
+        『
+        ⟦∫LRetInd∫┃1～⟧❰SubShader
+        {
+            ∫LAny∫
+        }
+    }❱
 ```
