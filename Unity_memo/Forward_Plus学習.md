@@ -80,10 +80,10 @@
     - データ
       - Pos(V3),Normal,Tangent,UV(V2),Color(V4),Motion(V3) と 頂点インデックス
       - RGBADS //D:Depth, S:Stencil
-    - シェーダーステージ
-      - Vertex(3D空間) -> Tessellation\[Hull,Tessellator,Domain] -> Geometry -> Culling -> //Vector処理
-      Rasterize -> PreZTest -> Fragment(スクリーン空間) -> ZTest -> StencilTest -> AlphaTest -> AlphaBlending //Raster処理
-    - 座標系と座標変換
+    - シェーダーステージ VTGC_RDFDSAA
+      - Vertex(3D空間) -> Tessellation\[Hull,Tessellator,Domain] -> Geometry -> Culling -> //Vector処理 VTGC
+      Rasterize -> PreZTest -> Fragment(スクリーン空間) -> ZTest -> StencilTest -> AlphaTest -> AlphaBlending //Raster処理 RDFDSAA
+    - 座標系と座標変換 M (-M->) W (-V->) V (-P->) P (-/Z->) C (-->) Vp (-G->) S
       - MVP変換
         - UnityではM(Transform)とVP(Camera)変換が良く使われる?
         - ⟪モデル¦ワールド¦ビュー¦プロジェクション,クリッピング(\[-1,-1,1]～\[1,1,0](Unityは1がNear))¦ビューポート(\[-1,-1]～\[1,1])¦スクリーン(\[0,0]～\[RT解像度])⟫空間
