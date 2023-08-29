@@ -21,6 +21,7 @@
       - Pass
         - Tags
           - LightMode
+        - RenderingState
         - HLSL
 - HLSL
   - SimpleLitForwardPass.hlsl
@@ -77,12 +78,16 @@
     - [Direct3D でのグラフィックスの概念](https://learn.microsoft.com/ja-jp/windows/uwp/graphics-concepts/)
     - [Unity でレンダリングパイプラインとライティングを設定する](https://docs.unity3d.com/ja/2022.2/Manual/BestPracticeLightingPipelines.html)
     - [空間とプラットフォームの狭間で](https://tech.drecom.co.jp/knowhow-about-unity-coordinate-system/)
+    - 構成
+      ジオメトリ ⊃ プリミティブ ⊃ サーフェス
+      ピクセル、テクセル
     - データ
       - Pos(V3),Normal,Tangent,UV(V2),Color(V4),Motion(V3) と 頂点インデックス
       - RGBADS //D:Depth, S:Stencil
-    - シェーダーステージ VTGC_RDFDSAA
+    - シェーダーステージ VTGC_R_DFDSAA
       - Vertex(3D空間) -> Tessellation\[Hull,Tessellator,Domain] -> Geometry -> Culling -> //Vector処理 VTGC
-      Rasterize -> PreZTest -> Fragment(スクリーン空間) -> ZTest -> StencilTest -> AlphaTest -> AlphaBlending //Raster処理 RDFDSAA
+      Rasterize -> //パスタライス(あんこ入り)
+      PreZTest -> Fragment(スクリーン空間) -> ZTest -> StencilTest -> AlphaTest -> AlphaBlending //Raster処理 RDFDSAA
     - 座標系と座標変換 M (-M->) W (-V->) V (-P->) P (-/Z->) C (-->) Vp (-G->) S
       - MVP変換
         - UnityではM(Transform)とVP(Camera)変換が良く使われる?
@@ -121,3 +126,40 @@
     - FrameDebugger
     - RenderingDebugger
     - RenderDoc,PIX //ここまでは使わないかも
+
+- その他メモ
+  - 白飛び回避にSoftmax使うとか
+  - LightingDataアセットはランタイムで参照される。(uniform変数かcpu側か)
+  - ライトマップ専用のuvが作られライトマップはアトラス化されている
+  - RealtimeGIはデフォルトで有効(BuildInRP(教科書3))
+  - ライトマップBake時にアルベドとエミッションが必要なため"LightMode" = "META"を指定したメタPassが走る?(アルベドとエミッションのマップを焼くだけ?)(教科書3P23,教科書4P61)
+  - Mixedライトは、直接光はリアルタイム描画し、間接光はライト⟪マップ¦プローブ⟫ (Subtractiveは静的オブジェクトの直接光にもライトマップ使う(スペキュラがしぬ))
+  - ポイントライト6面,並行光源カスケードと同様にスポットライトも分割キャストシャドウできるかな
+  - GIにはライトマップには＠❰直接光❱,間接光があり、シャドウは⟪ライトマップ¦シャドウマスク¦ライトプローブ¦Ø⟫にベイク?
+    - GIによる間接光計算には、くっきりとした影を描画するほど精度がないので、自前でシャドウを考慮した描画を行う必要がある(教科書3P31)
+    - シャドウマスクのRGBAを超えたライトのシャドウはライトマップにベイクされる
+    - アンビエントオクルージョンもライトマップにベイクできるがデフォルトoff
+    - 事前計算の直接光,間接光,シャドウ,AOはバラバラに使うことができる?
+  - 教科書3、ライト⟪マップ¦プローブ⟫の理解度がうんこ
+  - Scは可視光のRGB毎の反射量だから、Sc * Lcとなる
+  - Kyoukasyo4
+    - Per Object Limit 追加ライト8個まで
+    - 光や減衰などの呼び方と記号をきめる?(鏡面光など)
+    - フレネル式が拡散反射量と鏡面反射量の割合を決めている。F0は鏡面反射の色
+    - shadowDistance:ディレクショナルはカスケードが範囲によってストレッチする。スポットは範囲内外によってスイッチする
+    - 初期化方法: Varings output = (Varings)0;
+    - TransformObjectToWorld⟪Normal¦Dir⟫()の違い(教科書4P72)
+    - SampleSH⟪Vertex¦Fragment⟫でライトプローブから取得してL0/L1/L2の計算をしている?(多分ライトマップは取得して貼ってるだけ)
+    - SAMPLE_TEXTURE2D(map, sampler, uv) (教科書4P84)
+      - GLES2: tex2D(map, uv)
+      - 非GLES2: map.Sample(sampler, uv)
+    - SAMPLE_TEXTURE2D_SHADOW(shadowMap, sampler, shadowCoord.xy, shadowCoord.z) (教科書4P105)
+      - DX11: shadowMap.SampleCmpLevelZero(sampler, shadowCoord.xy, shadowCoord.z)
+        - (int)(サンプリング値 >= shadowCoord.z) を返す
+    - SAMPLE_TEXTURECUBE_LOD(cubeMap, sampler, reflect, mip)『mipは実数?(教科書4P110)
+      - DX11: cubeMap.SampleLevel(sampler, reflect, mip)
+    - real型(マクロ)練乳1.5
+    - SafeNormalize(ベクトル)という長さがゼロでも不定にならない謎関数(教科書4P93)
+    - Mixed Light対応 教科書4P108
+    - occlusionは、bakeGI \* occlusion, irradiance \* occlusion など各光の種類に対して乗算される?
+  - Textureはサーフェス単位の頂点属性のようなもの?(baseColMapをvertexでuv参照したらそれは頂点カラーと変わらない)

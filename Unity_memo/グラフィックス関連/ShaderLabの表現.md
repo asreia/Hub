@@ -184,6 +184,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         ∮END_SHADER_CODE∮
                             ＃START_SHADER_CODE＝≪｡｡｡○¦SC⟪CG¦HLSL⟫PROGRAM≫
                             ＃END_SHADER_CODE  ＝≪END○¦SC⟪CG¦HLSL⟫≫
+                                『>HLSLとCGの差は型名などあるのですが、Unityではマクロ等でそれらの差を多く吸収しているため、ユーザーは意識せずに済むようになっています。(教科書4P62)
                     ❱
 
                     ＃RENDERING_STATE＝≪『GPUへの固定機能の設定(カリング、RGBADSマスク、ADSテスト、ブレンド)
@@ -198,7 +199,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         ＠❰ZWrite ⟪On¦Off⟫❱『これをOnにするとPreZTestが無効になる?(これをOnにしないとSV_DEPTHへの書き込みができない?)
                         ＠❰ZTest ⟪Less¦Greater¦⟪L¦G¦Ø¦Not⟫Equal¦Always⟫❱『⟪>¦<¦>=¦<=¦==¦!=⟫∪❰True❱ (Src OP Dst)(デフォルトはLEqual)
                         『
-                        『Zファイティング回避 (glPolygonOffset関数)
+                        『Zファイティング回避 (glPolygonOffset関数) (URPAssetのDepthBias,NormalBiasはシェーダー制御っぽい(教科書4P40))
                         ＠❰Offset ❰⟪float┃～⟫『％0Factor』,⟪float┃～⟫『％0Units』❱『Zファイティングが発生した場合、Unitsを⟪1¦-1⟫にしダメだったらFactorも⟪1¦-1⟫にしてみる
                         『
                         『アルファブレンディング Color(RGB(∮BlendOp∮(Src * ∮SrcFactor∮, Dst * ∮DstFactor∮)),A(∮AlphaOp∮(SrcA * ∮SrcFactorA∮, DstA * ∮DstFactorA∮)))
@@ -275,15 +276,17 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                                 『｢ShaderKeyword｣は｢DEFINE_WORD｣。❰_❱は｢ShaderKeyword｣なし版。 (∮RENDERING_STATE∮の切り替えは、シェーダーバリアント要らない)
                                                 ❰multi_compile ⟦ ┃2～⟧⟪_¦｢ShaderKeyword｣⟫❱
                                                     『≪⟦～⟧❰｡｡multi_compile⟪｡⟦¦┃2～⟧⟪_¦｢ShaderKeyword｣⟫｡⟫｡｡❱≫を全て網羅しコンパイルする([MC N個] * [MC N個] *..* [MC N個])
+                                                    『multi_compile_fogは、multi_compile _ FOG_EXP FOG_EXP2 FOG_LINEAR と同じ(教科書4P63)他にmulti_compile_instancing(GPU Instancing)
                                                 ¦❰shader_feature ⟦ ┃1～⟧⟪_¦｢ShaderKeyword｣⟫❱
                                                     『コンパイル時に∮PROPERTY_ATTRIBUTE∮の❰Toggle❱と❰Enum❱と❰KeywordEnum❱に設定された｢ShaderKeyword｣のみコンパイルする
                                                         『❰Toggle❱と❰Enum❱と❰KeywordEnum❱のPropertyの定義からshader_featureの定義が一意に決まりそうだが、
                                                         『∮SHADER_CODE∮内に記述し、ShaderCompilerに伝える必要があるためにshader_featureが必要と思われる
+                                                            『追記:❰Toggle❱と❰Enum❱と❰KeywordEnum❱に関係なくコンパイル時に定義されているかいないかかも(教科書4P63)
                                                     『なぜか、shader_featureだけ⟦ ┃1┃⟧の時❰shader_feature _ ｢ShaderKeyword｣❱になる❰_❱の省略定義がある
                                             ⟫
                                             ¦⟪『シェーダーターゲット (GPUのシェーダー機能のレベル。Unityが独自に定義した値)(この条件を満たすSubShaderが選択される?)
-                                                ❰target 2.0❱『Unityの全プラットフォームでサポート
-                                                ¦％❰target 2.5❱『3.0のサブセット(DX9SM3.0からInterpolator8個まで、LODテクスチャサンプリングを含まない)
+                                                ％❰target 2.0❱『Unityの全プラットフォームでサポート (URPのデフォルト(教科書4P62))
+                                                ¦❰target 2.5❱『3.0のサブセット(DX9SM3.0からInterpolator8個まで、LODテクスチャサンプリングを含まない)
                                                 ¦❰target 3.0❱『DX9シェーダーモデル3.0相当
                                                 ¦❰target 3.5❱『OpenGLES3.0相当(DX10SM4.0からジオメトリシェーダを含まない)。Metalのサポート範囲 (近年(2017/10)のモバイル)
                                                 ¦❰target 4.0❱『DX11シェーダーモデル4.0相当
@@ -312,6 +315,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                             ❱
                                             ¦❰enable_d3d11_debug_symbols❱『DirectX11をターゲットにした出力のバイナリにデバッグ情報を埋め込みます(教科書P68)
                                             ¦❰hardware_tier_variants❱『DirectX12環境のTierによりShaderKeyword(UNITY_HARDWARE_TIER⟪1～3⟫)が有効になりバリアントコードが生成する(教科書P68)
+                                            ¦❰prefer_hlslcc gles❱『Open GL ES(gles)環境でもHLSLccトランスパイラの使用を強制する(教科書4P62)
                                         ⟫
                                     ❱
                                     ¦⟪『マクロ定義系 (マクロ変数は⟪定義¦未定義⟫という状態と❰置換された値❱という状態を持っている)
@@ -339,21 +343,22 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                             ≫
                             ＃:Semantics＝≪『データをレンダリングパイプラインに流し込む時にGPUに役割(意味)を伝える
                                 ❰ : ❱
-                                『Interpolator(補間器)(Vertex->Fragmentのラスタライズする時に補間するための器)
+                                『Interpolator(補間器)(Vertex->Fragmentのラスタライズする時に補間するための器)(使用数を節約するためにパッキングすることもある)
                                     『8      Direct3D9 シェーダーモデル2.0
                                     『10     Direct3D9 シェーダーモデル3.0 (#pragma target 3.0)
                                     『16     OpenGL ES 3.0
                                     『32     Direct3D10 シェーダーモデル4.0 (#pragma target 4.0)
                                 ⟪
                                     ⟪Vertex『主に、TBNP、UV、Colorなど
-                                        ⟪入力(in)
+                                        ⟪『入力(in) (モデルデータの方にSemanticsが付いていてそれと対応する?)
                                             『頂点インデックス
                                             SV_VertexID(unit)『VertexTextureFetch(VTF)で使うやつ(テクスチャによる頂点アニメーション)
                                             『位置(P)
                                             ¦POSITION(float4)『位置ベクトル
                                             『接空間(TBN)『位置と合わせるとTBNP(アフィン) ?
                                             ¦NORMAL(float3)『法線ベクトル(Z)
-                                            ¦TANGENT(float4)『接線ベクトル(X)(最後の1要素は右手か左手かの係数(⟪1¦-1⟫))
+                                            ¦TANGENT(float4)『接線ベクトル(X)(最後の1要素は正しい向きへの係数?(⟪1¦-1⟫)
+                                                『座標系の⟪1¦-1⟫はGetOddNegativeScale()(WorldTransformParams.w)みたい教科書4P72)
                                             ¦BINORMAL『従法線ベクトル(Y)(これが無くてもNORMALとTANGENTの外積で作れる)
                                             『頂点カラー
                                             ¦COLOR(float4)
@@ -361,11 +366,11 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                             ¦BLENDINDICES『頂点インデックス
                                             ¦BLENDWEIGHT 『頂点の重み
                                         ⟫
-                                        ¦⟪入出力(inout)
+                                        ¦⟪『入出力(inout)
                                             TEXCOORD⟪0～3⟫(float4)『テクスチャUV座標
                                             ¦PSIZE『ポイントサイズ
                                         ⟫
-                                        ¦⟪出力(out)
+                                        ¦⟪『出力(out)
                                             SV_POSITION(float4)『VertexでMVP変換された位置ベクトルを、Z除算しクリッピングしてカリングしラスタライズするためにGPUが使う
                                             ¦TEXCOORD⟪4～7⟫(float4)『テクスチャUV座標
                                             ¦COLOR⟪0～1⟫(float4)『頂点カラー
@@ -374,19 +379,19 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                         ⟫
                                     ⟫
                                     ¦⟪Fragment『主に、SV_TARGET、SV_DEPTH
-                                        ⟪入力(in)
+                                        ⟪『入力(in)
                                             TEXCOORD⟪0～7⟫(float4)『テクスチャUV座標
                                             ¦COLOR⟪0～1⟫(float4)『頂点カラー
                                             ¦VFACE(float)『面がカメラに向いている度合い(float)(視線ベクトルとプリミティブのP->PとP->Pの外積による法線の内積?)
                                             ¦VPOS(float2)『スクリーン座標([0,0]～[RT解像度])。(UNITY_VPOS_TYPEマクロを使って型を合わせるらしい)
                                         ⟫
-                                        ¦⟪出力(out)
+                                        ¦⟪『出力(out)
                                             SV_TARGET(float4)『画面に出力するカラー値(MRT: Position, Normal, Velocity, Specula, Roughness)
                                             ¦SV_DEPTH(float)『深度(Z)。多分設定するとPreZTestが死ぬ(死ぬ必要はあるのか?) (VPOS?+Depthでスクリーンスペース)
                                             『Stencil(byte)『描画マスク(マスクを作ってそこに描画する)
                                         ⟫
                                     ⟫
-                                    ¦⟪良く分からんシステムバリュー
+                                    ¦⟪『良く分からんシステムバリュー
                                         ⟪
                                             SV_PrimitiveID『プリミティブごとの識別子 (fragment ?)
                                             ¦SV_InstanceID『インスタンスごとの識別子 (vertex, fragment ?)
@@ -468,7 +473,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                     {
                                         ∮Implement∮
                                     }
-                                        ＃InOut＝≪『多分、あんまり使わない。公式でも使われていない(複数の戻り値は構造体で返す)
+                                        ＃InOut＝≪『outが教科書4P83のLitPassFragment関数で使われていたが、構造体で返せば良くない？
                                             ⟪
                                                 in      『入力セマンティクス(引数のデフォルト)
                                                 ¦out    『出力セマンティクス(戻り値のデフォルト?)(C#と同じ挙動で参照渡しで変更が呼び出し元に反映されるみたい)
@@ -496,7 +501,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
     }❱『SubShader_終わり
 
     『多分、全てのSubShaderの実行が失敗した場合、指定した｢ShaderName｣のSubShaderを実行する。Offにすると全てのSubShaderが失敗しても警告も出さずFallBackもしない(描画されない?)
-    FallBack ⟪"｢ShaderName｣"¦Off⟫
+    FallBack ⟪"｢ShaderName｣"¦Off⟫ 『(教科書4P64)
 
     CustomEditor "｢EditorName｣"『｢EditorName｣はShaderGUIの派生クラス。今はUIElementでエディタ拡張できるはず。(UIElementからMaterial(.mat)のシリアライズ経由でPropertiesの操作かな?)
 }『Shader_終わり
