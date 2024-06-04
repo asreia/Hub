@@ -1,103 +1,7 @@
 # ShaderLabの表現
 
 ```shaderlab
-『整列のための⏎とか｡｡｡｡とかを無くした(∫LRetInd∫┃は無くせなかった) ==========書き方のスタイルによってその改行やインデントに意味があるか無いかのルールを作る？================
-『[スタイルルール] => [マクロ] => ..
-『
-    [スタイルルール]================
-        {⟪¥＄¦¥＃⟫∮SEC∮∮Space∮＝∮LAny∮} => {⟪¥＄¦¥＃⟫∮SEC∮＝∮LAny∮}『∮Space∮∮SEC∮∮Space∮にしようと思ったけど⟪¥＄¦¥＃⟫∮SEC∮で検索したいのでやめた
-            ＃Space＝≪⟦～⟧❰ ❱≫
-            ＃NoSpace＝≪⟦～⟧❰∫LChar∫∸❰ ❱❱≫
-            ＃SEC＝≪∮NoSpace∮∫LToken∫∮NoSpace∮≫『最初と最後の文字はスペース(❰ ❱)以外の文字になる(中間(∫LToken∫)にスペースが含まれることはある)
 
-        ↓⟪¦⟫と【⇒∥┃∠〖⸨⸩〗】
-        {『本当に改行やインデントが必要な場合は∫LReturn∫や∫LIndent∫や❰ ❱を使う
-            ∮LAny∮○¦Blk⟪¥⟪¦¥【⟫
-                ｡∮LAny∮｡
-                ｡⟦∫LRetInd∫┃～⟧❰○¦Blk⟪¥¦¦⟪¥┃¦¥∥⟫¦Ø⟫∮LAny∮❱｡
-            ○¦Blk⟪¥⟫¦¥】⟫
-        }
-        ↓
-        {
-            ∮LAny∮○¦Blk⟪¥⟪¦¥【⟫｡∮LAny∮｡｡⟦～⟧❰○¦Blk⟪¥¦¦⟪¥┃¦¥∥⟫¦Ø⟫∮LAny∮❱｡○¦Blk⟪¥⟫¦¥】¦¥❱¦¥≫⟫
-        }
-        ↓❰❱と≪≫
-        {
-            ∮LAny∮⟪¥❰¦¥≪⟫
-                ∮LAny∮
-                ⟦∫LRetInd∫┃～⟧❰∮LAny∮❱
-            ⟪¥❱¦¥≫⟫
-        }
-        ↓
-        {
-            ∮LAny∮⟪¦¥❰¦¥≪⟫∮LAny∮
-            ⟦∫LRetInd∫┃～⟧❰∮LAny∮❱⟪¦¥❱¦¥≫⟫
-        }
-    ================
-
-    要るパターン================
-        {≪○¦PT⟪Int｡｡｡｡¦Float｡｡｡｡¦Range∮VECTOR2∮¦C}
-        とか
-        {
-            ＃Int_Float_ATT＝≪＠❰[｡Toggle＠❰(｢define ShaderKeyword｣)❱｡]❱⏎
-                    ＠❰[Enum＠❰(｡｡⟪｢C#列挙型｣¦｡⟦,┃1～7⟧❰｢ShowEnum｣,⟪～⟫❱｡⟫｡｡)❱]❱⏎
-                    ＠❰[KeywordEnum(⟦, ┃1～⟧❰｢Keyword｣❱)]『｢PropertyName｣_｢Keyword｣と
-        }
-        とかは`｡`や`⏎`が要る。
-        ↓ボツ
-        見やすさのために行を開けたい場合は、
-        {
-            aaa
-        『
-            bbb
-        }
-        とするかいやどうしようやめた(マクロ定義を⟪❰ ❱¦\n⟫にした)
-    ================
-
-    対象言語特化パターン================
-        普通のコピペと同じで、
-        1.{
-            ＃複数行＝≪
-                あああ
-                いいい
-                ううう
-            ≫
-            {
-                ∮複数行∮
-            }
-        }
-        ↓
-        {
-            {
-                あああ
-            いいい
-            ううう
-            }
-        }
-        となってしまう問題は残る。変数定義位置と変数出現位置のインデント差を2行目移行に足すかどうかの制御が必要？
-            足すかどうかのメタ文字を作るとまたややこしくなるので対象言語によって決定される事にしよう
-        2.{∮LAny∮＠❰\n❱⟦～⟧❰ ❱『コメント   \n} => {∮LAny∮\n}
-        3.{\n⟦～⟧⟪❰ ❱¦\n⟫⟪＃マクロ定義＃⟫⟦～⟧⟪❰ ❱¦\n⟫\n} => {\n}
-        他にも↑のように文章やコード系に特化した[スタイルルール]が必要
-    ================
-    ❰＠❰A❱ ＠❰B❱ ＠❰C❱❱
-    ↓
-    ⟪⟦＠❰A❱ ⟧⟦＠❰B❱ ⟧⟦＠❰C❱ ⟧⟫
-    ↓
-    ⟪
-        ⟦＠❰A❱ ⟧
-        ⟦＠❰B❱ ⟧
-        ⟦＠❰C❱ ⟧
-    ⟫
-    Permutation(置換(`⟦：⟧`))は`⟪⟫`を`❰❱`のように使ったりXorのように使ったりするからやめとくか
-    ================
-    『言語表現の違法な使用(面倒くさかった(●●(即時実行)を認めるか審議(●を即時実行にするか?)))
-    ✖❰＄Express＝❰『✖＄..＝❰..❱を作るか?..いや✖＄がそもそも✖❰＄だっけ..
-        - ブロック単項演算子の合成則
-            [例] `{⟦～⟧＠❰A❱} ⇔ {⟦～⟧❰＠❰A❱❱} = {⟦～⟧❰⟪A¦Ø⟫❱} => {⟪Ø｡¦｡⟪A¦Ø⟫｡¦｡⟪A¦Ø⟫⟪A¦Ø⟫｡¦｡⟪A¦Ø⟫⟪A¦Ø⟫⟪A¦Ø⟫｡¦｡..⟫}`
-』
-
-『==============================================================================================================================================================================
 Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層を作れる
 {
     Properties
@@ -126,7 +30,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
 
     ⟦∫LRetInd∫┃1～⟧❰SubShader
     {
-        『SubShaderのTags
+        『SubShaderのTags (https://docs.unity3d.com/ja/2023.2/Manual/SL-SubShaderTags.html)
         ＠❰Tags
         {
             『↓なくなったっけ？
@@ -166,8 +70,10 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         『PassのTags
                         ＠❰Tags
                         {
-                            『LightModeはPass(｢ShaderPassName｣)のグループみたいなもの?
-                            ＠❰"LightMode" = "⟪｢LightModeName｣¦Always『ある?』¦✖❰ForwardBase❱¦✖❰ForwardAdd❱¦ShadowCaster『ある？』¦MotionVectors『ある？』⟫"❱
+                            『LightModeはPass(｢ShaderPassName｣)のグループみたいなもの? //追記: Passの種類?
+                            ＠❰"LightMode" = "⟪｢LightModeName｣¦Always『ある?』¦✖❰ForwardBase❱¦✖❰ForwardAdd❱¦ShadowCaster『ある？』¦MotionVectors『ある？』⟫⏎
+                                                ¦UniversalForward『ForwardLit』¦ShadowCaster『ShadowCaster』¦DepthOnly『DepthOnly』¦Meta『Meta』¦Universal2D『Universal2D』"❱
+                                                    『↑教科書4P61(『ForwardLit』は｢ShaderPassName｣)』
                         }❱
                     ❱
                     『
@@ -179,7 +85,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         ∮START_SHADER_CODE∮
                             『
                             ∮SHADER_CODE∮
-                                ＃SHADER_CODE＝≪○¦SC⟪CG_SHADER_CODE¦HLSL_SHADER_CODE⟫≫『CG_SHADER_CODEは定義した
+                                ＃SHADER_CODE＝≪○¦SC⟪∮CG_SHADER_CODE∮¦∮HLSL_SHADER_CODE∮⟫≫『CG_SHADER_CODEは定義した
                             『
                         ∮END_SHADER_CODE∮
                             ＃START_SHADER_CODE＝≪｡｡｡○¦SC⟪CG¦HLSL⟫PROGRAM≫
@@ -196,7 +102,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         ＠❰ColorMask ⟪RGB¦A¦0¦⟪＃R,G,B,Aの任意の組み合わせ＃⟫⟫❱『教科書に書いてあるやつそのまま写した。良く分からないが、コストが高いらしい
                         『
                         『深度系
-                        ＠❰ZWrite ⟪On¦Off⟫❱『これをOnにするとPreZTestが無効になる?(これをOnにしないとSV_DEPTHへの書き込みができない?)
+                        ＠❰ZWrite ⟪On¦Off⟫❱『これをOnにしないとSV_DEPTHへの書き込みができない?『追記:SV_DEPTHに書くとPreZTestが無効?
                         ＠❰ZTest ⟪Less¦Greater¦⟪L¦G¦Ø¦Not⟫Equal¦Always⟫❱『⟪>¦<¦>=¦<=¦==¦!=⟫∪❰True❱ (Src OP Dst)(デフォルトはLEqual)
                         『
                         『Zファイティング回避 (glPolygonOffset関数) (URPAssetのDepthBias,NormalBiasはシェーダー制御っぽい(教科書4P40))
@@ -267,7 +173,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                             ＃PreProcess＝≪
                                 ⟦∫LRetInd∫┃～⟧❰⟪
                                     ❰『プラグマ系
-                                        ❰#pragma ❱⏎
+                                        ❰#pragma ❱⏎『(https://docs.unity3d.com/ja/2023.2/Manual/SL-PragmaDirectives.html)
                                         ⟪
                                             ❰『各シェーダーステージの使用の宣言とその関数名を指定
                                                 ⟪vertex『vert』¦⟪hull¦domain⟫¦geometry『target 4.0以降』¦fragment『frag』⟫ ｢ShaderStageFunctionName｣
@@ -319,9 +225,10 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                         ⟫
                                     ❱
                                     ¦⟪『マクロ定義系 (マクロ変数は⟪定義¦未定義⟫という状態と❰置換された値❱という状態を持っている)
+                                        『[C言語のマクロについてまとめる](https://qiita.com/Yuzu2yan/items/0e7bcf2e8bc1aa1c030b)
                                         『マクロ定数』❰#define ｢DEFINE_WORD｣ ⟪｢置換する文字列｣¦Ø⟫❱
                                         ¦『マクロ関数』❰#define ｢DEFINE_WORD｣(｡⟦, ┃1～⟧｢arg｣｡)  ⟪＃argを使った置換＃⟫❱
-                                            『定義: #define DEFINE_WORD(arg) "arg" + "ｧ"
+                                            『定義: #define DEFINE_WORD(arg) "arg" + "ｧ"『追記: #arg ?
                                             『使用: DEFINE_WORD(KND)
                                             『評価: "KND" + "ｧ" //=>"KNDｧ" となる
                                         ¦『マクロ定義解除』❰#undef ｢DEFINE_WORD｣❱『定義された｢DEFINE_WORD｣を未定義にする(マクロ変数を再定義する時に使われる)
@@ -341,7 +248,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                     ¦❰#error ｢ErrorMessage｣❱『これが評価されるとプリプロセスを止め｢ErrorMessage｣を表示させる(条件分岐系の中で使われる)
                                 ⟫❱
                             ≫
-                            ＃:Semantics＝≪『データをレンダリングパイプラインに流し込む時にGPUに役割(意味)を伝える
+                            ＃:Semantics＝≪『データをレンダリングパイプラインに流し込む時にGPUに役割(意味)を伝える(https://docs.unity3d.com/ja/2023.2/Manual/SL-ShaderSemantics.html)
                                 ❰ : ❱
                                 『Interpolator(補間器)(Vertex->Fragmentのラスタライズする時に補間するための器)(使用数を節約するためにパッキングすることもある)
                                     『8      Direct3D9 シェーダーモデル2.0
@@ -350,9 +257,9 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                     『32     Direct3D10 シェーダーモデル4.0 (#pragma target 4.0)
                                 ⟪
                                     ⟪Vertex『主に、TBNP、UV、Colorなど
-                                        ⟪『入力(in) (モデルデータの方にSemanticsが付いていてそれと対応する?)
+                                        ⟪『入力(in) (モデルデータ(ジオメトリ)の方にSemanticsが付いていてそれと対応する?)
                                             『頂点インデックス
-                                            SV_VertexID(unit)『VertexTextureFetch(VTF)で使うやつ(テクスチャによる頂点アニメーション)
+                                            SV_VertexID(unit)『VertexTextureFetch(VTF)で使うやつ(テクスチャによる頂点アニメーション)『> uint の必要があります
                                             『位置(P)
                                             ¦POSITION(float4)『位置ベクトル
                                             『接空間(TBN)『位置と合わせるとTBNP(アフィン) ?
@@ -367,7 +274,8 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                             ¦BLENDWEIGHT 『頂点の重み
                                         ⟫
                                         ¦⟪『入出力(inout)
-                                            TEXCOORD⟪0～3⟫(float4)『テクスチャUV座標
+                                            TEXCOORD⟪0～3⟫(float4)『テクスチャUV座標。
+                                                『>テクスチャ座標や位置などの任意の高精度のデータを示すために使用されます(任意のデータもこれが使われうる)
                                             ¦PSIZE『ポイントサイズ
                                         ⟫
                                         ¦⟪『出力(out)
@@ -382,12 +290,15 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                         ⟪『入力(in)
                                             TEXCOORD⟪0～7⟫(float4)『テクスチャUV座標
                                             ¦COLOR⟪0～1⟫(float4)『頂点カラー
-                                            ¦VFACE(float)『面がカメラに向いている度合い(float)(視線ベクトルとプリミティブのP->PとP->Pの外積による法線の内積?)
-                                            ¦VPOS(float2)『スクリーン座標([0,0]～[RT解像度])。(UNITY_VPOS_TYPEマクロを使って型を合わせるらしい)
+                                            ¦VFACE(fixed(floatでもいい?))『面がカメラに向いている度合い(float)(視線ベクトルとプリミティブのP->PとP->Pの外積による法線の内積?)
+                                            ¦VPOS(UNITY_VPOS_TYPE)『スクリーン座標([0,0]～[RT解像度])。(UNITY_VPOS_TYPEマクロを使って型を合わせるらしい)
+                                                『[VPOSと構造体について](https://light11.hatenadiary.com/entry/2018/07/22/205542)
                                         ⟫
                                         ¦⟪『出力(out)
-                                            SV_TARGET(float4)『画面に出力するカラー値(MRT: Position, Normal, Velocity, Specula, Roughness)
+                                            SV_TARGET⟪＠❰0❱¦1¦2¦3¦4¦..⟫(float4)『画面に出力するカラー値(MRT: Position, Normal, Velocity, Specula, Roughness)
                                             ¦SV_DEPTH(float)『深度(Z)。多分設定するとPreZTestが死ぬ(死ぬ必要はあるのか?) (VPOS?+Depthでスクリーンスペース)
+                                                『[Depthテスト](https://youtu.be/iqYQvpTndTw?t=611)
+                                                『>多くの GPU では、これは深度バッファの最適化をオフ(多分PreZ)にするので、正当な理由なしに Z バッファ値を上書きしないように注意してください。SV_Depth で発生するコストは GPU アーキテクチャによって異なり ますが、全体的にはアルファテストのコスト（HLSL の組み込み void clip(float4 x) { if (any(x < 0)) discard; } 関数を使用）とほぼ同じです(**discardがSV_DEPTHを元のDepth値に戻すよう上書きしPreZを殺す?**)。深度を変更するシェーダは、すべての通常の不透明シェーダの後にレンダ リングします（たとえば、AlphaTest レンダリングキューを使用します）。
                                             『Stencil(byte)『描画マスク(マスクを作ってそこに描画する)
                                         ⟫
                                     ⟫

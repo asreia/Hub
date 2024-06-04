@@ -9,7 +9,7 @@
 ![ドメインリロード](画像\ドメインリロード.drawio.png)
 
 - Objectは、**System.Objectではなく**、**それを継承**した**UnityEngin.Object**である。UnityEngin.Objectは名前が長いので個人的に**UnityObject**と呼ぶことにする
-- UnityObjectは**Unityのシステムの中**に **(各部分に)シングルトン**として生成され、そのインスタンスの**対**として**C++側のオブジェクト**が生成される
+- UnityObjectは**Sceneかそれ以外のUnityのシステムの中**に生成され、そのインスタンスの**対**として**C++側のオブジェクト**が生成される
 - そのC++側のオブジェクト(以後**C++Object**)とその**UnityObject(instance)**の間の通信は、
   UnityObjectのフィールドの**m_CachedPtr**: UnityObject(instance) -> C++Object
   C++Objectのフィールドの  **GCHandle**   : C++Object -> UnityObject(instance)

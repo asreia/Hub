@@ -5,6 +5,7 @@
 ### 概要
 
 ![UnityObject操作](\画像\UnityObject操作.drawio.png)
+![Unityのシリアライズ言語YAMLを理解する](\画像\Unity_のシリアライズ言語_YAML_を理解する.png)
 
 - SerializedObjectは、**C++Object内のシリアライズデータ**を**C#のSerializedObject型**にコピーして編集し、またC++Objectへコピーできる様な型で、
   C++Object内のシリアライザを**C#の参照型で編集**するための機能です
@@ -47,14 +48,12 @@
 というよう変換を差し込みます
 - このコールバックを使うことで**シリアライズ,デシリアライズ**の**タイミングを知る**ことができる
 - その結果、
-  - Unityは**UnityObject**が**Inspectorに表示**(**Inspector**はUnityObjectのC++Objectにある**シリアライズデータ**をプロパティとして**表示**します(追記: 正確には
-    さらに、そのシリアライズデータをInspectorを表示している**SerializedObjectへUpdate関数で更新**していると思う。Update関数の中でシリアライズを実行しているかもしれない))
-    されている間、`OnBeforeSerialize()`を**呼び続け**、
-    **UnityObjectのシリアライズ可能な変数**から**C++Objectのシリアライズデータ**を更新し続け、Inspectorに表示されているUnityObjectの**最新のプロパティの状態を表示**します
+  - Unityは**UnityObject**が**Inspectorに表示**している間、そのUnityObjectのSerializedObjectの`Update()`を呼び続け、その中で、`OnBeforeSerialize()`を呼び、次に**シリアライズ**し、その後**SerializedObjectを更新**し、その結果をInspectorに表示していると思われる
     - Inspectorを表示せず**UnityObjectのシリアライズ可能な変数**のみをスクリプトなどで**変更**しても`OnBeforeSerialize()`は呼ばれないので、
-    **UnityObjectの変更**を**常に**シリアライズしC++Objectへ**更新している訳ではない**
+    **UnityObjectの変更**を`Update()`で**常に**シリアライズしC++Objectへ**更新している訳ではない**
   - Editor操作によるInspectorの**プロパティへの書き込み**があった場合`OnAfterDeserialize()`がよばれ、**C++Objectのシリアライズデータ**が**UnityObjectのシリアライズ可能な変数**へ
-    更新されます
+    デシリアライズされます
+    - 多分、`ApplyModifiedProperties()` ⊃ \[`デシリアライズ` => `UnityObject更新` => `OnAfterDeserialize()`] 
 
 ### コールバック
 

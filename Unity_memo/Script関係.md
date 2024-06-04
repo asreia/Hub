@@ -16,7 +16,7 @@
 
 ### 概要
 
-MonoBehaviourは、必ずGameObjectにアタッチして**Componentとして振る舞い**、**Unityのシステムの中**に **(各部分に)シングルトン**として生成されます
+MonoBehaviourは、必ずGameObjectにアタッチして**Componentとして振る舞い**、UnityObjectとして生成されます
 **ゲームループ**の特定のタイミングで呼び出される**コールバックが多く**定義されており、主にランタイム時に**Component間で情報をやり取り**しゲームを制御します
 
 - **注意事項**
@@ -30,7 +30,8 @@ MonoBehaviourは、必ずGameObjectにアタッチして**Componentとして振�
 
 ### 概要
 
-ScriptableObjectは、**ScriptableなObject**であり**Unityのシステムの中**に **(各部分に)シングルトン**として生成され一つの**モジュールシステム**として運用されます
+ScriptableObjectは、**ScriptableなObject**であり**Assetとして振る舞い**UnityObjectして生成し**一つのモジュールシステム**として運用されます
+- [CreateAssetMenu(menuName = "SelfMadeSRP_Asset/SRP0", fileName = "SRP0_Asset_File")] (とりあえずコピペメモ)
 
 - **注意事項**
   - ファイル名とクラス名が**同じでない**とCreateAsset時警告がでる
