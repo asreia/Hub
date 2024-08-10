@@ -122,7 +122,7 @@
         };
 //型============================================================================================================================================================================
 //universal/ShaderLibrary/BRDF.hlsl
-struct BRDFData
+struct BRDFData //struct SurfaceDataから作る
 {
     half3 albedo;
     half3 diffuse;
@@ -194,9 +194,9 @@ struct VertexPositionInputs //●
 //universal/ShaderLibrary/Core.hlsl 
 struct VertexNormalInputs //●
 {
-float3 tangentWS;
-float3 bitangentWS;
-float3 normalWS;
+    float3 tangentWS;
+    float3 bitangentWS;
+    float3 normalWS;
 };
 //universal/ShaderLibrary/AmbientOcclusion.hlsl
 struct AmbientOcclusionFactor //SSAO (_ScreenSpaceOcclusionTexture, _AmbientOcclusionParam.w)
@@ -310,7 +310,7 @@ struct ShadowSamplingData
         //メインライトシャドウ関連
         float4 _MainLightShadowOffset0; //ソフトシャドウのサンプリング時にオフセットする
         float4 _MainLightShadowOffset1;
-        float4 _MainLightShadowParams;  //shadowStrengthとソフトシャドウの品質
+        float4 _MainLightShadowParams;  //shadowStrength(.x)とソフトシャドウの品質(.y) とシャドーフェイド(.zw)
         float4 _MainLightShadowmapSize; // メインライトのシャドウマップのサイズ //使ってない
         //追加ライトシャドウ関連
         float4 _AdditionalShadowOffset0; // 追加ライトのシャドウオフセット
@@ -380,7 +380,7 @@ struct ShadowSamplingData
     //universal/ShaderLibrary/ShaderVariablesFunctions.hlsl
     static const half kSurfaceTypeTransparent = 1.0;
 
-//Level:7 まで Shadow と ProbeVolume しか無い
+//Level:7～12 Shadow と ProbeVolume しか無い
 //Level:12=======================================================================================================================================================================
 //core/ShaderLibrary/Shadow/ShadowSamplingTent.hlsl
 float SampleShadow_GetTriangleTexelArea(float triangleHeight)
@@ -1473,7 +1473,7 @@ void EvaluateAdaptiveProbeVolume(APVSample apvSample, float3 normalWS, out float
         bakeDiffuseLighting += apvSample.L0; //↑にL0を加算
         if(_LeakReduction_SkyOcclusion.z > 0)
             bakeDiffuseLighting += EvaluateOccludedSky(apvSample, normalWS); //↑に従来のライトプローブ(EvaluateAmbientProbe(normalWS))を重みを掛けて足してるみたい
-        {
+        {                                                                           //↑訂正: bDL += EvalSHOccludedSky(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱
             bakeDiffuseLighting = bakeDiffuseLighting * _Weight_MinLoadedCellInEntries.x; //最後に重みを掛ける (ココはifの外)
         }
     }
@@ -1729,7 +1729,7 @@ void EvaluateAdaptiveProbeVolume(in float3 posWS, in float3 normalWS, in float3 
     posWS = AddNoiseToSamplingPosition(posWS, positionSS, viewDir); //posWS += (viewDir.⟪x¦y⟫ + ノイズ) * ノイズ をしている
 
     APVSample apvSample = SampleAPV(posWS, normalWS, viewDir); //最終的にTexture3D L⟪0¦1⟫をuvwでサンプリングするが超複雑そう
-    EvaluateAdaptiveProbeVolume(apvSample, normalWS, bakeDiffuseLighting); //L1 + L0 + if{従来のライトプローブ}
+    EvaluateAdaptiveProbeVolume(apvSample, normalWS, bakeDiffuseLighting); //L1 + L0 + if{EvalSH"OccludedSky"(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱}
 }
 //universal/ShaderLibrary/ShaderVariablesFunctions.hlsl 
 float2 GetNormalizedScreenSpaceUV(float2 positionCS) //●positionCS.xy * 0.5 + 0.5 じゃだめなの?
@@ -1953,7 +1953,7 @@ inline void InitializeStandardLitSurfaceData(float2 uv, out SurfaceData outSurfa
         half3 bakedGI;
         if(_EnableProbeVolumes) //APV
         {
-            EvaluateAdaptiveProbeVolume(absolutePositionWS, normalWS, viewDir, positionSS, bakedGI); //positionCS.xyだからSSなのかな
+            EvaluateAdaptiveProbeVolume(absolutePositionWS, normalWS, viewDir, positionSS, bakedGI); //positionCS.xyだからpositionSS(スクリーンスペース)なのかな
         }
         else //従来のライトプローブ?
         {
@@ -1978,10 +1978,12 @@ half4 UniversalFragmentPBR(InputData inputData, SurfaceData surfaceData)
     AmbientOcclusionFactor aoFactor = CreateAmbientOcclusionFactor(inputData, surfaceData);
     uint meshRenderingLayers = GetMeshRenderingLayer();
     Light mainLight = GetMainLight(inputData, shadowMask, aoFactor); //シャドウの計算もある
+        //uniformからLight情報取得 と light.shadowAttenuationを_MainLightShadowmapTextureをshadowCoordでサンプリング＆比較して取得
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI);
 
     LightingData lightingData = CreateLightingData(inputData, surfaceData);
 
+    //環境拡散光:inputData.bakedGI と 環境鏡面光:urp_ReflProbes_AtlasとinputData で 合算してlightingData.giColorを算出
     lightingData.giColor = GlobalIllumination(brdfData, brdfDataClearCoat, surfaceData.clearCoatMask,
     inputData.bakedGI, aoFactor.indirectAmbientOcclusion, inputData.positionWS,
     inputData.normalWS, inputData.viewDirectionWS, inputData.normalizedScreenSpaceUV);
@@ -2006,11 +2008,13 @@ half4 UniversalFragmentPBR(InputData inputData, SurfaceData surfaceData)
         }
     }
     {
-        uint lightIndex;
+//==============================Forward+な部分。(リフレクションも同じ機構を利用している(urp_ReflProbes_ProbePosition[probeIndex]))
+        uint lightIndex; //このインデックスで配列要素にアクセスしている
         ClusterIterator _urp_internal_clusterIterator = ClusterInit(inputData.normalizedScreenSpaceUV, inputData.positionWS, 0);
        [loop] while(ClusterNext(_urp_internal_clusterIterator, lightIndex)) //クラスター (なぜ↑↑とコレと2つある?) //●
         {
             lightIndex += ((uint)_FPParams0.w);
+//===========================================
             Light light = GetAdditionalLight(lightIndex, inputData, shadowMask, aoFactor); //lightIndex で cbuffer AdditionalLights から取得
             if(IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
             {

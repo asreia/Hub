@@ -9,8 +9,8 @@
 - C#
   - UniversalRenderPipeline : RenderPipeline
     - UniversalRenderPipelineAsset : RenderPipelineAsset
-    - ForwardRenderer : ScriptableRenderer
-      - ForwardRendererData : ScriptableRendererData
+    - UniversalRenderer : ScriptableRenderer
+      - UniversalRendererData : ScriptableRendererData
       - CustomPass : ScriptableRenderPass
         - CustomFeature : ScriptableRenderFeature
 - ShaderLab
@@ -59,7 +59,7 @@
       - Material //バリアント
     - SRP
       - ●URP //URPPackageにDoxygen
-        - ●RenderingData
+        - ●frameData (旧RenderingData)
         - ●Forward+Renderer
     - 低レベル操作
       - データ
@@ -68,7 +68,7 @@
         - テクスチャ
           - Texture
           - RenderTexture
-        - スカラーとベクトルと行列
+        - スカラーとベクトルと行列 (テンソル)
           - float
           - Vector⟪2～4⟫
           - Matrix
@@ -91,6 +91,7 @@
     - [よく使うシェーダーのテクニック](https://zenn.dev/r_ngtm/articles/unity-urp10-shader-memo)
     - [シャドウ深度マップを向上させるための一般的な方法](https://learn.microsoft.com/ja-jp/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps)
     - [カスケードされたシャドウ マップ](https://learn.microsoft.com/ja-jp/windows/win32/dxtecharts/cascaded-shadow-maps)
+    - [LightModeの用途を整理する](https://light11.hatenadiary.com/entry/2022/03/15/195620)
     - 構成
       ジオメトリ ⊃ プリミティブ ⊃ サーフェス
       ピクセル、テクセル

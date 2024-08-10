@@ -7,7 +7,7 @@
   - ContextContainer, RenderingData, ScriptableRenderer, CommandBuffer, ScriptableRenderContext, RTHandles
   - 最終的にRenderPassが書ければ良い?
   - よく使われる、データ構造(フィールドデータ), モジュールの使い方(RTHandle,cmd,ctxなど) を理解する。
-    - RenderGraph,XR,NativeRenderPassは保留
+    - XR,NativeRenderPassは保留
     - RenderDoc¦PIX, スクリプトデバッグなどを使う
   - まずは、大まかな流れをdraw.ioする
     - デバッグ系を触る
@@ -60,7 +60,7 @@
   - G+FBOカリング(Grid+フラスタム,BackFace,Occlusion)
   - GraphicsModules
     - ok:RenderTexture, ok:RenderTargetIdentifier, ok:RTHandle, o:RenderGraph, ok:CommandBuffer, frameData, ok:ScriptableRenderContext
-    - Camera, Light, MeshFilter, MeshRenderer, Material, Shader
+    - ok:Camera, ok:Light, ok:MeshFilter, ok:MeshRenderer, ok:Material, ok:Shader
     - o:FrameDebugger, o:RenderDoc, o:RenderingViewer, o:Profiler,
     - ●Internal_**Draw**⏎『全て、BatchRendererGroup(BRG)(UnityのMDI機構?)に置き換えれるらしい。(rRG->drawCommandsでUnity描画パイプラインに差し込まれる?)(GPU Instancing(SSBO(unity_DOTSInstanceData <= GraphicsBuffer?))、Job/NativeArray、カメラカリング、SRPBatcherフレンドリー(Meshを固定しInstanceコールする?(**SRPBatcherはCbufferとMeshを変える**))、Hybrid Renderer V2の基盤)(シェーダーはDOTS Instancingをサポートしている必要がある, BatchID毎にInstanceコールしている)(https://blog.virtualcast.jp/blog/2019/10/batchrenderergroup/)
       - bRGにMeshとMaterial(CBuffer,DOTS Instancingシェーダー)と\[メタデータ(PropertyToID)とGraphicsBuffer]を渡し、カメラカリングし、BatchID毎にInstance描画する
@@ -73,6 +73,8 @@
   - 座標系とYupなどの違いは、ある軸を*-1するか軸を入れ替えると左手と右手が入れ替わりYupなども変わる?(ベクトル,行列の基底ベクトル:要素反転か入れ替え、クォータニオン:軸反転)
     - 多分、座標系の違いはCS空間しか受けない(CS空間で違いを吸収する(Z軸反転?))
   - HLSLPROGRAM **API組み込み関数の違い**、**座標系の違い**、**バリアント**、自作メッシュ描画するときAPVなどの機能を取ってこれるか
+    - **APV機能**: //universal/ShaderLibrary/GlobalIllumination.hlsl
+      - `half3 SampleProbeVolumePixel(in half3 vertexValue, in float3 absolutePositionWS, in float3 normalWS, in float3 viewDir, in float2 positionSS)`
     - Unityは、uniformとShaderKeywordを設定し、Tags{..}を見てドローコールする
     - 謎マクロ(UNITY_SETUP_STEREO～やDEBUG_DISPLAY)などを無視できるか
     - CgからHLSLで何が変わっているか: ただ**ShaderLibraryが変わっているだけ**
@@ -84,7 +86,7 @@
           - uv.y, pos.z の反転
         - API組み込み関数の違い吸収
           - TEXTURE2D(texture)
-          - SAMPLER(sampler_texture) //C#のどこで設定している?
+          - SAMPLER(sampler_texture) //C#のどこで設定している?=>`class Texture`で設定していた
           - SAMPLE_TEXTURE2D_X(texture, sampler_texture, uv)
       - Unity組み込みヘルパー系 (マクロ=>関数でも関数=>マクロでもやっていることは変わらん?)
         - インスタンシング Material:GPUインスタンシングを有効にする で、ドローコールがインスタンシングになる?
@@ -170,6 +172,7 @@
               - universal/ShaderLibrary/AmbientOcclusion.hlsl
               - universal/ShaderLibrary/DBuffer.hlsl
             - universal/ShaderLibrary/LODCrossFade.hlsl
+  - レンダリング順序: Camera.depth => SRPass.renderPassEvent => `Renderer.rendererPriority`? => Material.renderQueue
 
 - コードメモ
 

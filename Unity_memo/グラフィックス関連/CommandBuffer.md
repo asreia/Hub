@@ -6,7 +6,12 @@
   - (｡GPU Instancing(SSBO(unity_DOTSInstanceData <= GraphicsBuffer?))、
     - Job/NativeArray、カメラカリング、SRPBatcherフレンドリー(Meshを固定しInstanceコールする?(SRPBatcherはCbufferとMeshを変える))、
     - Hybrid Renderer V2の基盤｡)
+  - ECS\[Hybrid Renderer V2] -> SRP\[｡GPU Resident Drawer -> Batch Render Group -> DOTS Instancing -> \[SRPBatcher, GPU Instancing]｡] かな?
   - (シェーダーはDOTS Instancingをサポートしている必要がある, BatchID毎にInstanceコールしている)[](https://blog.virtualcast.jp/blog/2019/10/batchrenderergroup/)
+  - [BRG->DOTS Instancingという機能はSRP BatcherとGPU Instancingの併用を可能にしました。](https://logicalbeat.jp/blog/15417/)
+  - [DOTS Hybrid Renderer V2](https://docs.unity3d.com/Packages/com.unity.rendering.hybrid@0.4/manual/index.html)
+  - [Entities Graphics](https://docs.unity3d.com/Packages/com.unity.entities.graphics@1.2/manual/overview.html)
+    - >実行時に、`Entities Graphics` は `LocalToWorld`、`RenderMesh`、`RenderBounds` コンポーネントを持つすべてのエンティティを処理します。
 
 - よく使うor忘れそうなcmd==後ろにCmdクラスメソッド書く?==
   - Resource操作系
