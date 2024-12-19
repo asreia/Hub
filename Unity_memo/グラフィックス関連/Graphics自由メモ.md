@@ -62,7 +62,7 @@
     - ok:RenderTexture, ok:RenderTargetIdentifier, ok:RTHandle, o:RenderGraph, ok:CommandBuffer, frameData, ok:ScriptableRenderContext
     - ok:Camera, ok:Light, ok:MeshFilter, ok:MeshRenderer, ok:Material, ok:Shader
     - o:FrameDebugger, o:RenderDoc, o:RenderingViewer, o:Profiler,
-    - ●Internal_**Draw**⏎『全て、BatchRendererGroup(BRG)(UnityのMDI機構?)に置き換えれるらしい。(rRG->drawCommandsでUnity描画パイプラインに差し込まれる?)(GPU Instancing(SSBO(unity_DOTSInstanceData <= GraphicsBuffer?))、Job/NativeArray、カメラカリング、SRPBatcherフレンドリー(Meshを固定しInstanceコールする?(**SRPBatcherはCbufferとMeshを変える**))、Hybrid Renderer V2の基盤)(シェーダーはDOTS Instancingをサポートしている必要がある, BatchID毎にInstanceコールしている)(https://blog.virtualcast.jp/blog/2019/10/batchrenderergroup/)
+    - ●Internal_**Draw**⏎『全て、BatchRendererGroup(BRG)(UnityのMDI機構?)に置き換えれるらしい。(rRG->drawCommandsでUnity描画パイプラインに差し込まれる?)(GPU Instancing(SSBO(ByteAddressBuffer **unity_DOTSInstanceData**; <= GraphicsBuffer?))、Job/NativeArray、カメラカリング、SRPBatcherフレンドリー(Meshを固定しInstanceコールする?(**SRPBatcherはCbufferとMeshを変える**))、Hybrid Renderer V2の基盤)(シェーダーはDOTS Instancingをサポートしている必要がある, BatchID毎にInstanceコールしている)(https://blog.virtualcast.jp/blog/2019/10/batchrenderergroup/)
       - bRGにMeshとMaterial(CBuffer,DOTS Instancingシェーダー)と\[メタデータ(PropertyToID)とGraphicsBuffer]を渡し、カメラカリングし、BatchID毎にInstance描画する
       - DOTS Instancingシェーダー: SV_InstanceID -> uniform InstanceIndex = uint property\[SV_InstanceID] -> graphicsBuffer\[InstanceIndex] でInstanceデータにアクセス?
       - >ノート: Shader Graph と、Unity が URP と HDRP で提供するシェーダーは、DOTS Instancing をサポートしています。
@@ -72,7 +72,7 @@
       - [GPU インスタンシング対応シェーダーの作成](https://docs.unity3d.com/ja/2023.2/Manual/gpu-instancing-shader.html)
   - 座標系とYupなどの違いは、ある軸を*-1するか軸を入れ替えると左手と右手が入れ替わりYupなども変わる?(ベクトル,行列の基底ベクトル:要素反転か入れ替え、クォータニオン:軸反転)
     - 多分、座標系の違いはCS空間しか受けない(CS空間で違いを吸収する(Z軸反転?))
-  - HLSLPROGRAM **API組み込み関数の違い**、**座標系の違い**、**バリアント**、自作メッシュ描画するときAPVなどの機能を取ってこれるか
+  - HLSLPROGRAM **API組み込み関数の違い**、**○座標系の違い**、**バリアント**、自作メッシュ描画するときAPVなどの機能を取ってこれるか
     - **APV機能**: //universal/ShaderLibrary/GlobalIllumination.hlsl
       - `half3 SampleProbeVolumePixel(in half3 vertexValue, in float3 absolutePositionWS, in float3 normalWS, in float3 viewDir, in float2 positionSS)`
     - Unityは、uniformとShaderKeywordを設定し、Tags{..}を見てドローコールする
@@ -141,7 +141,7 @@
                 『#ifあり『Lighting.hlslのライティング関数内で使う具体的なライティング関数群がある。(BRDFData, EnvironmentBRDF(..), DirectBRDF(..))
                 - core/ShaderLibrary/BSDF.hlsl
                   『PBRの原始的な光の計算をする関数がある。(F_Schlick(..),V_SmithJointGGX(..) (アセンブラレベルで最適化している)) (多分BRDF.hlslでは使われていない)
-                  - core/ShaderLibrary/Color.hlsl
+                  - core/ShaderLibrary/**Color**.hlsl
                     『色空間変換系の関数がある。(SRGBToLinear(..), RgbToHsv(..), NeutralTonemap())
                     - core/ShaderLibrary/ACES.hlsl
                 - core/ShaderLibrary/CommonMaterial.hlsl
@@ -173,6 +173,37 @@
               - universal/ShaderLibrary/DBuffer.hlsl
             - universal/ShaderLibrary/LODCrossFade.hlsl
   - レンダリング順序: Camera.depth => SRPass.renderPassEvent => `Renderer.rendererPriority`? => Material.renderQueue
+  - **RenderBuffer⟪Load¦Store⟫Action**
+    ```CSharp
+    // >値がネイティブ側と同期していることを確認する！
+    //擬似コード ('R'ender'B'uffer == RT (タイルメモリ))
+    // Load: RB = prevBuffer;
+    // DontCare: RB = RB;
+    // Clear: RB = ClearBuffer(RB);
+    public enum RenderBufferLoadAction
+    {
+        Load = 0,
+        Clear = 1,
+        DontCare = 2,
+    }
+
+    //enum RenderTextureMemoryless memoryless: RenderBuffer⟪Load¦Store⟫Action.DontCare ? //ClearとResolveはするかも知れない
+
+    // >値がネイティブ側と同期していることを確認する！
+    //擬似コード ('R'ender'B'uffer == RT (タイルメモリ))
+    // Store: nextBuffer = RB;
+    // DontCare: RB = RB
+    // Resolve: RB = ResolveBuffer(RB);
+    // StoreAndResolve: nextBuffer = ResolveBuffer(RB);
+    public enum RenderBufferStoreAction
+    {
+        Store = 0,
+        Resolve = 1, // >MSAAサーフェスを解決する（現在はRenderPassSetupでのみ機能する）
+        StoreAndResolve = 2, // >MSAAサーフェスをリゾルブターゲットにリゾルブするが、MSAAバージョンも保存する
+        DontCare = 3,
+    }
+    ```
+  - **CoreUtils.SetRenderTarget(cmd, ..)**: カラー＆デプス、クリア、サブリソース、ビューポート、⟪ロード¦ストア⟫アクション
 
 - コードメモ
 

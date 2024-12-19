@@ -1,8 +1,8 @@
 # ShaderLabの表現
 
-```shaderlab
+<!-- ```shaderlab -->
 
-Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層を作れる
+Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層を作れる『`Shader Shader.Find(string ｢ShaderName｣)`で検索
 {
     Properties
     {
@@ -16,33 +16,39 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                 ＃TEXTURE＝≪"⟪white¦black¦gray¦bump⟫" {}≫
             ＃PROPERTY_ATTRIBUTE＝≪○¦PT⟪∮Int_ATT∮¦∮Float_ATT∮¦∮Range_ATT∮¦∮Color_ATT∮¦∮Vector_ATT∮¦∮2D_ATT∮¦∮Cube_ATT∮¦∮3D_ATT∮⟫≫
                 ＃Int_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮≫
-                ＃Float_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮＠❰[Gamma]❱≫
+                ＃Float_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮＠❰\[Gamma]❱≫
                     ＃Int_Float_ATT＝≪＠❰[｡Toggle＠❰(｢define ShaderKeyword｣)❱｡]❱⏎
-                                    ＠❰[Enum＠❰(｡｡⟪｢C#列挙型｣¦｡⟦,┃1～7⟧❰｢ShowEnum｣,⟪～⟫❱｡⟫｡｡)❱]❱⏎『EnumでもShaderKeywordが設定されるっぽい
+                                    ＠❰\[Enum＠❰(｡｡⟪｢C#列挙型｣¦｡⟦,┃1～7⟧❰｢ShowEnum｣,⟪～⟫❱｡⟫｡｡)❱]❱⏎『EnumでもShaderKeywordが設定されるっぽい
                                     ＠❰[KeywordEnum(⟦, ┃1～⟧❰｢Keyword｣❱)]『｢PropertyName｣_｢Keyword｣というShaderKeywordがdefineされる』❱≫
                 ＃Range_ATT＝≪∮ALL_ATT∮＠❰[PowerSlider(⟪unsigned float┃～⟫)]『Range^PowerSlider ?』❱≫
                 ＃Color_ATT＝≪∮ALL_ATT∮≫
-                ＃Vector_ATT＝≪∮ALL_ATT∮＠❰[Gamma]❱≫
+                ＃Vector_ATT＝≪∮ALL_ATT∮＠❰\[Gamma]❱≫
                 ＃2D_ATT＝＃3D_ATT＝＃Cube_ATT＝≪∮ALL_ATT∮∮2D_3D_Cube_ATT∮≫
-                    ＃2D_3D_Cube_ATT＝≪＠❰[NoScaleOffset]❱＠❰[Normal]❱＠❰[HDR]❱＠❰[PreRenderData]❱≫
-                    ＃ALL_ATT＝≪＠❰[HideInspector]❱＠❰[Header(｢ShowString｣)]❱＠❰[｡Space＠❰(⟪～⟫)❱｡]❱≫
+                    ＃2D_3D_Cube_ATT＝≪＠❰\[NoScaleOffset]❱＠❰\[Normal]❱＠❰\[HDR]❱＠❰\[PreRenderData]❱≫
+                    ＃ALL_ATT＝≪＠❰\[HideInspector]❱＠❰\[Header(｢ShowString｣)]❱＠❰\[｡Space＠❰(⟪～⟫)❱｡]❱≫
     }
 
+    『`int shader.subshaderCount`: >このシェーダーの**SubShader数**を返します。
+    『`int GetPassCountInSubshader(int subshaderIndex)`: >指定されたSubShaderの**Pass数**を返します。
     ⟦∫LRetInd∫┃1～⟧❰SubShader
     {
         『SubShaderのTags (https://docs.unity3d.com/ja/2023.2/Manual/SL-SubShaderTags.html)
+        『`ShaderTagId FindSubshaderTagValue(int subshaderIndex, ShaderTagId tagName)`:
+            『`subshaderIndex`の`tagName`を**キー**に、その**バリュー**の**ShaderTagIdを返す**?
         ＠❰Tags
         {
             『↓なくなったっけ？
             ＠❰"Queue" = "⟪Background『1000』¦Geometry『2000(デフォルト)』¦AlphaTest『2450』¦Transparent『3000』¦Overlay『4000』⟫＠❰+⟪～⟫❱"❱
+                『`int ⟪material¦shader⟫.renderQueue`: >シェーダーのレンダーキュー(ReadOnly)
             ＠❰"RenderType" = "⟪Opaque¦Transparent⟫"❱
             『↓なさそう
             ＠❰"DisableBatching" = "⟪True¦False¦LODFading⟫"❱＠❰"ForceNoShadowCasting" = "True"❱＠❰"IgnoreProjector" = "True"❱＠❰"CanUseSpriteAtlas" = "False"❱
             『↓これはある？
             ＠❰"PreviewType" = "⟪Sphere¦Plane¦Skybox⟫"❱
+            ＠❰"RenderPipeline" = ｢Name｣❱『`string Shader.globalRenderPipeline`と比較
         }❱
 
-        ＠❰LOD ⟪～⟫❱ 
+        ＠❰LOD ⟪～⟫❱『`int Shader.globalMaximumLOD`と比較。`int shader.maximumLOD`: `globalMaximumLOD`のLocal版
 
         ∮RENDERING_STATE∮『ここでのRENDERING_STATE定義はこのSubShader内の全てのPassに適用される(Passと設定項目が被ったらそのPassの設定で上書きされる?)
 
@@ -52,6 +58,10 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
 
         ⟦∫LRetInd∫┃1～⟧『Passの定義
         ❰
+            『`int ⟪material¦shader⟫.passCount`: >アクティブなSubShaderの**Pass数**を返します。
+            『`bool SetPass(int passIndex)`: `passIndex`の`Pass`の`Vertex,Fragment Shader`を**GPUにセット**する?
+            『`int FindPass(string ｢ShaderPassName｣)`: `｢ShaderPassName｣`から`ShaderPassIndex`を返します。(存在しない場合は、-1)
+            『`string GetPassName(int ShaderPassIndex)`: ↑の逆射。`ShaderPassIndex`から`｢ShaderPassName｣`を返します。(存在しない場合は、空文字列)
             ⟪『Passの種類
                 Pass
                 {
@@ -62,6 +72,8 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
             ⟫
 
                 ＃DEFINE_PASS＝≪『Passの実装
+                    『`ShaderTagId FindPassTagValue(＠❰int subshaderIndex,❱ int passIndex, ShaderTagId tagName)`:
+                        『⟪アクティブなSubShader¦`subshaderIndex`⟫の`passIndex`の`tagName`を**キー**に、その**バリュー**の**ShaderTagIdを返す**?(PassのTags{..})
                     ❰『Passの名前とタグ付け
                         『
                         『Passの名前
@@ -181,6 +193,8 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                             ¦⟪『[シェーダーバリアント](https://light11.hatenadiary.com/entry/2019/01/12/232533)(https://www.youtube.com/watch?v=GbqeTM8fxtk)
                                                 『｢ShaderKeyword｣は｢DEFINE_WORD｣。❰_❱は｢ShaderKeyword｣なし版。 (∮RENDERING_STATE∮の切り替えは、シェーダーバリアント要らない)
                                                 ❰multi_compile ⟦ ┃2～⟧⟪_¦｢ShaderKeyword｣⟫❱
+                                                    『(取得: ❰GlobalKeyword[] Shader.＠❰enabled❱GlobalKeywords❱, ❰LocalKeywordSpace ⟪shader.keywordSpace¦material.enableKeywords⟫❱)
+                                                    『(設定: `⟪material¦Shader⟫.SetKeyword(ref ⟪Local¦Global⟫Keyword keyword, bool value)`)
                                                     『≪⟦～⟧❰｡｡multi_compile⟪｡⟦¦┃2～⟧⟪_¦｢ShaderKeyword｣⟫｡⟫｡｡❱≫を全て網羅しコンパイルする([MC N個] * [MC N個] *..* [MC N個])
                                                     『multi_compile_fogは、multi_compile _ FOG_EXP FOG_EXP2 FOG_LINEAR と同じ(教科書4P63)他にmulti_compile_instancing(GPU Instancing)
                                                 ¦❰shader_feature ⟦ ┃1～⟧⟪_¦｢ShaderKeyword｣⟫❱
@@ -299,6 +313,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                             ¦SV_DEPTH(float)『深度(Z)。多分設定するとPreZTestが死ぬ(死ぬ必要はあるのか?) (VPOS?+Depthでスクリーンスペース)
                                                 『[Depthテスト](https://youtu.be/iqYQvpTndTw?t=611)
                                                 『>多くの GPU では、これは深度バッファの最適化をオフ(多分PreZ)にするので、正当な理由なしに Z バッファ値を上書きしないように注意してください。SV_Depth で発生するコストは GPU アーキテクチャによって異なり ますが、全体的にはアルファテストのコスト（HLSL の組み込み void clip(float4 x) { if (any(x < 0)) discard; } 関数を使用）とほぼ同じです(**discardがSV_DEPTHを元のDepth値に戻すよう上書きしPreZを殺す?**)。深度を変更するシェーダは、すべての通常の不透明シェーダの後にレンダ リングします（たとえば、AlphaTest レンダリングキューを使用します）。
+                                                『追記: GPT-4o: >discardを使用すると、Early-Z(PreZTest) が無効。SV_DepthGreaterEqual: 初期 Z を無効にせず
                                             『Stencil(byte)『描画マスク(マスクを作ってそこに描画する)
                                         ⟫
                                     ⟫
@@ -395,6 +410,11 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                 ≫
                                 ＃VariableDefine＝≪
                                     ＠❰uniform❱ ∮DataType∮ ｢VariableName｣＠❰ = ∫Express∫❱;『uniformは付けなくてもuniform変数になる(省略できる)
+                                        『`int Shader.PropertyToID(string ｢VariableName｣)`でID化
+                                        『Has,Get,Set
+                                            『Has: bool material.Has～(⟪int nameID¦string name⟫)
+                                            『Set: void ⟪material¦Shader⟫.Set＠❰Global❱～(⟪int nameID¦string name⟫, ｢Type｣ value, ..)
+                                            『Get: ｢Type｣ ⟪material¦Shader⟫.Get＠❰Global❱～(⟪int nameID¦string name⟫)
                                 ≫
                             ❱
                             ✖＄Express＝❰『✖＄..＝❰..❱を作るか?..いや✖＄がそもそも✖❰＄だっけ..
@@ -416,10 +436,10 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
 
     CustomEditor "｢EditorName｣"『｢EditorName｣はShaderGUIの派生クラス。今はUIElementでエディタ拡張できるはず。(UIElementからMaterial(.mat)のシリアライズ経由でPropertiesの操作かな?)
 }『Shader_終わり
-```
+<!-- ``` -->
 
 - Category
-```shaderlab
+<!-- ```shaderlab -->
     ⟦∫LRetInd∫┃1～⟧❰Category『ShaderCode内にスコープを設定するために使われる。主に複数のSubShaderに同一の∮RENDERING_STATE∮を適用するため。らしいが、汎用性が低く公式も推奨していないみたい
     {
         ∮RENDERING_STATE∮
@@ -429,4 +449,4 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
             ∫LAny∫
         }
     }❱
-```
+<!-- ``` -->

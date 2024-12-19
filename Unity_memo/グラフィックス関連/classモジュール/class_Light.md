@@ -1,12 +1,12 @@
 # Light (Behaviour継承)
 
-主に、**Lightパラメータ**, **GlobalIllumination**, **Shadow**
+主に、**renderingLayerMask**, **Lightパラメータ**, **GlobalIllumination**, **Shadow**
 
 ## Instance変数
 
-- **ライティング方法(Built-in?)**
-  - `LightRenderMode renderMode`: `Light`のレンダリングする`Mode`を設定する。(⟪`Pixel`¦`Vertex`⟫単位ライティング)
-    - `enum LightRenderMode`: ⟪`Auto`¦`Force`⟪`Pixel`¦`Vertex`⟫⟫
+- **ライティング方法**
+  - `enum LightRenderMode renderMode`: `Light`のレンダリングする`Mode`を設定する。(⟪`Pixel`¦`Vertex`⟫単位ライティング)
+    - ⟪`Auto`¦`Force`⟪`Pixel`¦`Vertex`⟫⟫
 
 - **Culling**
   - `bool useBoundingSphereOverride`: `true`にすると↓で`Override`する
@@ -27,32 +27,30 @@
   - `float innerSpotAngle`: `Spot`の**内側**の円錐の角度(度)
   - `float range`: `Light`の**範囲**。
     - >**エリアライト**は1点ではなく発光面を持つため、光の累積範囲はこの特性よりも**大きくなる**。
-    - >この大きな範囲は、`Light.dilatedRange`プロパティから読み取ることができる。
-    - >**非エリアライト**の場合、`Light.range`と`Light.dilatedRange`は**同じ**値を返します。
+      >この大きな範囲は、`Light.dilatedRange`プロパティから読み取ることができる。(dilated(ダイレイテッド):拡張した)
+      >**非エリアライト**の場合、`Light.range`と`Light.dilatedRange`は**同じ**値を返します。
 
 - **GlobalIllumination**
-  - `LightBakingOutput bakingOutput`: GIの**ベイク情報**
-    - `struct LightBakingOutput`:
-      - `bool isBaked`: >この`Light`は⟪`Lightmap`¦`Lightprobe`⟫に**ベイクされているか**
-      - `LightmapBakeType lightmapBakeType`: **ベイク**の**タイプ**
-        - `enum lightmapBakeType`:
-          - `Realtime`: リアルタイム
-          - `Baked`: ベイク
-          - `Mixed`: ミックス
-      - 以下`Mixed`の**場合**
-        - `MixedLightingMode mixedLightingMode`: **Mixed**の**タイプ**
-          - `enum MixedLightingMode`:
-            - `IndirectOnly`: 間接光だけベイクし、直接光とシャドーはリアルタイム
-            - `Shadowmask`: 間接光とシャドーをベイクし、直接光はリアルタイム (`Distance Shadowmask`: 近距離のみリアルタイムシャドー)
-            - `Subtractive`: 全てのライトパスをベイク? (スペキュラーが死ぬ。影の色を調整する)
-        - `int occlusionMaskChannel`: >使用する`OcclusionMaskChannel`のインデックス?
-        - `int probeOcclusionLightIndex`: >`OcclusionProbe`の視点から見た`Light`のインデックス?
-  - `lightShadowCasterMode`: `mixedLightingMode == Shadowmask`時、`Light`毎にグローバルShadowmaskモードを**オーバーライド**できる。
-    - `enum LightShadowCasterMode`: `ShadowMap`へのレンダリング設定っぽい
-  - `LightmapBakeType lightmapBakeType`: ↑↑と同じと思われる。フィールド直下版?
-  - `Vector2 areaSize`: >エリアライトの大きさ (Editor only).
-  - `float bounceIntensity`: バウンスライト(**ベイク**)の`Intensity`。(1が物理的に正しい)
-  - `float dilatedRange`: エリアライトの場合はその**範囲**(非エリアライトの場合は`range`と`dilatedRange`は同じ)
+  - `struct LightBakingOutput bakingOutput`: GIの**ベイク情報**
+    - `bool isBaked`: >この`Light`は`Lightmap`と`Lightprobe`に**ベイクされているか**
+    - `enum LightmapBakeType lightmapBakeType`: **ベイク**の**タイプ**
+      - `Realtime`: リアルタイムライト
+      - `Baked`: ベイク: `Lightmap`と`Lightprobe`にベイク
+      - `Mixed`: ミックス: `Lightmap`と`Lightprobe` ＆ リアルタイムライト
+    - 以下`Mixed`の**場合**
+      - `enum MixedLightingMode mixedLightingMode`: **Mixed**の**タイプ**
+        - `IndirectOnly`: 間接光だけベイクし、直接光とシャドーはリアルタイム
+        - `Shadowmask`: 間接光とシャドーをベイクし、直接光はリアルタイム (`Distance Shadowmask`: 近距離のみリアルタイムシャドー)
+          - `enum LightShadowCasterMode lightShadowCasterMode`: `ShadowMap`へのレンダリング設定っぽい。`Light`毎にグローバルShadowmaskモードを**オーバーライド**できる。
+        - `Subtractive`: 全てのライトパスをベイク? (スペキュラーが死ぬ。影の色を調整する)
+      - `int occlusionMaskChannel`: >使用する`OcclusionMaskChannel`のインデックス?
+      - `int probeOcclusionLightIndex`: >`OcclusionProbe`の視点から見た`Light`のインデックス?
+  - `LightmapBakeType lightmapBakeType`: ↑↑と同じと思われる。フィールド直下版? (Editor-only)
+  - **ベイク**
+    - `float bounceIntensity`: バウンスライト(**ベイク**)の**Intensity**。(1が物理的に正しい)
+    - **エリアライト**
+      - `Vector2 areaSize`: >エリアライトの大きさ (Editor only).
+      - `float dilatedRange`: エリアライトの場合はその**範囲**(非エリアライトの場合は`range`と`dilatedRange`は同じ)
 
 - **cookie, flare**
   - `Texture cookie`: `cookie`の`Texture`。`Point Light`の場合は`CubeMap`になる。ベイクの場合は`EditorSettings.enableCookiesInLightmapper`を有効にする
@@ -67,21 +65,21 @@
       - `enum LightShadows`: ⟪％None¦Hard¦Soft⟫
     - `float shadowStrength`: `Shadow`の**強さ**
   - Shadow解像度
-    - `LightShadowResolution shadowResolution`: `ShadowMap`の**解像度**。
-      - `enum LightShadowResolution`: ⟪％`FromQualitySettings`¦`Low`¦`Medium`¦`High`¦`VeryHigh`⟫
+    - `enum LightShadowResolution shadowResolution`: `ShadowMap`の**解像度**。
+      - ⟪％`FromQualitySettings`¦`Low`¦`Medium`¦`High`¦`VeryHigh`⟫
     - `int shadowCustomResolution`: (**Built-inのみ**)`ShadowMap`のカスタムの**解像度**。
   - カリング系
-    - `bool useViewFrustumForShadowCasterCul`: `Light`がビュー・フラストラムの外側にある場合に、この`Light`の**Shadow**を**Culling**するかどうか。
+    - `bool useViewFrustumForShadowCasterCull`: `Light`がビュー・フラストラムの外側にある場合に、この`Light`の**Shadow**を**Culling**するかどうか。
     - `float[] layerShadowCullDistances`: **Layer単位**の**シャドー**(キャスト)の**カリング距離**。
       - (`Directional Light`のみ。 `Camera.layerCullDistances`のシャドー版。`Camera.layerCullSpherical`は共有される)
     - フラスタムカリング?
       - `useShadowMatrixOverride`: ↓のオーバーライド許可
-        - `Matrix4x4 shadowMatrixOverride`: >`Shadow`の(フラスタム?)カリング時に、通常の**投影行列**を**オーバーライド**する。
+        - `Matrix4x4 shadowMatrixOverride`: >`Shadow`の(フラスタム?)カリング時に、通常の**投影行列**を**オーバーライド**する。(`Camera.cullingMatrix`のシャドー版)
       - `float shadowNearPlane`: **Shadow視錐台**に使用する`NearPlane`との距離?(これもカリング?)
   - ベイク?
     - `float shadowAngle`: `DirectionalLight`によって投影される`Shadow`のエッジに適用される人工的な柔らかさの量を制御します。 (Editor only).
     - `float shadowRadius`: ポイントライトまたはスポットライトによって投影される影のエッジに適用される人工的な柔らかさの量を制御します。 (Editor only).
-  - バイアス
+  - バイアス (Zファイティング回避)
     - `float shadowBias`: `ShadowMap`比較時の`Bias`
     - `float shadowNormalBias`: `ShadowMap`比較時の`NormalBias`
 
@@ -100,4 +98,4 @@
   - `AddCommandBufferAsync(LightEvent evt, CommandBuffer buffer ＠❰, ShadowMapPass shadowPassMask❱, ComputeQueueType queueType)`: ↑のGPU非同期コンピュートキュー版
   - `CommandBuffer[] GetCommandBuffers(LightEvent evt)`: >指定された`LightEvent`で実行される`cmd`を取得します。
   - `RemoveCommandBuffer＠❰s❱(LightEvent evt, ＠❰CommandBuffer buffer❱)`: >指定された`LightEvent`で実行から＠❰全ての❱`cmd`を削除します。
-    - `RemoveAllCommandBuffers()`: この`Camera`に設定される全ての`cmd`を削除します。
+    - `RemoveAllCommandBuffers()`: この`Light`に設定される全ての`cmd`を削除します。

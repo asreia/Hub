@@ -356,13 +356,13 @@ Dx12Wrapper::CreateSwapChain(const HWND& hwnd) {
 //『ID3D12CommandAllocator _cmdAllocator, ID3D12GraphicsCommandList _cmdList, ID3D12CommandQueue _cmdQueue の生成
 HRESULT Dx12Wrapper::InitializeCommand() {
 	//『コマンドアロケータ,コマンドリストを生成====================================================================================================================
-	//『コマンドアロケータ[_cmdAllocator]生成
+	//『コマンドアロケータ❰_cmdAllocator❱生成
 	auto result = _dev->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(_cmdAllocator.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
 		return result;
 	}
-	//『コマンドアロケータを引数にコマンドリスト[_cmdList]を生成
+	//『コマンドアロケータを引数にコマンドリスト❰_cmdList❱を生成
 	result = _dev->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, /*●*/_cmdAllocator.Get(), nullptr, IID_PPV_ARGS(_cmdList.ReleaseAndGetAddressOf()));
 	if (FAILED(result)) {
 		assert(0);
@@ -400,6 +400,13 @@ HRESULT Dx12Wrapper::CreateSceneView(){
 		return result;
 	}
 
+// D3D12_ROOT_PARAMETER
+// D3D12_ROOT_SIGNATURE_DESC
+// D3D12_DESCRIPTOR_RANGE_FLAGS
+// ID3D12Resource
+// GetGPUDescriptorHandleForHeapStart()
+// D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND
+
 	_mappedSceneData = nullptr;//マップ先を示すポインタ[SceneData*]
 	result = _sceneConstBuff->Map(0, nullptr, (void**)&_mappedSceneData);/*●*///マップ
 	
@@ -433,7 +440,7 @@ HRESULT Dx12Wrapper::CreateSceneView(){
 
 }
 
-//『RTVディスクリプタヒープ[_rtvHeaps]を生成し、スワップチェインのResourceを入れる。それと、_viewport, _scissorrectを設定
+//『RTVディスクリプタヒープ❰_rtvHeaps❱を生成し、スワップチェインのResourceを入れる。それと、_viewport, _scissorrectを設定
 HRESULT	Dx12Wrapper::CreateFinalRenderTargets() {
 	//『スワップチェインから.BufferCount,.Width,Heightの情報を取得=============================================================================================================
 	//『descは、スワップチェインの.Width,Heightのみ利用されている
@@ -443,7 +450,7 @@ HRESULT	Dx12Wrapper::CreateFinalRenderTargets() {
 	DXGI_SWAP_CHAIN_DESC swcDesc = {};
 	result = _swapchain->GetDesc(&swcDesc);
 
-	//『スワップチェインのResource分だけディスクリプタヒープ[_rtvHeaps]を生成 と ハンドル[handle]取得==============================================================================
+	//『スワップチェインのResource分だけディスクリプタヒープ❰_rtvHeaps❱を生成 と ハンドル❰handle❱取得==============================================================================
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;/*●*///レンダーターゲットビューなので当然RTV	//『draw.ioではD3D12_DESCRIPTOR_HEAP_TYPE_を小さく薄くし、[RTV|DSV|..]を大きくする?
 	heapDesc.NodeMask = 0;
@@ -454,23 +461,23 @@ HRESULT	Dx12Wrapper::CreateFinalRenderTargets() {
 		SUCCEEDED(result);
 		return result;
 	}
-	//『ディスクリプタヒープ[_rtvHeaps]のハンドル取得
+	//『ディスクリプタヒープ❰_rtvHeaps❱のハンドル取得
 	D3D12_CPU_DESCRIPTOR_HANDLE handle = _rtvHeaps->GetCPUDescriptorHandleForHeapStart(); //『ディスクリプタヒープの先頭アドレス取得
 		
-	//『スワップチェインからResourceを取得し、ディスクリプタヒープ[_rtvHeaps]のハンドル[handle]に詰める============================================================================
+	//『スワップチェインからResourceを取得し、ディスクリプタヒープ❰_rtvHeaps❱のハンドル❰handle❱に詰める============================================================================
 	//『配列(vector)を2個にリサイズするだけ
 	_backBuffers.resize(swcDesc.BufferCount);
 	//『レンダーターゲットビュー(RTV)のDescを設定
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;/*●*/
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;/*●*///『width,heightなど足りない情報はResourceから取得している[
-	//『スワップチェインのResource分ループし、ディスクリプタヒープ[_rtvHeaps]のハンドル[handle]に詰める
+	//『スワップチェインのResource分ループし、ディスクリプタヒープ❰_rtvHeaps❱のハンドル❰handle❱に詰める
 	for (int i = 0; i < swcDesc.BufferCount; ++i) {
 		result = _swapchain->GetBuffer(i, IID_PPV_ARGS(&_backBuffers[i])); /*●*///『スワップチェインからバッファを_backBuffers[i]に抽出
 		assert(SUCCEEDED(result));
 		rtvDesc.Format = _backBuffers[i]->GetDesc().Format;
-		_dev->CreateRenderTargetView(_backBuffers[i], &rtvDesc, handle); /*●*///『スワップチェインから取得したResourceを、ディスクリプタヒープ[_rtvHeaps]のハンドル[handle]に詰める
-		handle.ptr += _dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//『RTV分ハンドル[handle]の.ptrを進める
+		_dev->CreateRenderTargetView(_backBuffers[i], &rtvDesc, handle); /*●*///『スワップチェインから取得したResourceを、ディスクリプタヒープ❰_rtvHeaps❱のハンドル❰handle❱に詰める
+		handle.ptr += _dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);//『RTV分ハンドル❰handle❱の.ptrを進める
 	}
 
 	//『ビューポート,シザーレクトの設定========================================================================================================================================
@@ -499,6 +506,19 @@ void Dx12Wrapper::BeginDraw() {
 	//DirectX処理
 	//現在のバックバッファのインデックスを取得=================================================================================================
 	auto bbIdx = _swapchain->GetCurrentBackBufferIndex();
+
+// ID3D12GraphicsCommandList
+// D3D12_CPU_DESCRIPTOR_HANDLE
+// D3D12_RECT
+// D3D12_ENCODE_SHADER_4_COMPONENT_MAPPING
+// ID3D12GraphicsCommandList
+// D3D12_QUERY_TYPE_OCCLUSION
+// D3D12_COMMAND_SIGNATURE_DESC
+// D3D12_DRAW_INDEXED_ARGUMENTS
+// D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED
+// CreateCommandSignature
+// D3D12_DRAW_INDEXED_ARGUMENTS
+// ID3D12CommandQueue
 
 	//『バリア設定//『現在のバックバッファ[ID3D12Resource _backBuffers[bbIdx]]のバリアを Transition:PRESENT=>TARGET に設定======================
 	_cmdList->ResourceBarrier(

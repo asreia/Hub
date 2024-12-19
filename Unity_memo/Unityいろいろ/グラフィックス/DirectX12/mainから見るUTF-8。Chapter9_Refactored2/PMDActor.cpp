@@ -48,7 +48,7 @@ PMDActor::Transform::operator new(size_t size) {
 	return _aligned_malloc(size, 16);
 }
 
-//『主に PMDのファイルパスから、ビュー{_vbView, _ibView} ディスクリプタヒープ{_transformHeap[_transform.world], _materialHeap[CBVx1,SRVx4]} と _materials[].indicesNum を生成
+//『主に PMDのファイルパスから、ビュー{_vbView, _ibView} ディスクリプタヒープ{_transformHeap❰_transform.world❱, _materialHeap❰CBVx1,SRVx4❱} と _materials[].indicesNum を生成
 PMDActor::PMDActor(const char* filepath,PMDRenderer& renderer):
 	_renderer(renderer),
 	_dx12(renderer._dx12),
@@ -60,7 +60,7 @@ PMDActor::PMDActor(const char* filepath,PMDRenderer& renderer):
 	_transform.world = XMMatrixIdentity(); //『↓のCreateTransformView()で使う。描画ループで更新するかも
 	CreateTransformView(); //『Transform[4x4マトリックス]のResource[_transformBuff]生成 => _transformをマップ => ディスクリプタヒープ[_transformHeap]を生成して_transformBuffを入れる
 	//『マテリアルの構造体(MaterialForHlsl)から、(CBVx1,SRVx4)xマテリアル数 のディスクリプタープを作る
-	CreateMaterialData();  //『全てのMaterialを入れるResource[_materialBuff]を確保 => 全てのMaterial[_materials[].material(MaterialForHlsl型)]をマップする
+	CreateMaterialData();  //『全てのMaterialを入れるResource[_materialBuff]を確保 => 全てのMaterial[_materials[].material(MaterialForHlsl型)]をコピーする
 	CreateMaterialAndTextureView(); //『ディスクリプタヒープ[_materialHeap]に、生成済みのID3D12Resource(定数[CBV(_materialBuffの1要素)]1つ、テクスチャ[SRV]4つ)を詰めていく
 }
 
@@ -70,7 +70,7 @@ PMDActor::~PMDActor()
 }
 
 
-//『PMDのファイルパス[path]から、ビュー(_vbView, _ibView), _materials[](indicesNum, 他CBuffer関連), [_texture|_sph|_spa|_toon]Resource を生成
+//『PMDのファイルパス❰path❱から、ビュー(_vbView, _ibView), _materials[](indicesNum, 他CBuffer関連), ❰_texture, _sph, _spa, _toon❱Resource を生成
 HRESULT PMDActor::LoadPMDFile(const char* path) {
 	//PMDヘッダ構造体
 	struct PMDHeader {
@@ -111,8 +111,8 @@ HRESULT PMDActor::LoadPMDFile(const char* path) {
 
 	//『マップ
 	unsigned char* vertMap = nullptr;
-	result = _vb->Map(0, nullptr, (void**)&vertMap);
-	std::copy(vertices.begin(), vertices.end(), vertMap); //『頂点バッファをID3D12Resource _vbへマップ
+	result = _vb->Map(0, nullptr, (void**)&vertMap); //メモリマッピング(Resource => vector<unsigned char>)
+	std::copy(vertices.begin(), vertices.end(), vertMap); //『頂点データをID3D12Resource _vbへコピー
 	_vb->Unmap(0, nullptr);
 
 	//『ビュー作成 //バーテックスバッファビュー //『struct D3D12_VERTEX_BUFFER_VIEW _vbView
@@ -160,7 +160,7 @@ HRESULT PMDActor::LoadPMDFile(const char* path) {
 		unsigned char toonIdx; //トゥーン番号(後述)						  //『このtoonIdxのテクスチャをロードしResourceを生成する (Resourceは複数のビューから参照される)
 		unsigned char edgeFlg;//マテリアル毎の輪郭線フラグ
 		//2バイトのパディングが発生！！
-		unsigned int indicesNum; //このマテリアルが割り当たるインデックス数 //『この単位でドローコールされる
+		unsigned int indicesNum; //このマテリアルが割り当たるインデックス数 //『この単位でドローコールされる。(サブメッシュ)
 		char texFilePath[20]; //テクスチャファイル名(プラスアルファ…後述)   //『このファイル名でテクスチャをロードしResourceを生成する
 	};//70バイトのはず…でもパディングが発生するため72バイト
 #pragma pack()//1バイトパッキング解除
@@ -281,7 +281,7 @@ HRESULT PMDActor::CreateTransformView() { //『Transform* _mappedTransform は�
 		assert(SUCCEEDED(result));
 		return result;
 	}
-	//『Transform* _mappedTransform //『Unmap(..)していないのでTransform* _mappedTransformを操作するとマップ先も変更される
+	//『Transform* _mappedTransform //『Unmap(..)していないのでTransform* _mappedTransformを操作するとマップ元も変更される
 	*_mappedTransform = _transform; //『_transformは、PMDActor(..) の _transform.world = XMMatrixIdentity()/*単位ベクトル*/; で設定している
 
 	//『ディスクリプタヒープ生成
@@ -374,7 +374,7 @@ HRESULT PMDActor::CreateMaterialAndTextureView() {
 	//『ディスクリプタヒープ[_materialHeap]に、全てのマテリアル[_materials[]と～Resources[]]の5要素(定数[CBV]1つ、テクスチャ[SRV]4つ)を詰めていく==============================
 	for (int i = 0; i < _materials.size(); ++i) {
 		//マテリアル固定バッファビュー
-		_dx12.Device()->CreateConstantBufferView(&matCBVDesc, matDescHeapH); //『Resource[_materialBuff]から1つ分のMaterialForHlslのビューをmatDescHeapHに入れる
+		_dx12.Device()->CreateConstantBufferView(&matCBVDesc, matDescHeapH); //『Resource❰_materialBuff❱から1つ分のMaterialForHlslのビューをmatDescHeapHに入れる
 		matCBVDesc.BufferLocation += materialBuffSize; //『次のMaterialForHlslにポインタを移動する★
 		matDescHeapH.ptr += incSize; //『ディスクリプタヒープの次の位置に移動
 		if (_textureResources[i] == nullptr) { //『_whiteTex
@@ -424,7 +424,7 @@ HRESULT PMDActor::CreateMaterialAndTextureView() {
 //『モデル変換行列_mappedTransform->worldを更新し、Y軸を中心に回転する
 void PMDActor::Update() {
 	_angle += 0.03f;
-	//『Y軸を中心に回転する//『Transform* _mappedTransform。マップ先は_transformBuff。ビューは_transformHeap
+	//『Y軸を中心に回転する//『Transform* _mappedTransform。マップ元は_transformBuff。ビューは_transformHeap
 	_mappedTransform->world =  XMMatrixRotationY(_angle);
 }
 
@@ -454,13 +454,13 @@ void PMDActor::Draw() {
 	//『ドローコールマテリアルループ=================================================
 	for (auto& m : _materials) {
 		//『ルートパラメータの2番にディスクリプタヒープ[materialH]をパイプラインに設定
-		_dx12.CommandList()->SetGraphicsRootDescriptorTable(2/*RootParameterIndex*/, materialH/*BaseDescriptor[ディスクリプタヒープ]*/);
+		_dx12.CommandList()->SetGraphicsRootDescriptorTable(2/*RootParameterIndex*/, materialH/*BaseDescriptor[ディスクリプタヒープ]*/);//『シェーダーリソース(マテリアル)を設定
 		//『idxOffset～m.indicesNumまでの頂点をドローコール
-		_dx12.CommandList()->DrawIndexedInstanced(m.indicesNum/*IndexCountPerInstance*/, 1, idxOffset/*StartIndexLocation*/, 0, 0);
+		_dx12.CommandList()->DrawIndexedInstanced(m.indicesNum/*IndexCountPerInstance*/, 1, idxOffset/*StartIndexLocation*/, 0, 0);//『サブメッシュ描画
 		//『ディスクリプタヒープ[materialH]の.ptr を cbvsrvIncSize[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV * 5] でインクリメント
-		materialH.ptr += cbvsrvIncSize;
+		materialH.ptr += cbvsrvIncSize; //『次のマテリアルのヒープ位置に移動
 		//『次の頂点範囲の下限をm.indicesNumで設定
-		idxOffset += m.indicesNum;
+		idxOffset += m.indicesNum; //『次のサブメッシュ位置に移動
 	}
 
 }

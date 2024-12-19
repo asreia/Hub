@@ -1,6 +1,6 @@
 # Material (UnityObject継承)
 
-主に、保持している`shader`、**Local❰Instance❱\[LocalShaderKeyword**、**ShaderProperty]**、Tags{..}操作、**Materialバリアント**
+主に、保持している`shader`、`.ctor(shader)`、**Local❰Instance❱\[LocalShaderKeyword**、**ShaderProperty]**、Tags{..}操作、**Materialバリアント**
 
 ## .ctor
 
@@ -57,10 +57,10 @@
       (`searchFallbacks`は全ての`SubShader{..}`と`FallBack`を検索。`defaultValue`は見つからない場合の`文字列`)
   - **SetOverrideTag**`(string tagKey, string tagValue)`: `tags{..}`内の`tagKey`を`tagValue`で更新する?
 - **Materialバリアント** (Editor-Only)
-  - **Ancestor(祖先)**
-    - `bool IsChildOf(Material ancestor)`: 指定された`ancestor`がこの`Material`の**祖先**である場合は`true`を返す
+  - **Ancestor(祖先)** (`Ancestor`は`parent`とは限らない)
+    - `bool IsChildOf(Material ancestor)`: 指定された`ancestor`(アンセスター)がこの`Material`の**祖先**である場合は`true`を返す
     - `ApplyPropertyOverride(Material destAncestor, ⟪int nameID¦string name⟫, bool recUndo)`:
-      - >Materialバリアントに関連付けられたOverrideを`dest`に適用します。(Undo有無あり)
+      - >Materialバリアントに関連付けられたOverrideを`destAncestor`に適用します。(Undo有無あり)
         - `destAncestor`は祖先の`Material`であり、そこへ この`Material`の`ShaderProperty❰nameID❱`をOverrideし、**Override先**を**祖先に移す**。と思われる
   - **Override**
     - `bool IsPropertyOverriden(⟪int nameID¦string name⟫)`: この`Material`によって`ShaderProperty`が**Override**されている場合は`true`
@@ -70,7 +70,7 @@
     - `SetPropertyLock(⟪int nameID¦string name⟫, bool value)`: この`Material`の`ShaderProperty`の**Lock**状態を`value`で設定する
 - **Material要素のコピーと補間**
   - `Copy＠❰Matching❱PropertiesFromMaterial(Material mat)`
-    - この`Material`と⟪**同一Shader**を持つMaterial¦matの**積集合**⟫の要素をこの`Material`に**コピー**する?。コピーする項目は、`ShaderKeyword`, `ShaderProperty`, `Materialのメンバ` ?
+    - この`Material`と⟪**同一Shader**を持つMaterial¦matの**積集合**⟫の要素をこの`Material`に**コピー**する?。コピーする項目は、`ShaderKeyword`, `ShaderProperty`, `Materialのフィールド` ?
   - `Lerp(Material start, Material end, float t)`: `ShaderProperty`の`Color`と`float`を`start`から`end`を`t`によって補間するらしい
 - **Passの扱い**
   - `bool SetPass(int passIndex)`: `passIndex`の`Pass`の`Vertex,Fragment Shader`を**GPUにセット**する?。それを`GL.⟪Begin¦End⟫`や`Graphics.DrawMeshNow(..)`で描画する
@@ -78,7 +78,7 @@
     - `bool GetShaderPassEnabled(string ｢ShaderPassName｣)`: ↓`SetShaderPassEnabled(..)`で`｢ShaderPassName｣`の**Pass**を**無効化**されている場合のみ`false`を返す
     - `SetShaderPassEnabled(string ｢ShaderPassName｣, bool enabled)`: `｢ShaderPassName｣`の**Pass**を`enabled`で**有効無効**する。(無効は、定義してない?のと同じになるらしい)
   - **｢ShaderPassName｣**
-    - `int FindPass(string ｢ShaderPassName｣)`: `｢ShaderPassName｣`から`ShaderPassIndex`を返します。(存在しない場合は、-1)
-    - `string GetPassName(int ShaderPassIndex)`: ↑の逆射。`ShaderPassIndex`から`｢ShaderPassName｣`を返します。(存在しない場合は、空文字列)
+    - `int FindPass(string ｢ShaderPassName｣)`: `｢ShaderPassName｣`から`｢ShaderPassIndex｣`を返します。(存在しない場合は、-1)
+    - `string GetPassName(int ｢ShaderPassIndex｣)`: ↑の逆射。`｢ShaderPassIndex｣`から`｢ShaderPassName｣`を返します。(存在しない場合は、空文字列)
 - `int ComputeCRC()`
   - >この`Material`から**CRCハッシュ値**を計算する

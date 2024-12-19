@@ -2,6 +2,8 @@
 
 ## Renderer (Component継承)
 
+主に、**rendererPriority**, **renderingLayerMask**, `⟪｡⟦local⟧To⟦World⟧｡⟫Matrix`, **Material**
+
 ### Instance変数
 
 #### 有効化と優先度とレイヤー
@@ -44,7 +46,7 @@
 - **Material**
   - `Material＠❰[]❱ ＠❰shared❱Material＠❰s❱`
     - `✖❰shared❱`は、`Renderer`が参照している`Material`を**クローン**(シャローコピー?)して返す。(`Material`への変更は**独立**)
-      - 正確には`this.＠❰shared❱Material = new Material(this.sharedMaterial)`つまり、**クローン**した`Material`を`this`(**自分自身**)に**Set**しそれを**返している**
+      - 正確には`this.＠❰shared❱Material = new Material(this.sharedMaterial)`つまり、**クローン**した`Material`を`this`(**自分自身**)に**Set**しそれを**返している(Get)**
         - そして、`new Material(..)`による**クローン**(`UnityObject.Instantiate(obj)`とは処理が違う?)は **＠❰Set後❱最初の1回**しか行われない。(2回目以降は`❰shared❱`と挙動が同じ?)
       - そうなっているのは、元々`Material`を`Asset`として**複数**の`Renderer`と**共有されている状態**から**クローンして分離**し`Material`への**変更を独立**させるためと思われる
         - **挙動が複雑**なので`sharedMaterial＠❰s❱`と`new Material(..)`のみを使うのもありかも(<https://qiita.com/nigiri/items/19bc9af74d81e91935d4>)
@@ -88,9 +90,9 @@
         - `Texture2D lightmapColor`: >`入射光の色`を保存するライトマップ。(`lightmapDir`が無い場合は`dot(Normal,LightDir) * 入射光の色`が入っている?)
         - `Texture2D lightmapDir`: >入射光の主な`方向`を保存するライトマップ。(`LightmapsMode.CombinedDirectional`時)(GIを`dot(Normal,lightmapDir) * lightmapColor`で算出する必要がある?)
         - `Texture2D shadowMask`: >ライトごとにオクルージョンマスク(`Shadow`?)を保存するテクスチャ (ShadowMask、最大 4 つのライト)。(`MixedLightingMode.Shadowmask`時)
-    - `Vector4 ＠❰realtime❱lightmapScaleOffset`:
-      - `LightmapData`は**アトラス化**されており、この`Renderer`で**参照する部分を計算**するために`lightmapUV`?に`Scale(.xy)`と`Offset(.zw)`を**適用**する
-        - (`(lightmapUV.xy * lightmapScaleOffset.xy) + lightmapScaleOffset.zw`)
+    - `Vector4 ＠❰realtime❱lightmapScaleOffset`: シェーダー: `unity_LightmapST`?
+      - `LightmapData`は**アトラス化**されており、この`Renderer`で**参照する部分を計算**するために`staticLightmapUV`?に`Scale(.xy)`と`Offset(.zw)`を**適用**する
+        - (`(staticLightmapUV.xy * lightmapScaleOffset.xy) + lightmapScaleOffset.zw`)
   - **LightProbe**
     - `LightProbeUsage lightProbeUsage`: (`APV`だとまた**違うかも**知れない)
       - `enum LightProbeUsage`: >ライトプローブ補間のタイプ

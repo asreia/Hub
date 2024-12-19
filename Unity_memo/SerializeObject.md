@@ -53,7 +53,7 @@
     **UnityObjectの変更**を`Update()`で**常に**シリアライズしC++Objectへ**更新している訳ではない**
   - Editor操作によるInspectorの**プロパティへの書き込み**があった場合`OnAfterDeserialize()`がよばれ、**C++Objectのシリアライズデータ**が**UnityObjectのシリアライズ可能な変数**へ
     デシリアライズされます
-    - 多分、`ApplyModifiedProperties()` ⊃ \[`デシリアライズ` => `UnityObject更新` => `OnAfterDeserialize()`] 
+    - 多分、`ApplyModifiedProperties()` ⊃ \[`デシリアライズ` => `UnityObject更新` => `OnAfterDeserialize()`]
 
 ### コールバック
 

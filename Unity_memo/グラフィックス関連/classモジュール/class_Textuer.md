@@ -49,8 +49,8 @@
 ## Instance変数
 
 - **Resource Desc**
-  - `TextureDimension dimension`: >Textureの**次元数** (Read-Only)
-    - `enum TextureDimension`: ⟪`Unknown`¦`None`¦`Any`¦`Tex⟪2D¦3D⟫`¦`Cube`¦⟪`Tex2D`¦`Cube`⟫`Array`⟫
+  - `enum TextureDimension dimension`: >Textureの**次元数** (Read-Only)
+    - ⟪`Unknown`¦`None`¦`Any`¦`Tex⟪2D¦3D⟫`¦`Cube`¦⟪`Tex2D`¦`Cube`⟫`Array`⟫
   - `GraphicsFormat graphicsFormat`: ピクセルの**型** (`Texture2D`の場合`GPUテクスチャ`のフォーマット?)
     - `GraphicsFormat`: `R8G8B8A8_SRGB`や`R16G16B16A16_SFloat`とかのやつ
   - **解像度** (`PlayerSettings.mipStripping`が有効な場合、許容する最高解像度での`Texture`の⟪幅¦高さ⟫)
@@ -60,9 +60,9 @@
 - **Texture Sampler**
   - `FilterMode filterMode`: >`Texture`の**フィルタリングモード**。
     - `enum FilterMode`: ⟪`Point`¦％?`Bilinear`¦`Trilinear`⟫(<https://someiyoshino.info/entry/2022/01/30/171912>)
-  - `TextureWrapMode wrapMode`: >テクスチャ座標の折り返しモード(Texture Addressing Mode)。**Set**:全ての軸に設定。**Get**:`wrapModeU`と同じ
-    - `enum TextureWrapMode`: ⟪`Repeat`¦`Clamp`¦`Mirror`¦`MirrorOnce`⟫
-    - `wrapMode⟪U¦V¦W⟫`: >テクスチャ⟪U¦V¦W⟫軸座標の折り返しモード。
+  - `enum TextureWrapMode wrapMode`: >テクスチャ座標の折り返しモード(Texture Addressing Mode)。**Set**:全ての軸に設定。**Get**:`wrapModeU`と同じ
+    - ⟪`Repeat`¦`Clamp`¦`Mirror`¦`MirrorOnce`⟫
+    - `TextureWrapMode wrapMode⟪U¦V¦W⟫`: >テクスチャ⟪U¦V¦W⟫軸座標の折り返しモード。
   - `float mipMapBias`: >Textureの**ミップマップバイアス**。(算出された`MipMapLv`に加算される)
   - `anisoLevel`: >**異方性フィルタリングレベル**を設定します。(鋭角な`視線の方向`の**解像度が上がる**)
     - (`Texture`との`視線の角度`によって、サンプリングする範囲を変える(鋭角ほど広い)(`Level`は範囲中のサンプリング数))
@@ -70,42 +70,41 @@
     - (anisoLevel 値が `1` から `9` の間で、**Quality Settings** の `Anisotropic Filtering` が `Forced On` に設定されている場合、Unity は anisoLevel を **9** に設定します。(`0`は無効))
     - (考察: `Trilinear`＆`anisoLevel`の場合、**サンプリング数** = 2(`Bilinear`) x 2(`MipMap補間`) x anisoLevel数 ?)
 - **GraphicsTexture**
-  - `GraphicsTexture` `graphicsTexture`: >GPUにアップロードされた**テクスチャリソース**を表す。(Read-Only).
-    - `class GraphicsTexture`:
-      - `static GraphicsTexture active`: **現在アクティブ**な`GraphicsTexture`。`static RenderTexture active`のようなもの
-        - (**Set**するにはテクスチャ作成時に`GraphicsTexture.descriptor.flags`で`GraphicsTextureDescFlags.RenderTarget`を有効にする)
-      - `GraphicsTextureDescriptor descriptor`: UnityがGraphicsTextureを作成するために使用するすべての情報が含まれています。(`D3D12_RESOURCE_DESC`。RTDescにも似ている)
-        - Resource Desc (↑↑参照)
-          - `TextureDimension dimension`: >Textureの**次元数** (Read-Only)
-          - `GraphicsFormat format`: ピクセルの**型**
-          - `width`: >Unityが**GPUにアップロード**するときのGraphicsTextureの`幅`をピクセル単位で指定します。
-          - `height`: >Unityが**GPUにアップロード**するときのGraphicsTextureの`高さ`をピクセル単位で指定します。
-          - `int mipCount`: >**MipMapレベル数**
-        - `int depth`: `TextureDimension.Tex3D`の時の深さ (多分テクスチャ枚数)
-        - `int arrayLength`: `TextureDimension.`⟪`Tex2D`¦`Cube`⟫`Array`の時の要素数 (CubeはCube数 * 6 ?)
-        - `int numSamples`: **MSAA**のサンプル数
-          - 1以上でMSAA有効。`GraphicsTextureDescriptorFlags.RenderTarget`を設定する必要がある。`GraphicsTextureDescriptorFlags.RandomWriteTarget`と互換性は無い
-        - `GraphicsTextureDescriptorFlags flags`: テクスチャのレンダリングや読み込みを制御する GraphicsTextureDescriptorFlags のセット。
-          - `enum GraphicsTextureDescriptorFlags`: >`GraphicsTexture`の**レンダリング**および**読み取り/書き込みアクセス** モード。
-            - `None`: >デフォルト。この`GraphicsTexture`からサンプリングできる。(`class Texture2D`?)
-            - `RenderTarget`: >この`GraphicsTexture`を**レンダーターゲット**として**設定**し、レンダリングできるようにします。
-            - `RandomWriteTarget`: `ShaderModel5.0`のシェーダーで、この`GraphicsTexture`への**ランダム書き込みアクセス**を**許可**します。(`class RenderTexture`?)
-      - `GraphicsTextureState state`: >`GraphicsTexture` の**現在の状態**。レンダリング スレッドで構築、初期化、または破棄される `GraphicsTexture` の状態を記述します。
-        - `enum GraphicsTextureState`: (↓は上から順に実行される感じがするがよく分からない(.png => Texture.ctor => 作成キュー => .pngをDXT等に変換＆作成完了 => 破棄キュー => 破棄 かな?))
-          - `Constructed`: >`GraphicsTexture` **コンストラクタ**(.ctor?)が実行を開始しました。
-          - `Initializing`: >ディスクリプタは初期化され、`GraphicsTexture`を**作成する作業**はレンダースレッドで**キューに入れられた**。
-          - `InitializedOnRenderThread`: >`GraphicsTexture`がレンダースレッド上で**作成を完了**した。
-          - `DestroyQueued`: >`GraphicsTexture`はレンダリングスレッドで**破壊のキュー**に入っているが、まだ完了していない。
-          - `Destroyed`: >`GraphicsTexture`がレンダースレッド上で**完全に破壊**された。
+  - `class GraphicsTexture` `graphicsTexture`: >GPUにアップロードされた**テクスチャリソース**を表す。(Read-Only).
+    - `static GraphicsTexture active`: **現在アクティブ**な`GraphicsTexture`。`static RenderTexture active`のようなもの
+      - (**Set**するにはテクスチャ作成時に`GraphicsTexture.descriptor.flags`で`GraphicsTextureDescFlags.RenderTarget`を有効にする)
+    - `GraphicsTextureDescriptor descriptor`: UnityがGraphicsTextureを作成するために使用するすべての情報が含まれています。(`D3D12_RESOURCE_DESC`。RTDescにも似ている)
+      - Resource Desc (↑↑参照)
+        - `TextureDimension dimension`: >Textureの**次元数** (Read-Only)
+        - `GraphicsFormat format`: ピクセルの**型**
+        - `width`: >Unityが**GPUにアップロード**するときのGraphicsTextureの`幅`をピクセル単位で指定します。
+        - `height`: >Unityが**GPUにアップロード**するときのGraphicsTextureの`高さ`をピクセル単位で指定します。
+        - `int mipCount`: >**MipMapレベル数**
+      - `int depth`: `TextureDimension.Tex3D`の時の深さ (多分テクスチャ枚数)
+      - `int arrayLength`: `TextureDimension.`⟪`Tex2D`¦`Cube`⟫`Array`の時の要素数 (CubeはCube数 * 6 ?)
+      - `int numSamples`: **MSAA**のサンプル数
+        - 1以上でMSAA有効。`GraphicsTextureDescriptorFlags.RenderTarget`を設定する必要がある。`GraphicsTextureDescriptorFlags.RandomWriteTarget`と互換性は無い
+      - `enum GraphicsTextureDescriptorFlags flags`: >`GraphicsTexture`の**レンダリング**および**読み取り/書き込みアクセス** モード。
+        - `None`: >デフォルト。この`GraphicsTexture`からサンプリングできる。(`class Texture2D`?)
+        - `RenderTarget`: >この`GraphicsTexture`を**レンダーターゲット**として**設定**し、レンダリングできるようにします。
+        - `RandomWriteTarget`: `ShaderModel5.0`のシェーダーで、この`GraphicsTexture`への**ランダム書き込みアクセス**を**許可**します。(`class RenderTexture`?)
+    - `enum GraphicsTextureState state`: >`GraphicsTexture` の**現在の状態**。レンダリング スレッドで構築、初期化、または破棄される `GraphicsTexture` の状態を記述します。
+      (↓は上から順に実行される感じがするがよく分からない(.png => Texture.ctor => 作成キュー => .pngをDXT等に変換＆作成完了 => 破棄キュー => 破棄 かな?))
+      - `Constructed`: >`GraphicsTexture` **コンストラクタ**(.ctor?)が実行を開始しました。
+      - `Initializing`: >ディスクリプタは初期化され、`GraphicsTexture`を**作成する作業**はレンダースレッドで**キューに入れられた**。
+      - `InitializedOnRenderThread`: >`GraphicsTexture`がレンダースレッド上で**作成を完了**した。
+      - `DestroyQueued`: >`GraphicsTexture`はレンダリングスレッドで**破壊のキュー**に入っているが、まだ完了していない。
+      - `Destroyed`: >`GraphicsTexture`がレンダースレッド上で**完全に破壊**された。
 - **その他情報**
   - `bool isReadable`: `Texture2D.GetPixels(..)`など**CPU上で操作**する場合にtrueである必要がある(GPU上の操作は関係ない)
     - インポートのデフォルトでは`false`。スクリプトからでは`true`。`false`にするには`Texture2D.Apply(.., makeNoLongerReadable:false)`をする
   - `bool isDataSRGB`: >テクスチャが**sRGB色空間**の場合、`true` (Read-Only) (`GraphicsFormat.～_SRGB`になって描画時、ガンマ<=>リニア変換されると思われる)
   - `uint updateCount`: >このカウンターはTextureが**更新**されると**インクリメント**される。
-    - >GPU 側から更新を実行する場合は、カウンターを自分で増分する必要があります。(たとえば、 RenderTexture にブリットする場合)。( IncrementUpdateCountを参照)。
+    - >GPU 側から更新を実行する場合は、カウンターを自分で増分する必要があります。(たとえば、 RenderTexture にブリットする場合)。(IncrementUpdateCount を参照)。
   - `Hash128 imageContentsHash`: >Textureのハッシュ値。(Unityがテクスチャを変更するときハッシュも更新される) (Editor-Only)
 
 ## Instance関数
 
-- `IntPtr GetNativeTexturePtr()`: グラフィックAPIに内在するColor?バッファリソースを指すポインター(Draw.io/RenderTexture/bindings/`GetNativeDepthBufferPtr()`のColor版だと思われる)
+- `IntPtr GetNativeTexturePtr()`: [GetNative～Ptr()はR_Resource](\..\..\Unityいろいろ\グラフィックス\レンダーパイプライン\GetNative～Ptr()はR_Resource.png)
+  (Draw.io/RenderTexture/bindings/`GetNativeDepthBufferPtr()`のColor版だと思われる)
 - `IncrementUpdateCount()`: `uint updateCount`をインクリメントする。

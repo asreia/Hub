@@ -1,20 +1,21 @@
 # Camera (Behaviour継承)
 
 主に、**depth**, **cameraType**, **cullingMask**, **⟪active¦target⟫Texture**, **clearFlags**, **allow⟪HDR¦MSAA¦DynamicResolution⟫** **⟪worldToCamera¦projection⟫Matrix**
+     **GetAllCameras(..)**, **Sort**, **描画位置**, **depthTextureMode**
 
 ## Static変数
 
 - **Camera**
-  - `Camera[] allCameras`: `Scene`内の有効(`enabled`)な`Camera`を全て返す。
+  - ●`Camera[] allCameras`: `Scene`内の有効(`enabled`)な`Camera`を全て返す。
   - `int allCamerasCount`: 現在の`Scene`の`Camera`数。(↑の長さ)
   - `Camera current`: 現在レンダリングに使用(`on～Render`時の`Camera`?)している、低レベルレンダリングを管理するカメラ（Read-Only）。
   - `Camera main`: `MainCamera`と**タグ付け**された、最初に有効化されたCameraコンポーネント。(Read-Only).
 - **on～Renderデリゲート版(Built-in)**
   ●`URP`は`RenderPipelineManager`を使用
   - `delegate void CameraCallback(Camera cam)`
-    - `Camera.CameraCallback onPostRender`: `Camera`が`Scene`をレンダリングした**後**に、カスタムコードを実行するために使用できる`Delegate`です。
-    - `Camera.CameraCallback onPreRender`: `Camera`が`Scene`をレンダリングした**前**に、カスタムコードを実行するために使用できる`Delegate`です。
     - `Camera.CameraCallback onPreCull`:`Camera`が`Scene`を切り取る(`Cull`)**前**に、カスタムコードを実行するために使用できる`Delegate`です。
+    - `Camera.CameraCallback onPreRender`: `Camera`が`Scene`をレンダリングする**前**に、カスタムコードを実行するために使用できる`Delegate`です。
+    - `Camera.CameraCallback onPostRender`: `Camera`が`Scene`をレンダリングした**後**に、カスタムコードを実行するために使用できる`Delegate`です。
 - **物理カメラ**
   - `float k⟪Max¦Min⟫Aperture`: 最大許容絞り。
   - `int k⟪Max¦Min⟫BladeCount`: 絞りダイアフラムの最大ブレード数。
@@ -37,10 +38,13 @@
     - `enum CameraType`: ⟪`Game`¦`SceneView`¦`Preview`¦`VR`¦`Reflection`⟫
   - `bool useOcclusionCulling`: **オクルージョンカリング**を使用するかどうか。
   - `int` **cullingMask**: `gameObject.layer`との**論理積**でその`gameObject`を**描画するか**決める
+  - `Scene scene`: NULLでない場合、カメラは指定されたSceneの内容のみをレンダリングする。(EditorSceneManager.NewPreviewSceneで作成されたSceneのみサポート)
   - **Sort**
-    - `OpaqueSortMode opaqueSortMode`: オブジェクトを不透明にするソーティングモード
+    - `enum OpaqueSortMode opaqueSortMode`: オブジェクトを不透明にするソーティングモード
+      - `⟪Default¦FrontToBack¦NoDistanceSort⟫`
     - `ResetTransparencySortSettings()`でリセット
-      - `TransparencySortMode transparencySortMode`: ソートモードの透明オブジェクト。
+      - `enum TransparencySortMode transparencySortMode`: ソートモードの透明オブジェクト。
+        - `⟪Default¦Perspective¦Orthographic¦↓CustomAxis(or GraphicsSettings)⟫`
       - `Vector3` `transparencySortAxis`: オブジェクト(`Renderer`)を描画順のソートする時に使用する軸(`Axis`) (**Built-inかも?**)
   - **Built-In,レガシー機能**
     - RenderingPath
@@ -48,14 +52,13 @@
         - `enum RenderingPath`: ⟪UsePlayerSettings¦VertexLit¦Forward¦DeferredShading⟫
       - `RenderingPath renderingPath`: 可能な場合、レンダリングパスが使用されます。
     - `bool clearStencilAfterLightingPass`: カメラが Deferred Light Path の後にステンシルバッファをクリーンにする必要があるかどうか
-    - `Scene scene`: NULLでない場合、カメラは指定されたSceneの内容のみをレンダリングする。
     - `bool renderCloudsInSceneView`: Falseの場合、このカメラのシーンビューに雲は描画されない。
     - `int commandBufferCount`: コマンドバッファ数をこのカメラに設定(取得?)します (Read-Only)
 
 - **カリングとレイヤー**
   - **Layer単位のカリング距離**
-    - `float[] layerCullDistances`: **Layer単位**の**カリング距離**。
-    - `bool layerCullSpherical`: カメラに対して↑のLayer単位のカリングを**球体**で実行するか。
+    - `float[] layerCullDistances`: **gameObject.layer単位**の**カリング距離**。
+    - `bool layerCullSpherical`: カメラに対して↑のLayer単位のカリングを**球体**で実行するか。(カメラのnear-farクリップの距離ではないという意味?)
     - `Matrix4x4 cullingMatrix`: すべてのカリングクエリに使うための`Camera`のカスタムMatrixを設定します。(フラスタムカリング用のMatrix?)
       - (`ResetCullingMatrix()`でリセット)
   - 現在URPで使われているか分からん
@@ -66,9 +69,8 @@
 - **カメラとテクスチャに関する情報**
   - **描画位置**(ViewPort?)
     - `Rect ＠❰pixel❱Rect`: 画面上の **⟪正規(0～1)¦ピクセル(解像度)⟫座標**でどこに`Camera`が描画されるか。
-    - `int ＠❰scaled❱pixel⟪Width¦Height⟫`: `Camera`の画素の`⟪Width¦Height⟫`幅。(`ViewPort.⟪x¦y⟫`) (`❰scaled❱`は、**ダイナミック解像度**のスケーリングを**考慮する**) (Read-Only)
-    - ⟪`Camera`¦`GraphicsSettings`⟫が`TransparencySortMode.CustomAxis`であること
-  - `Vector3` **velocity**: `Camera`のワールド空間での速度を取得します（読み取り専用）。
+    - `int ＠❰scaled❱pixel⟪Width¦Height⟫`: `Camera`の解像度の`⟪Width¦Height⟫`幅。(`ViewPort.⟪x¦y⟫`) (`❰scaled❱`は、**ダイナミック解像度**のスケーリングを**考慮する**) (Read-Only)
+  - ●`Vector3` **velocity**: `Camera`のワールド空間での速度を取得します（読み取り専用）。
 
 - **テクスチャ設定**
   - `Camera`の`RenderTexture`
@@ -81,19 +83,17 @@
     - `bool allowHDR`: (**Built-in?**)**HDR**の許可。(R16G16B16A16FLOAT?)
     - `bool allowMSAA`: **MSAA**の許可。(rt.msaaSamples)
     - `bool allowDynamicResolution`: **動的解像度**の許可
-  - `CameraClearFlags` **clearFlags**: カメラがどのように背景を取り除くか。
-    - `CameraClearFlags`: >`Camera`をレンダリングするときに**何でクリアするか**を決める
-      - `Skybox`: スカイボックスをクリアする
-      - `SolidColor`: 背景色をクリアします。
-      - `Depth`: **深度バッファのみ**をクリアする
-      - `Nothing`: 何もクリアしません
-  - `Color backgroundColor`: 画面に何もないときに表示される色。(`camera.clearFlags == CameraClearFlags.SolidColor`の時)
-  - `DepthTextureMode depthTextureMode`: (**Built-in?**)>どのようにカメラがテクスチャを生成するか。まず生成するのか。(`Depth`と言いつつ`MotionVectors`も生成するの?)
-    - `DepthTextureMode`:
-      - `None`: 深度テクスチャを生成しません（デフォルト）
-      - `Depth`: 深度テクスチャを生成します
-      - `DepthNormals`: 深度と法線を組み合わせたテクスチャを生成します
-      - `MotionVectors`: (可能な場合に) モーションベクターをレンダリングするかを指定します。
+  - `enum CameraClearFlags` **clearFlags**: >`Camera`をレンダリングするときに**何でクリアするか**を決める
+    - `Skybox`: スカイボックスでクリアする
+    - `SolidColor`: 背景色をクリアします。
+      - `Color backgroundColor`: 背景色
+    - `Depth`: **深度バッファのみ**をクリアする
+    - `Nothing`: 何もクリアしません
+  - `enum DepthTextureMode depthTextureMode`: (**Built-in?**)>どのようにカメラがテクスチャを生成するか。まず生成するのか。(`Depth`と言いつつ`MotionVectors`も生成するの?)
+    - `None`: 深度テクスチャを生成しません（デフォルト）
+    - `Depth`: 深度テクスチャを生成します
+    - `DepthNormals`: 深度と法線を組み合わせたテクスチャを生成します
+    - `MotionVectors`: (可能な場合に) モーションベクターをレンダリングするかを指定します。
 
 - **カメラ行列**
   - **変換行列**
@@ -108,8 +108,8 @@
       - `bool useJitteredProjectionMatrixForTransparentRendering`: >`Transparent`レンダリングに**ジッター**マトリックスを**使うべきか**？
   - **パラメータ**
     - **平行投影**
-      - `bool` **orthographic**: >`Camera`が`orthographic`か(true)、`perspective`か(false)。
-        - >`orthographic`の場合、視域は`OrthographicSize`で定義される。
+      - `bool` **orthographic**: >`Camera`が`orthographic`(true)か、`perspective`(false)か。
+        - >`orthographic`の場合、視域は`orthographicSize`で定義される。
         - >`perspective`の場合、視域は`fieldOfView`で定義される。
       - `orthographicSize`: >orthographic モードの場合、カメラの半分のサイズ。(?)
     - **透視投影**
@@ -121,7 +121,7 @@
     - **物理カメラ(usePhysicalProperties)**
       - `usePhysicalProperties`: **物理カメラ**を使用する
       - `Vector2 sensorSize`: >カメラセンサーの大きさで、単位はミリメートル。
-      - `Camera.GateFitMode gateFit`: カメラにはセンサーゲートと解像度ゲートの2つのゲートがあります。物理的なカメラのセンサーゲートは`sensorSize`プロパティで定義され、解像度ゲートはレンダーターゲット領域で定義されます。
+      - `Camera.GateFitMode gateFit`: カメラにはセンサーゲートと解像度ゲートの2種類があります。センサーゲートは`sensorSize`プロパティ、解像度ゲートはレンダーターゲット領域で定義されます。
       - `Vector2 lensShift`: >カメラのレンズオフセット。レンズシフトはセンサーサイズに対する相対値である。例えば、0.5のレンズシフトは、センサーの水平サイズの半分をオフセットします。
       - `float anamorphism`: >アナモルフィックをシミュレートするためにセンサーを伸ばします。正の値はカメラを垂直に歪ませ、負の値はカメラを水平に歪ませます。
       - `float aperture`: >カメラの絞り。
@@ -145,12 +145,10 @@
 
 - **Copy, Culling, Frustum**
   - `CopyFrom(Camera other)`: `other`の設定パラメータをこの`Camera`に**コピー**する(`Transform`と`Layer`もコピーされる)
-  - `SetTargetBuffers(RenderBuffer＠❰[]❱ colorBuffer, RenderBuffer depthBuffer)`:
-    - `targetTexture`の**RenderBuffer**版?
   - `bool TryGetCullingParameters(＠❰bool stereoAware,❱ out ScriptableCullingParameters cullingParameters)`:
-    - `Camera`の`ScriptableCullingParameters`を取得する。
+    - `Camera`の`ScriptableCullingParameters`を取得する。(`ctx.Cull(ref cullParams)`のようなもの?)
   - `CalculateFrustumCorners(Rect viewport, float z, Camera.MonoOrStereoscopicEye eye, Vector3[] outCorners)`:
-    - `viewport`座標と`Camera`の深度(`z`)が与えられると、`View`空間の`Frustum`の4つの`Corner`(クラスタの面のようなもの)を計算して`outCorners`に入れる
+    - `viewport`座標と`Camera`の深度(`z`)が与えられると、`View`空間の`Frustum`の4つの`Corner`(クラスタの面のようなもの)を計算して`outCorners`に入れる。(Forward+のクラスタ?)
 
 - **CommandBuffer, Shader, Render**
   - **⟪Add¦Get¦Remove⟫CommandBuffer**
@@ -216,6 +214,6 @@
   - `OnPreCull`: `Camera`が❰`scene`を切り取る(`Cull`)**前**❱に呼び出すイベント関数。
   - `OnWillRenderObject`: ❰`Camera`から`Object`が可視状態❱
   - `OnPreRender`: ❰`Camera`が`Scene`をレンダリングする**前**❱
-  - `OnRenderObject`: ❰`Camera`が`Scene`をレンダリングする**後**❱(Object単位?)
-  - `OnPostRender`: ❰`Camera`が`Scene`をレンダリングする**後**❱
+  - `OnRenderObject`: ❰`Camera`が`Scene`をレンダリングした**後**❱(Object単位?)
+  - `OnPostRender`: ❰`Camera`が`Scene`をレンダリングした**後**❱
   - `OnRenderImage(RenderTexture source,RenderTexture destination)`: UnityがCameraのレンダリング終了後に呼び出すイベント関数で、Cameraの最終画像を変更できます。

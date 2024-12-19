@@ -118,16 +118,17 @@
           >深度クリップモードを固定に設定します。ニアクリップ面よりも近いフラグメントは、正確にアクリップ面に配置され、ファークリップ面よりも遠いフラグメントは正確にファークリップ面に配置されます。
           - Conservative:
           >慎重なラスタライズ(Conservative)とは、覆われる度合い(ピクセル中心点?)にに関係なく、**三角形で部分的に覆われているピクセルをラスタライズ**することです。
+          ![Conservative](\..\画像\D3D12_CONSERVATIVE.png)
           >これは、オクルージョンカリング、GPU の衝突検出、可視性検出を行う場合など、確実性が求められる場合に役立ちます。
           - AlphaToMask
           >アルファテストで破棄された箇所の境界線を滑らかにします。(MSAAのアルファ版?)(教科書1_P43)
           - [centroid](https://wgld.org/d/webgl2/w013.html)
-          ![centroid](\画像\centroid.png)
+          ![centroid](\..\画像\centroid.png)
         - ステンシル (あるモノでマスクを作り、そのマスクで別のモノを描画(基本的にWriteしてRead))
           - Comp(ref & ReadMask, Ref & ReadMask)//特定のビットを比較, ⟪Pass¦Fail¦ZFail⟫(StencilBuffer & WriteMask)//Writeするビットを指定 かな?
           - 初期値: ReadMask:11111111, WriteMask:11111111, Comp:Always, ⟪Pass¦Fail¦ZFail⟫:Keep
     - [ラスター化ルール](https://learn.microsoft.com/ja-jp/windows/uwp/graphics-concepts/rasterization-rules)
-      - ![ラスター化ルール](\画像\ラスター化ルール.png)
+      - ![ラスター化ルール](\..\画像\ラスター化ルール.png)
     - ライブラリ
       - SimpleLitForwardPass.hlsl
       - SpaceTransforms.hlsl //座標変換系
@@ -142,6 +143,25 @@
     - RenderDoc,PIX //ここまでは使わないかも
 
 - その他メモ
+  - ●SSGI:まずpositionWSを描画して、それをpositionWSの.x,.y,.zの順で昇順ソート(positionWSのAS構造)してバッファに書き出す。(positionWSに対するpositionSSもペアで書く)
+      (SpaceFillingCurves.hlsl/uint EncodeMorton3D(uint3 coord) 使う? これを使って、ピクセルシェーダ時にUAVバッファに書いて挿入ソート?する)
+      (静的メッシュを全てEncodeMorton3Dでソートしてバッファにベイクしとく?)
+      (CubeMapのようにすれば全方位いける?(CubeMapのpositionWSポイントクラウド上でレイマーチ))
+      ソートコストが大きすぎる。普通のレイトレーシングシェーダーのほうがいいかも。レイをSS空間に変換してレイマーチでもそれはSSGIか
+    コンピュートシェーダで、positionWSバッファをLoadしてライティングしてpositionSSを参照しライティング結果用バッファに書く。
+    続けて反射したレイでpositionWSバッファを参照し.x,.y,.zの順で２分探索してレイマーチして、(レイマーチ中はマンハッタン距離使うとか)
+    しきい値内かつ最も近いpositionWSを探してライティングしてInterlockedAdd(..)(←要らないかも)でライティング結果用バッファに書く。
+      (拡散反射を表現するために、しきい値を大きめにして、しきい値内に入ったpositionWS を 最も近い位置を探して、しきい値内に入った複数のpositionWSをライティングする?)
+    そして、ライティング結果用バッファが描画結果となる
+  - ●複雑な半透明の描画: PSO:Zを奥から手前に描画,フロントフェイスカリング で 一番奥のバックフェイスの深度のみを描画。その後、深度と一致したピクセルのみ描画。
+    - PSO:バックフェイスカリング と 新しいDSのRT にして Pixelシェーダで前の深度値を参照しそれより奥だったらDiscardし手前ならその深度のみを描画。その後、深度と一致したピクセルのみ描画。
+      - (PSO:Zを奥から手前に描画 と Discard により、PreZカルされるかDiscardされ無ければ、深度を描画できる)   ↓>SV_Depth は書き込み専用の出力変数；；UAVでいける?(それ自体が重い..)
+      - (しかし、Discardを使うとPreZTest無効；；(Pixelシェーダの最初でPreZTest相当(CS_ZとSV_Depthの比較)を書けばコスト安いか?)) SV_DepthGreaterEqual: 初期 Z を無効にせず
+        - ↑恐らく通常のPreZTestはラスタライザの時点で深度を決定してDSVに書いてしまうから?(Discardを使うとピクセルシェーダー起動しないと分からない)
+          でもLODCrossFadeとか普通にDiscard(clip(.))使ってるが?
+    - 追記:深度描画時、ピクセルシェーダーでDiscardしなかったらUAVに論理和(|=)で1を書いて、"深度と一致したピクセルのみ描画"をするかのフラグにする
+  - ●アルファブレンディングを設定するより、RTのカラーをSRVとして読み込みfragでブレンド処理して、RTのデプスと新しいカラーバッファをRTVにセットすれば良いのでは？
+    - (ジオメトリレンダー＆ポストプロセス)
   - 白飛び回避にSoftmax使うとか
   - デファードMSAA: ジオメトリ毎にindexを振りTextureにindexを書き込む
     そして、ライティング後ポスプロでddx,ddy系(フィルタ系処理でもいい)で隣のピクセルのindexを読みindexが同じで無かったらぼかすとか

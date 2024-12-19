@@ -1,6 +1,6 @@
 # Texture2D (Texture継承)
 
-主に、`TextureFormat format`, `Apply(..)`(｡`CPUテクスチャ`(`Texture.isReadable==True`) => `GPUテクスチャ`｡),
+主に、`.ctor`, `TextureFormat format`, `Apply(..)`(｡`CPUテクスチャ`(`Texture.isReadable==True`) => `GPUテクスチャ`｡),
       `ReadPixels(..)`, `⟪Get¦Set⟫Pixels(..)`, `⟪Get¦Set⟫PixelData<T>(..)`
 
 ## Static変数
@@ -12,11 +12,10 @@
 
 - `static Texture2D CreateExternalTexture(int width, int height, TextureFormat format, bool mipChain, bool linear, IntPtr nativeTex)`:
   - **Unity外部**で作成されたネイティブテクスチャオブジェクトからUnityの`GPU?テクスチャ`を作成します。(`UpdateExternalTexture`も参照)
-  - width,heightなどの`Resource Descパラメータ`は`IntPtr nativeTex`のリソースと**一致**している必要がある
-  - `nativeTex`は、各グラフィックAPIの`ID3D12Texture2D*`などを渡す。(`IntPtr Texture.GetNativeTexturePtr()`も同じ種類のポインタ?)
-- `bool GenerateAtlas(Vector2[] sizes, int padding, int atlasSize, List<Rect> results)`:
-  - >矩形の集合を正方形のアトラスに詰め込みます。矩形間のパディングはオプションです。(`.PackTextures(..)`と似ている)
-  - `atlasSize`分の領域を確保して、`results`で結果のアトラス要素(Sprite)の領域を示す?
+  - width,heightなどの`Resource Descパラメータ`は`IntPtr nativeTex`のリソースと**一致**している必要がある。(`nativeTex`からコピーするってこと?)
+  - `nativeTex`は、各グラフィックAPIの`ID3D12Texture2D*`などを渡す。(`IntPtr Texture.GetNativeTexturePtr()`も同じ種類のポインタ)
+- `bool GenerateAtlas(Vector2[] sizes, int padding, int atlasSize, List<Rect> results)`: (`.PackTextures(..)`と似ている)
+  - スプライト群（`sizes` 配列）を、パディング（`padding`）分を空けて、正方形のアトラス（`atlasSize`）のテクスチャ内に詰める。(収まらなかったら`false`)
 
 ## .ctor
 
@@ -38,14 +37,14 @@
   - `bool streamingMipmaps`: >この Texture に対して**ミップマップストリーミング**が**有効かどうか**を決定します。(QualitySettingsとの論理積っぽい)
   - `int streamingMipmapsPriority`: >メモリバジェット内に収まるようにメモリサイズを減らすときに、このテクスチャの**相対的な優先順位**を**設定**します。
   - `int requestedMipmapLevel`: >ロードするミップマップレベル。ミップマップレベルが**強制的にロード**され、**ミップマップストリーミングシステム**を**上書き**します。
-  - `int minimumMipmapLevel`: >ミップマップストリーミングシステムをこの Texture の**最小ミップレベル**に**制限**する。
+  - `int minimumMipmapLevel`: >ミップマップストリーミングシステムをこの Texture の**最小ミップレベル**を**制限**する。
   - `bool ignoreMipmapLimit`: >このプロパティは、テクスチャがすべてのテクスチャの**ミップマップ制限設定**を**無視**するようにします。
   - `string mipmapLimitGroup`: >このテクスチャが関連付けられているテクスチャの**ミップマップ制限グループ**の**名前**。 (Read-Only)
   - `int desiredMipmapLevel`: >`メモリバジェット`が**適用される前**にストリーミングシステムがロードするミップマップレベル。
   - `int activeMipmapLimit`: >Unityが**GPUにアップロードしない**、テクスチャからの高解像度**ミップマップレベルの数**。 (Read-Only)
   - `int loadedMipmapLevel`: >ストリーミングシステムが**現在ロード**している**ミップマップレベル**。
   - `int loadingMipmapLevel`: >ミップマップ・ストリーミング・システムが**ロード中**の**ミップマップレベル。**
-  - `calculatedMipmapLevel`: >ストリーミングシステムによって計算されたミップマップレベルで、ストリーミングカメラとこのTextureを含むオブジェクトの位置を考慮する。?
+  - `int calculatedMipmapLevel`: >ストリーミングシステムによって計算されたミップマップレベルで、ストリーミングカメラとこのTextureを含むオブジェクトの位置を考慮する。?
     - これは `requestedMipmapLevel` や `minimumMipmapLevel` には影響されない。
 
 ## Instance関数
@@ -56,7 +55,7 @@
     - `bool makeNoLongerReadable`: `true`の場合、`CPUテクスチャ`(メインメモリ)を削除して、`Texture.isReadable`を`false`にする。
       - (↑をした場合`ディスク`から**再ロード**は**できない**(**ディスク** `Import`?=> **CPUテクスチャ** <=`ReadPixels`? `Apply`=> **GPUテクスチャ**))
   - `bool Reinitialize(int width, int height, ⟪GraphicsFormat¦TextureFormat⟫ format, bool hasMipMap)`:
-    - 引数の指定で`CPUテクスチャ`を**作り直し0クリア**し、`GPUテクスチャ`は`Apply(..)`時に作り直される?
+    - 引数の指定で`CPUテクスチャ`を**作り直し＆0クリア**し、`GPUテクスチャ`は`Apply(..)`時に作り直される?
     - 戻り値boolは成功したか。`{TextureName}_`⟪`TexelSize`¦`HDR`⟫は自動的に更新しない
   - `Compress(bool highQuality)`: >**実行時**に`CPU?テクスチャ`を`DXT/BCn`または`ETC`フォーマットに**圧縮**します。
     - `highQuality`: `ETC`以外で、**ディザアーティファクト**が掛かるのを**減らす**が、遅くなる
@@ -64,8 +63,8 @@
     - 既に圧縮されている場合は何もしない。**エディターで操作**する場合は、`EditorUtility.CompressTexture(..)`もある
   - `Rect[] PackTextures(Texture2D[] textures, int padding, int maximumAtlasSize, bool makeNoLongerReadable)`:
     - >`Atlasテクスチャ`に`複数のテクスチャ`を**パック**します(<https://youtu.be/7tjycAEMJNg?t=2746>)
-    - 戻り値Rect[]は、`Atlasテクスチャ`内の各`Sprite`?のUV座標を表す
-    - `textures`: パックするテクスチャ。`padding`: テクスチャの間隔。`makeNoLongerReadable`: `Apply(..)`と同じ
+    - 戻り値Rect[]は、`Atlasテクスチャ`内の`スプライト群`のUV座標を表す
+    - `textures`: パックする`スプライト群`。`padding`: テクスチャの間隔。`makeNoLongerReadable`: `Apply(..)`と同じ
     - `maximumAtlasSize`: `Atlasテクスチャ`の**最大サイズ**を指定する。`textures`が収まらない場合は縮小される
     - `Atlasテクスチャ`が圧縮されるか?は複雑そうな条件がある[リファレンス参照](https://docs.unity3d.com/ja/2023.2/ScriptReference/Texture2D.PackTextures.html)
   - `UpdateExternalTexture(IntPtr nativeTex)`: >異なるネイティブのテクスチャオブジェクトを使うために Unity のテクスチャを更新します。
@@ -76,25 +75,25 @@
       - 現在の**レンダーターゲット**(`BRTT.CameraTarget`,`RenderTexture.active`,`GraphicsTexture.active`)
         から、`Rect source`の範囲をこの`CPUテクスチャ`の`int dest⟪X¦Y⟫`にコピーする。`GPUテクスチャ`を更新するために`Apply(..)`を呼ぶ必要がある
         - この`TextureFormat format`を`⟪RT¦GT⟫.active`の`GraphicsFormat Texture.graphicsTexture.descriptor.format`と合わせる必要がある?自動変換される?
+            >RTのフォーマットが自動的に変換され、CPU側で適切な `TextureFormat` にマッピングされます。
       - この関数はGPU処理が完了するまで待機するので**遅い**。代わりに`AsyncGPUReadback.RequestIntoNativeArray(..)`で**非同期にコピー**する(<>)
       - `recalculateMipMaps`で、`MipMap`を生成することもできるが、`Apply(bool updateMipmaps)`で`GPUテクスチャ`のみ?に生成することもできる
   - **Color型 <=Get Set=> CPUテクスチャ**
-    - `⟪『Set』void¦『Get』Color＠❰＠❰32❱[]❱⟫ ⟪Get¦Set⟫Pixel＠❰s＠❰32❱❱(｡＠❰『Set』⟪int x, int y, Color color,¦Color＠❰32❱[] colors,⟫❱ int miplevel= 0｡)`
+    - `⟪『Set』void¦『Get』Color＠❰＠❰32❱[]❱⟫ ⟪Get¦Set⟫Pixel＠❰s＠❰32❱❱(｡＠❰『✖❰s❱』int x, int y,❱＠❰『Set』⟪Color color,¦Color＠❰32❱[] colors,⟫❱ int miplevel= 0｡)`
       - **Get**:`CPUテクスチャ`(isReadable==true)のピクセル＠❰範囲❱を＠❰解凍し❱`Color＠❰32❱`に変換して取得する
         - 左下隅が`(0,0)`、範囲外の座標は`TextureWrapMode`に従う (`int x, int y`は解像度)
-          - `Pixels`の場合は、`CPUテクスチャ`の左下から行ごとにピクセルが格納される
+          - `Pixels`の場合は、`CPUテクスチャ`の左下から行ごとにピクセルが格納される (>配列のサイズは、`miplevel`の 幅 × 高さ)
       - **Set**:`Get`のほぼ**逆方向**と思われる。`GPUテクスチャ`を更新するために`Apply(..)`を呼ぶ必要がある
     - `Color GetPixelBilinear(float u, float v, int mipLevel= 0)`:
-      - >`正規化座標❰0～1❱ (u, v)` で**バイリニアフィルタリング**されたピクセルの色を**取得**します。
+      - >`正規化座標❰0～1❱ (u, v)` で**バイリニアフィルタリング**されたピクセルの色を**取得**します。(テクスチャサンプリングのような)
       - 後は`GetPixel＠❰s＠❰32❱❱(..)`と大体同じと思われる
-    - **生NativeArray版**
-      - `⟪『Set』void¦『Get』NativeArray<T>⟫ ⟪Get¦Set⟫PixelData<T>(｡＠❰『Set』NativeArray<T> data,❱ int mipLevel ＠❰『Set』, int sourceDataStartIndex= 0❱｡)`
-        - `CPUテクスチャ`を`NativeArray<T>`で**直接**⟪**取得**¦**設定**⟫する。
-          - (>`CPUテクスチャ`が、`16x8ピクセル (128)` x `TF.RGBA32 (4)` + `MipMap無し (0)` = `512byte`)(圧縮も考慮する?)
-          - `Get`して`NativeArray<T>`を書き換えるか、`Set`してポインタごと入れ替える
-          - `GPUテクスチャ`を更新するために`Apply(..)`を呼ぶ必要がある
-        - `T`: `Color＠❰32❱`または`合致するstruct`? (>`TextureFormat.RGBA32`の場合は、`Color32`を使用します)
-        - `sourceDataStartIndex`: コピーを開始する`NativeArray<T>`のインデックス
+    - **生NativeArray版**: **圧縮**(`TF.BC7`など)されている可能性があるので、解凍処理は手動で行う必要がある。`GPUテクスチャ`を更新するために`Apply(..)`を呼ぶ必要がある
+      - `NativeArray<T> GetPixelData<T>(int mipLevel)`
+        - `CPUテクスチャ`の`mipLevel`のバッファを指す`NativeArray<T>`を取得してデータを**直接、読み書き**できる
+        - `CPUテクスチャ`が、`16x16ピクセル`,`TF.RGBA32`,`Texture.mipmapCount:3`だとして、`GetPixelData(1)`で取得する場合
+          `NativeArray<T>`は、`8x8ピクセル`=`64要素の配列`で`<T>`は`TF.RGBA32`と同じ型(`Color32`など)にする必要がある
+      - `void SetPixelData<T>(NativeArray<T> data, int mipLevel, int sourceDataStartIndex = 0)`
+        - `CPUテクスチャ`の`mipLevel`のバッファを`data`配列の`sourceDataStartIndex`～`sourceDataStartIndex`+`mipLevel`のバッファサイズ の要素で**コピー**する
       - `⟪『Load』void¦『Get』NativeArray<T>⟫ ⟪Get¦Load⟫RawTextureData<T>(＠❰『Load』NativeArray<T> data❱)`:
         - `⟪Get¦Set⟫GetPixelData<T>(..)`の全ての`mipLevel`含んでいる版
 - **MipMapストリーミング**

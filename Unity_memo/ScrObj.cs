@@ -313,6 +313,7 @@ using System.Threading;
     //考察 (C:\Users\asreia\Reverse\Assets\CoroutineTest.cs :82 自作簡易コルーチンシステム)
         //StartCoroutine(),StopCoroutine()は同一の引数を渡して呼ぶ事でcoroutineを複数回実行したり一斉に停止することができるので、
         //内部で実行中のcoroutineを持っていて、外部からcoroutineをKeyとして実行中の同一のcoroutineを停止したり再開したり操作できると思われる。
+          //追記:妄想:List<CoroutineState> CoroutineStateList; struct CoroutineState{IEnumerator routine; ＠❰Custom❱YieldInstruction waitPoint; bool enable;} //enableは⟪Start¦Stop⟫Coroutine
     //YieldInstruction, CustomYieldInstruction
         //WaitForFixedUpdate():                 物理演算実行後まで待つ、１フレーム内に複数回実行される事がある
         //WaitWhile(Func<bool> predicate):      delegateがtrueを返す間停止される。

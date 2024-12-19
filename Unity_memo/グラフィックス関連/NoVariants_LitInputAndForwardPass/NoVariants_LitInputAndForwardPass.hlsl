@@ -321,7 +321,7 @@ struct ShadowSamplingData
         float4x4 _AdditionalLightsWorldToShadow[(256)]; // 追加ライトのワールド座標からシャドウマップへの変換行列
     };
     Texture2D _MainLightShadowmapTexture;
-    Texture2D _AdditionalLightsShadowmapTexture;
+    Texture2D _AdditionalLightsShadowmapTexture; //追加ライト2個以上になるとTexture2dArrayになったりする?
     SamplerComparisonState sampler_LinearClampCompare;
     //universal/ShaderLibrary/Input.hlsl====================
 
@@ -805,7 +805,7 @@ float3 SHEvalLinearL0L1(float3 N, float4 shAr, float4 shAg, float4 shAb)
 
     float3 x1;
 
-    //恐らく、shA⟪r¦g¦b⟫とvA==normalとの内積類似度を取り、その色が強い方向にnormalが向いていたら、その分だけその色が結果となる
+    //恐らく、shA⟪r¦g¦b⟫とvA==normalとの内積類似度を取り、その色が強い方向にnormalが向いていたら、その分だけその色が結果となる。(SHEvalLinearL1(..)と同じ)
     x1.r = dot(shAr, vA);
     x1.g = dot(shAg, vA);
     x1.b = dot(shAb, vA);
@@ -1473,7 +1473,7 @@ void EvaluateAdaptiveProbeVolume(APVSample apvSample, float3 normalWS, out float
         bakeDiffuseLighting += apvSample.L0; //↑にL0を加算
         if(_LeakReduction_SkyOcclusion.z > 0)
             bakeDiffuseLighting += EvaluateOccludedSky(apvSample, normalWS); //↑に従来のライトプローブ(EvaluateAmbientProbe(normalWS))を重みを掛けて足してるみたい
-        {                                                                           //↑訂正: bDL += EvalSHOccludedSky(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱
+        {                                                                           //↑訂正: bDL += EvalSHSkyOcclusion(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱
             bakeDiffuseLighting = bakeDiffuseLighting * _Weight_MinLoadedCellInEntries.x; //最後に重みを掛ける (ココはifの外)
         }
     }
@@ -1729,7 +1729,7 @@ void EvaluateAdaptiveProbeVolume(in float3 posWS, in float3 normalWS, in float3 
     posWS = AddNoiseToSamplingPosition(posWS, positionSS, viewDir); //posWS += (viewDir.⟪x¦y⟫ + ノイズ) * ノイズ をしている
 
     APVSample apvSample = SampleAPV(posWS, normalWS, viewDir); //最終的にTexture3D L⟪0¦1⟫をuvwでサンプリングするが超複雑そう
-    EvaluateAdaptiveProbeVolume(apvSample, normalWS, bakeDiffuseLighting); //L1 + L0 + if{EvalSH"OccludedSky"(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱}
+    EvaluateAdaptiveProbeVolume(apvSample, normalWS, bakeDiffuseLighting); //L1 + L0 + if{EvalSH"SkyOccluded"(N, apvSample) * EvaluateAmbientProbe(normalWS)❰従来❱}
 }
 //universal/ShaderLibrary/ShaderVariablesFunctions.hlsl 
 float2 GetNormalizedScreenSpaceUV(float2 positionCS) //●positionCS.xy * 0.5 + 0.5 じゃだめなの?

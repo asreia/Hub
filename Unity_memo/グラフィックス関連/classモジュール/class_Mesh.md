@@ -1,9 +1,5 @@
 # MeshFilter と Mesh
 
-- Vertex, Index([sub..],[sub..],..), SubMesh, Materialの関係のdraw.ioを作る?
-  - `SetVertexBufferParams(..)`: Attribute, Stream も (Streamは、インターリーブの単位)
-  - `SubMesh`毎に`MeshTopology`を設定できる?
-
 ## MeshFilter (Component継承)
 
 ### Instance変数
@@ -24,7 +20,7 @@
   `struct C#_Job_System{[Read] AcquireReadOnlyMeshData(meshes), [Write] writable_MeshDataArray = AllocateWritableMeshData(meshCount)};`
       `ApplyAndDisposeWritableMeshData(writable_MeshDataArray, Mesh[] meshes); return meshes;`
   みたいな感じ。
-  - `Mesh.MeshDataArray AcquireReadOnlyMeshData(⟪Mesh＠❰[]❱¦List<Mesh>⟫ meshes)`: (`meshes`は`isReadable==true`であること)
+  - `Mesh.MeshDataArray AcquireReadOnlyMeshData(⟪Mesh＠❰[]❱¦List<Mesh>⟫ meshes)`: (`meshes`は`isReadable==true`であること) (`Acquire(アクワイア)`: 獲得する)
     - `Mesh[] meshes`から**スナップショット**(`⟪Vertex¦Index⟫バッファ`のコピー?)を取り、`ReadOnly`の`struct Mesh.MeshData`の`struct Mesh.MeshDataArray`を作る
     - **C# Job System**でマルチスレッドで回すことができる。`Mesh.MeshDataArray`は`.Dispose()`を使用して**破棄**する必要がある。
   - `Mesh.MeshDataArray AllocateWritableMeshData(int meshCount)`:
@@ -36,7 +32,7 @@
 ### .ctor
 
 - `Mesh()`
-  - >空の`Mesh`を作成します。(`⟪Vertex¦Index⟫バッファ`も無い?`isReadable=false`と同じ?)
+  - >空の`Mesh`を作成します。(`⟪Vertex¦Index⟫バッファ`も無い?)
 
 ### Instance変数
 
@@ -73,7 +69,7 @@
       - `GraphicsBuffer.Target indexBufferTarget`: **Indexバッファの使用目的**を設定。(デフォルトは`Index`) (`vertexBufferTarget`と同じ感じ)
 - **Mesh設定**
   - `bool isReadable`:
-    - >`true`は、**読み"書き"可能**。(`Meshモデル`?をUnityに**インポート**するときは`Read/Write Enabledチェックボックス`を使う)
+    - >`true`は、**読み"書き"可能**。(CPU側データ)(`Meshモデル`?をUnityに**インポート**するときは`Read/Write Enabledチェックボックス`を使う)
     - `Mesh`を操作する必要がない場合は`false`にして**高速化**する (多分、`Mesh`にデータを持たない)
 - **Meshデータ**
   - `Bounds` **bounds**: **Local空間**の`Bounds`。(`Renderer.bounds`は**World空間**)
@@ -86,16 +82,18 @@
 ### Instance関数
 
 - **Clear**と**Upload**
-  - **Clear**`(bool keepVertexLayout= true)`:
-    - >全ての`Vertexデータ`と`Indexデータ`を**削除**します
+  - **Clear**`(bool keepVertexLayout= true)`: 旧/新APIで呼ばれている(<https://youtu.be/u51C_sNZsyA?t=202>)
+    - >全ての`Vertexデータ`と`Indexデータ`を**削除**します。(`isReadable == false`にはしないらしい)
     - `keepVertexLayout`: `SetVertexBufferParams(int vertexCount, VertexAttributeDescriptor[] attributes)`で設定される、
-      **頂点レイアウト**(`attributes`)の**構成**を**維持**する?
-  - `UploadMeshData(bool markNoLongerReadable)`:
-    - この`Mesh`で**変更した内容**を**即時**に**グラフィックAPI**(GPU?)に`Upload`する。
-    - `markNoLongerReadable`: `Mesh`のデータを**開放**する。(`isReadable`が`false`になる?)
+      **頂点レイアウト**(`attributes`)の**構成**を**維持**する (DirectX12 `D_INPUT_LAYOUT_DESC`)
+    - [Mesh_ClearとisReadable](\..\..\Unityいろいろ\グラフィックス\レンダーパイプライン\Mesh_ClearとisReadable.png)
+  - `UploadMeshData(bool markNoLongerReadable)`: こっちは即時でなければ呼ばなくてもいいみたい?
+    - この`Mesh`で**変更した内容**を**即時**に**グラフィックAPI**(GPU?)に`Upload`する。(DirectX12 `R_Resource->Map(..)`して書き込み?)
+    - `markNoLongerReadable`: `Mesh`のデータを**開放**する。(CPU側データを破棄し、`isReadable == false`にする)
+      `mesh.Clear(..)`とは違いGPU側バッファ(`R_Resource`)は破棄しない
 
 - **Mesh結合**
-  - `CombineMeshes (CombineInstance[] combine, bool mergeSubMeshes= true, bool useMatrices= true, bool hasLightmapData= false)`:
+  - `CombineMeshes(CombineInstance[] combine, bool mergeSubMeshes= true, bool useMatrices= true, bool hasLightmapData= false)`:
     - >この`Mesh`に複数の`Mesh`を**結合**します
     - 今ではGPU Resident Drawer(のGPU draw submission modes)?では、**静的バッチ**すら**推奨されない**
 
@@ -124,7 +122,7 @@
 - **Set⟪Vertex¦Index⟫Buffer⟪Params¦Data⟫(..)**
   - **SetVertexBufferParams**`(int vertexCount, ⟪params ∫VAD∫[]¦NativeArray<∫VAD∫>⟫ attributes)『＄VAD＝❰VertexAttributeDescriptor❱`:
     - この`Mesh`の**Vertexバッファ[]を生成**するための、**頂点数**(`vertexCount`)と**頂点レイアウト**(`attributes`)を指定する
-      `Attribute`は`Stream`内で`enum VertexAttribute`の定義の宣言順に**並べられる**らしい。(`attributes`の定義順ではない)
+      `Attribute`は`Stream`内で`enum VertexAttribute`の定義順に**並べられる**らしい。(`attributes`の定義順ではない)
       `Attribute`の**アライメント**は**4バイト**単位。((format=VAF.Float16 * dimension=3) / 8 = 6バイト は、できない)
     - [struct **VertexAttributeDescriptor**](https://docs.unity3d.com/ja/2023.2/ScriptReference/Rendering.VertexAttributeDescriptor.html)
       - コンストラクタ
@@ -142,6 +140,9 @@
     - `enum IndexFormat`: ⟪`UInt16`¦`UInt32`⟫
   - `SetIndexBufferData(⟪｡⟪NativeArray¦List⟫<T>¦T[]｡⟫ data, int dataStart, int indexBufferStart, int count, MeshUpdateFlags flags)`:
     - この`Mesh`の`Indexバッファ`に`data`を設定します。(`dataStart`:`data`開始位置, `count`:`data`の要素数, `indexBufferStart`:`Indexバッファ`の開始位置)
+  - 補足:`⟪｡⟪NativeArray¦List⟫<T>¦T[]｡⟫` **Get**`VertexBufferData(stream,..)`のようなGPU側から**stream**を取得する系は無い..
+    `Set⟪Vertex¦Index⟫BufferData(⟪｡⟪NativeArray¦List⟫<T>¦T[]｡⟫ data,..)`は、`data`を**即時?にGPUに転送**(`R_Resource->Map(..)`)しているらしい。(新APIは`isReadable`関係なし)
+    [.Dispose()している](https://youtu.be/u51C_sNZsyA?t=214), [SetVertexBufferData](\..\..\Unityいろいろ\グラフィックス\レンダーパイプライン\SetVertexBufferData.png)
 
 - **SubMesh**系
   - **SetSubMesh＠❰es❱(..)**
@@ -158,7 +159,8 @@
           - `int firstVertex`: この`SubMesh`を構成する`Vertexバッファ`の**開始位置**
           - `int vertexCount`: この`SubMesh`を構成する`Vertexバッファ`の**カウント**
         - `Bounds bounds`: この`SubMesh`?を包む`Bounds` (通常は**自動計算**される)
-        - `int baseVertex`: `Indexバッファ`の**要素**に**加算**する値。(`IndexFormat.Uint16`の時に`SubMesh`単位で`最大65535頂点`を使えるようにするため)
+        - `int baseVertex`: `Indexバッファ`の**要素**に**加算**し`Vertexバッファ`を**参照**する値。↓(DirectX12 `INT BaseVertexLocation`)
+          - (`IndexFormat.Uint16`の時に`SubMesh`単位で`最大65535頂点`を使えるようにするため。グラフィックAPIでサポート)
       - `enum` **MeshUpdateFlags**:
         このFlagは、`Mesh`**編集時**に様々な**検証,処理,自動計算**を**スキップ**して**効率化**することが目的。(後でまとめて処理するとか)
         関数によって使うFlagが異なる。**設定可能な関数**は、`SetSubMesh(..), Set⟪Vertex¦Index⟫BufferData(..)`
@@ -168,16 +170,16 @@
         - `DontValidateIndices`:
           - `mesh.SetIndexBufferData(..)`時、`Indexバッファ`が`Vertexバッファ`の**レンジ内のIndex**を指しているか検証する。事をしない。
         - `DontRecalculateBounds`:
-          - `mesh.SetSubMesh(..)`時、`SubMeshDescriptor.⟪bounds¦startVertex¦vertexCount⟫`を**自動計算**する
+          - `mesh.SetSubMesh(..)`時、`SubMeshDescriptor.⟪bounds¦firstVertex¦vertexCount⟫`を**自動計算**する
         - `DontNotifyMeshUsers`:
           - `SetSubMesh(..), Set⟪Vertex¦Index⟫BufferData(..)`時、`mesh.bounds`?の変更を`Renderer`に**通知しない**。後で`mesh.MarkModified`で通知できる
         - `DontResetBoneBounds`:
           - `Set⟪Vertex¦Index⟫BufferData(..)`時、`Skinned Mesh`?の`BoneBounds`(`Bone`による変形後の`Bounds`)?をリセットして再計算しない
     - `SetSubMeshes(⟪∫SMD∫[]¦⟪List¦NativeArray⟫<∫SMD∫>⟫ desc, ＠❰int start, int count,❱ MeshUpdateFlags flags)『＄SMD＝❰SubMeshDescriptor❱`:
-      - ⟪`全て`¦`start`から`start`+`count`⟫に`desc[]`を設定して、`Indexバッファ`から`SubMesh`を**定義**する。
+      - ⟪`全て`¦`start`から`start`+`count`⟫の`desc[]`を設定して、`Indexバッファ`から`SubMesh`を**定義**する。
   - **GetSubMesh(..)** 系
     - `SubMeshDescriptor` **GetSubMesh**`(int subMeshIndex)`:
-      - `subMeshIndex`から`SubMeshDescriptor`を**取得(Get)**する
+      - `subMeshIndex`から`SubMeshDescriptor`を**取得(Get)**する。(これがあれば↓要らないかも)
     - `MeshTopology GetTopology(int subMesh)`:
       - `SetSubMesh(int subMesh, SubMeshDescriptor desc, ..)`の`desc.topology`の値を**取得**する
     - `uint GetBaseVertex(int subMesh)`:
@@ -218,6 +220,12 @@
   - `GraphicsBuffer GetIndexBuffer()`:
     - `Indexバッファ`の`GraphicsBuffer`を**取得**する。(ComputeShaderへのSetは↑`GetVertexBuffer`と同じ)
 
+- `⟪Vertex¦Index⟫バッファ`の**IntPtr**: [GetNative～Ptr()はR_Resource](\..\..\Unityいろいろ\グラフィックス\レンダーパイプライン\GetNative～Ptr()はR_Resource.png)
+  - `IntPtr GetNativeIndexBufferPtr()`:
+    - `Indexバッファ`を**ネイティブプラグインから編集**するための`IntPtr`を**取得**する
+  - `IntPtr GetNativeVertexBufferPtr(int stream)`:
+    - `stream`の`Vertexバッファ`を**ネイティブプラグインから編集**するための`IntPtr`を**取得**する
+
 - **Recalculate**(再計算)
   - `RecalculateBounds(MeshUpdateFlags flags = .Default)`:
     - >`Vertexバッファ`を使って`Mesh`とその全ての`SubMesh`の`Bounds`を**再計算**します。(ちょっと再計算できる条件があるみたい)
@@ -235,12 +243,6 @@
     - 頂点とUV座標からMeshのUV分布メトリックを**再計算**します。`uvAreaThreshold`:>考慮すべきUV領域の最小値。(デフォルトは`1e-9f`)
   - `RecalculateUVDistributionMetrics(float uvAreaThreshold)`
     - 全ての?頂点とUV座標からMeshのUV分布メトリックを**再計算**します。
-
-- `⟪Vertex¦Index⟫バッファ`の**IntPtr**
-  - `IntPtr GetNativeIndexBufferPtr ()`:
-    - `Indexバッファ`を**ネイティブプラグインから編集**するための`IntPtr`を**取得**する
-  - `IntPtr GetNativeVertexBufferPtr(int stream)`:
-    - `stream`の`Vertexバッファ`を**ネイティブプラグインから編集**するための`IntPtr`を**取得**する
 
 - **Bone系**
   - `NativeArray<byte> GetBonesPerVertex()`

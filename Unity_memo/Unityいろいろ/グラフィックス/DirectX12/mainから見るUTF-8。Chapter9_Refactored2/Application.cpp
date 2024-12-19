@@ -111,7 +111,7 @@ Application::Init() {
 	_dx12.reset(new Dx12Wrapper(_hwnd)); //『URPのような
 	//『主に RootSignature[rootParams[3], samplerDescs[2]], PipelineState, Resource[_white|_black|_grad]Tex
 	_pmdRenderer.reset(new PMDRenderer(*_dx12)); //『Universal Rendererのような
-	//『主に PMDのファイルパスから、ビュー{_vbView, _ibView} ディスクリプタヒープ{_transformHeap[_transform.world], _materialHeap[CBVx1,SRVx4]} と _materials[].indicesNum を生成
+	//『主に PMDのファイルパスから、ビュー{_vbView, _ibView} ディスクリプタヒープ{_transformHeap❰_transform.world❱, _materialHeap❰CBVx1,SRVx4❱} と _materials[].indicesNum を生成
 	_pmdActor.reset(new PMDActor("Model/初音ミク.pmd", *_pmdRenderer)); //『GameObject.Rendererのような
 
 	return true;

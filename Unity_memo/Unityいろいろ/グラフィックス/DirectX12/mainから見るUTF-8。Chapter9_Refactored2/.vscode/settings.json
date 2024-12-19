@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "memory": "cpp"
+        "memory": "cpp",
+        "vector": "cpp"
     },
     "cSpell.words": [
         "TEXCOORD",

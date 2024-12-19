@@ -133,7 +133,12 @@ HRESULT PMDRenderer::CreateGraphicsPipelineForPMD() {
 	auto result = D3DCompileFromFile(
 		L"BasicShader.hlsl", //『ファイル名
 		nullptr, //『SHADER_MACRO (#define,シェーダーキーワード)
-		nullptr, //『Include (#include,インクルードファイル)
+		nullptr, //『#includeを処理する時にカスタムなインクルーダー(ID3DInclude)を使用する場合に設定する。nullptrを設定するとデフォルト(ファイルシステム)のインクルーダーを使用する
+			// ID3DInclude を実装する必要があるのは、以下のような特殊な状況です：
+				// カスタムファイルシステムを使いたい場合: 例えば、シェーダーコードをリモートサーバーや独自のアセットパイプラインから取得する場合。
+				// 特定のディレクトリ構造やバッファからインクルードしたい場合: デフォルトのファイルシステムとは異なる場所からファイルをインクルードする必要がある場合
+					//（例：ゲームエンジンの仮想ファイルシステムを使う場合）。
+				// メモリ上のデータからインクルードファイルを提供したい場合: インクルードファイルが物理的なファイルとして存在せず、メモリ内にロードされたデータからインクルードしたい場合。
 		"BasicVS", //『エントリポイント
 		"vs_5_0", //『どのシェーダーを割り当てるか（vs、psなど）
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, //『コンパイルオプション
@@ -141,6 +146,12 @@ HRESULT PMDRenderer::CreateGraphicsPipelineForPMD() {
 		&vsBlob, //『コンパイルBlob出力
 		&errorBlob //『エラー出力
 	);
+
+// D3DCOMPILE_OPTIMIZATION_LEVEL0
+// D3D12_INPUT_ELEMENT_DESC
+// D3D12_INPUT_CLASSIFICATION
+// D3D12_COLOR_WRITE_ENABLE_RED
+
 	if (!CheckShaderCompileResult(result,errorBlob.Get())){
 		assert(0);
 		return result;
@@ -149,7 +160,7 @@ HRESULT PMDRenderer::CreateGraphicsPipelineForPMD() {
 	result = D3DCompileFromFile(
 		L"BasicShader.hlsl", //『ファイル名
 		nullptr, //『SHADER_MACRO (#define,シェーダーキーワード)
-		nullptr, //『Include (#include,インクルードファイル)
+		nullptr, //『#includeを処理する時にカスタムなインクルーダー(ID3DInclude)を使用する場合に設定する。nullptrを設定するとデフォルト(ファイルシステム)のインクルーダーを使用する
 		"BasicPS", //『エントリポイント
 		"ps_5_0", //『どのシェーダーを割り当てるか（vs、psなど）
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, //『コンパイルオプション
@@ -163,12 +174,13 @@ HRESULT PMDRenderer::CreateGraphicsPipelineForPMD() {
 	}
 	//『頂点レイアウト=======================================================================================
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
-		{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0/*スロット*/,D3D12_APPEND_ALIGNED_ELEMENT/*0*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0/*インスタンシングだっけ?*/ },
-		{ "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT/*↑R32G32B32=(32/8)*3=12byte*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-		{ "TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT/*↑↑12+↑12=24byte*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-		//{ "BONE_NO",0,DXGI_FORMAT_R16G16_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-		//{ "WEIGHT",0,DXGI_FORMAT_R8_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-		//{ "EDGE_FLG",0,DXGI_FORMAT_R8_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		{ "POSITION",0,DXGI_FORMAT_R32G32B32/*12*/_FLOAT,0/*スロット*/,D3D12_APPEND_ALIGNED_ELEMENT/*0*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0/*インスタンシングだっけ?*/ },
+		{ "NORMAL",0,DXGI_FORMAT_R32G32B32/*12*/_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT/*↑R32G32B32=(32/8)*3=12byte*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		{ "TEXCOORD",0,DXGI_FORMAT_R32G32/*8*/_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT/*↑↑12+↑12=24byte*/,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		//{ "BONE_NO",0,DXGI_FORMAT_R16G16/*4*/_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		//{ "WEIGHT",0,DXGI_FORMAT_R8/*1*/_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		//{ "EDGE_FLG",0,DXGI_FORMAT_R8/*1*/_UINT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		//                          12 + 12 + 8 + 4 + 1 + 1 = 38byte == {constexpr unsigned int pmdvertex_size = 38;//頂点1つあたりのサイズ(PMDActor.cpp/G99)}
 	};
 		//UINT SemanticIndex: { "TEXCOORD",0,..},{ "TEXCOORD",1,..},..,{ "TEXCOORD",n,..}となると、シェーダー側のセマンティクスは、:TEXCOORD0,:TEXCOORD1,..,:TEXCOORDn となる?
 		//D3D12_APPEND_ALIGNED_ELEMENT: UINT AlignedByteOffsetは、「そのデータの場所」を示します。例えば座標データのあとに法線データが来るとして、そのときの法線データの場所は32ビット（4バイト）のfloat 3つ分のあとなので、12（バイト）と指定します。しかし、いちいちデータサイズを計算するのも面倒なので、次から次にデータが並んでいる場合は、連続していることを表す定数、D3D12_APPEND_ALIGNED_ELEMENTを指定するとよいでしょう。
