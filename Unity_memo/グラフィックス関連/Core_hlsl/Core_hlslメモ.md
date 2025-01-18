@@ -64,7 +64,7 @@
 #### テクスチャ, サンプラー 宣言
 
 - テクスチャ宣言:
-  - `＠⟪TYPED¦RW⟫＠❰_❱｡｡TEXTURE｡｡⟪2D＠❰_X❱¦CUBE¦3D⟫｡｡＠❰_ARRAY❱｡｡｡｡(＠❰type,❱ textureName)`
+  - `＠⟪TYPED_¦RW_⟫｡｡TEXTURE｡｡⟪2D＠❰_X❱¦CUBE¦3D⟫｡｡＠❰_ARRAY❱｡｡｡｡(＠❰type,❱ textureName)`
 ```C
 //テクスチャ
 #define TEXTURE2D_X(textureName)              Texture2D textureName
@@ -335,7 +335,7 @@ SAMPLER(samplerunity_SpecCube1);
 //シャドウマスク
 TEXTURE2D(unity_ShadowMask);
 SAMPLER(samplerunity_ShadowMask);
-TEXTURE2D_ARRAY(unity_ShadowMasks);
+TEXTURE2D_ARRAY(unity_ShadowMasks); //Shadows.hlsl/SAMPLE_SHADOWMASK(input.staticLightmapUV)で取得される
 SAMPLER(samplerunity_ShadowMasks);
 ```
 
@@ -411,7 +411,7 @@ struct LightData
         half4 unity_LightData;
         half4 unity_LightIndices[2]; // BatchRendererGroup ではサポートされていません。
 
-        float4 unity_ProbesOcclusion; // ?
+        float4 unity_ProbesOcclusion;  //Shadows.hlsl/#elif !defined (LIGHTMAP_ON) #define SAMPLE_SHADOWMASK(uv) unity_ProbesOcclusion; //多分、従来のプローブ (非APV)
 
         // ライトマップ
         float4 unity_LightmapST;
@@ -760,7 +760,7 @@ real4 unity_ShadowColor;
     - `SpaceTransforms.hlsl`
   - `ShaderVariablesFunctions.hlsl`
 
-- `主要Lighting.hlsl`
+- `主要Lighting.hlsl (Lit.shader)`
   - `BRDF.hlsl`
     - `BSDF.hlsl`
     - `CommonMaterial.hlsl`
