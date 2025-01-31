@@ -364,7 +364,7 @@ uint _MainLightLayerMask; //レンダリングレイヤー
 ```C
 #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA //SRVの次元:バッファーかな
     StructuredBuffer<LightData> _AdditionalLightsBuffer; //struct LightData は、 CBUFFER_START(AdditionalLights)の要素の型を全て含む型
-    StructuredBuffer<int> _AdditionalLightsIndices; //↑の要素数と思われる
+    StructuredBuffer<int> _AdditionalLightsIndices; //USE_FORWARD_PLUSではないときのlightIndexを変換している?
 #else
     CBUFFER_START(AdditionalLights)
         half4 _AdditionalLightsColor[MAX_VISIBLE_LIGHTS]; //ライトカラー
@@ -491,13 +491,23 @@ half4 _AdditionalLightsCount; // シーン内の追加ライトの数を格納�
 
 #define _InvCameraViewProj unity_MatrixInvVP // カメラのビュープロジェクション行列の逆行列
 
-// スカイのCubeMap ?
-half4 _GlossyEnvironmentCubeMap_HDR; // 光沢反射環境キューブマップのHDR情報
-TEXTURECUBE(_GlossyEnvironmentCubeMap); // 環境光の光沢を反射するためのキューブマップテクスチャ //`unity_SpecCube⟪0¦1⟫`ではなく、スカイのCubeMap?
+// スカイのCubeMap
+half4 _GlossyEnvironmentCubeMap_HDR; // 光沢反射環境キューブマップのHDR情報 //DecodeHDREnvironment(,, _GlossyEnvironmentCubeMap_HDR)で使われている
+TEXTURECUBE(_GlossyEnvironmentCubeMap); // 環境光の光沢を反射するためのキューブマップテクスチャ //`unity_SpecCube⟪0¦1⟫`ではなく、スカイのCubeMap
 SAMPLER(sampler_GlossyEnvironmentCubeMap); // 環境光の光沢用キューブマップテクスチャをサンプリングするためのサンプラー
+    // half3 CalculateIrradianceFromReflectionProbes(half3 reflectVector,..)
+    // {
+    //     ～～
+    //     if (totalWeight < 0.99f)
+    //     {
+    //         half4 encodedIrradiance = half4(SAMPLE_TEXTURECUBE_LOD(_GlossyEnvironmentCubeMap, sampler_GlossyEnvironmentCubeMap, reflectVector, mip));
 
-half4 _GlossyEnvironmentColor; // 環境の光沢反射の色を表すパラメータ
-half4 _SubtractiveShadowColor; // 影によって減算される色を表すパラメータ
+    //         irradiance += (1.0f - totalWeight) * DecodeHDREnvironment(encodedIrradiance, _GlossyEnvironmentCubeMap_HDR);
+    //     }
+    //     return irradiance;
+    // }
+half4 _GlossyEnvironmentColor; // 環境の光沢反射の色を表すパラメータ //環境鏡面マップを使わない場合に使う//GlossyEnvironmentReflection(..){return _GlossyEnvironmentColor.rgb * occlusion;}
+half4 _SubtractiveShadowColor; // 影によって減算される色を表すパラメータ //defined(_MIXED_LIGHTING_SUBTRACTIVE)時に使い、多分ライトマップを修正するやつ
 
 // xyz: 現在未使用
 // w: directLightStrength
@@ -578,7 +588,7 @@ real4 unity_IndirectSpecColor;
 //フォグ
 float4 unity_FogParams;
 real4  unity_FogColor;
-//シャドウ(多分Subtractive)
+//シャドウ
 real4 unity_ShadowColor;
 ```
 

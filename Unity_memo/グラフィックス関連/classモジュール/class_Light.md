@@ -84,7 +84,7 @@
     - `float shadowNormalBias`: `ShadowMap`比較時の`NormalBias`
 
 - **CommandBuffer**
-  - `int commandBufferCount`: この`Light`を設定する`cmd`の数 (Read Only)
+  - `int commandBufferCount`: この`Light`に設定する`cmd`の数 (Read Only)
 
 ## Instance関数
 

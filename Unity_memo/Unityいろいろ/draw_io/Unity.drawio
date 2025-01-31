@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2025-01-15T03:54:55.519Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="RQxuJrgfs_Bh_L1a04UE" version="21.7.5" type="device" pages="38">
+<mxfile host="Electron" modified="2025-01-26T10:36:29.103Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="dbHQ7qLYt52iaIHWJC3n" version="21.7.5" type="device" pages="38">
   <diagram id="c6NIqjE_sVigoFiQtTPQ" name="ページ1">
     <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -2573,10 +2573,10 @@
         <mxCell id="oCxhrwCdtckjSp1DS00h-9" value="&lt;span style=&quot;font-size: 12px;&quot;&gt;ExecuteDefaultActionAtTarget&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=#333333;" parent="1" vertex="1">
           <mxGeometry x="20" y="684" width="200" height="25" as="geometry" />
         </mxCell>
-        <mxCell id="oCxhrwCdtckjSp1DS00h-10" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;EventBaase型指定付き&lt;br&gt;TrickleDownの&lt;br style=&quot;&quot;&gt;Callback郡&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=14;fontColor=#333333;" parent="1" vertex="1">
+        <mxCell id="oCxhrwCdtckjSp1DS00h-10" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;EventBase型指定付き&lt;br&gt;TrickleDownの&lt;br style=&quot;&quot;&gt;Callback郡&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=14;fontColor=#333333;" parent="1" vertex="1">
           <mxGeometry x="20" y="519" width="140" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="oCxhrwCdtckjSp1DS00h-11" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;EventBaase型指定付き&lt;br&gt;BubbleUpの&lt;br style=&quot;&quot;&gt;Callback郡&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=14;fontColor=#333333;" parent="1" vertex="1">
+        <mxCell id="oCxhrwCdtckjSp1DS00h-11" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;EventBase型指定付き&lt;br&gt;BubbleUpの&lt;br style=&quot;&quot;&gt;Callback郡&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=14;fontColor=#333333;" parent="1" vertex="1">
           <mxGeometry x="20" y="580" width="140" height="64" as="geometry" />
         </mxCell>
         <mxCell id="oCxhrwCdtckjSp1DS00h-13" value="" style="endArrow=oval;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;endFill=1;curved=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="oCxhrwCdtckjSp1DS00h-6" target="oCxhrwCdtckjSp1DS00h-10" edge="1">
@@ -2584,7 +2584,7 @@
             <mxPoint x="200" y="640" as="sourcePoint" />
             <mxPoint x="250" y="590" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="240" y="547" />
+              <mxPoint x="240" y="540" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -4158,7 +4158,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="-gpJv8AY6r-2j79x95gQ" name="ページ17">
-    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="989" dy="582" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -5692,6 +5692,12 @@
         <mxCell id="FlxCTaYyn5gy3vl-MYOv-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; color=&quot;#616161&quot;&gt;Instancing =&amp;gt; Sub Mesh =&amp;gt; Mesh =&amp;gt; ShaderVariant&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="1150" y="1008" width="350" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="48gE5Cpf8tIQ4VwDGDsG-1" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/png,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;" vertex="1" parent="1">
+          <mxGeometry x="545" y="770" width="325" height="169" as="geometry" />
+        </mxCell>
+        <mxCell id="0OLF60JKqtwA8tdZjBGd-1" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;cmd.&lt;span style=&quot;color: #dcdcaa;&quot;&gt;DrawRendererList&lt;/span&gt;(&lt;span style=&quot;color: #9cdcfe;&quot;&gt;rendererList&lt;/span&gt;)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="5" y="218" width="290" height="30" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
@@ -5718,7 +5724,7 @@
         <mxCell id="X9vtZWp23H8-rrNgMFnz-7" value="SRD&lt;br&gt;m_RendererDataList[]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="498" y="105" width="190" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="X9vtZWp23H8-rrNgMFnz-8" value="SR&lt;br&gt;m_Renderers[]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;" parent="1" vertex="1">
+        <mxCell id="X9vtZWp23H8-rrNgMFnz-8" value="SR&lt;br&gt;m_Renderers[]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;glass=0;" parent="1" vertex="1">
           <mxGeometry x="498" y="215" width="130" height="85" as="geometry" />
         </mxCell>
         <mxCell id="X9vtZWp23H8-rrNgMFnz-9" value="" style="endArrow=block;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#B85450;strokeWidth=2;startArrow=diamond;startFill=1;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="X9vtZWp23H8-rrNgMFnz-3" target="X9vtZWp23H8-rrNgMFnz-7" edge="1">
@@ -5782,7 +5788,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="HpR09Z0VUhK30DgWYnKO-3" value="ScriptableRenderer&lt;br&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#616161&quot;&gt;(camからIndexアクセス)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" parent="1" vertex="1">
+        <mxCell id="HpR09Z0VUhK30DgWYnKO-3" value="ScriptableRenderer&lt;br&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#616161&quot;&gt;(camからIndexアクセス)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="598" y="470" width="180" height="60" as="geometry" />
         </mxCell>
         <mxCell id="HpR09Z0VUhK30DgWYnKO-6" value="" style="endArrow=block;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;startArrow=diamond;startFill=1;endFill=1;" parent="1" source="HpR09Z0VUhK30DgWYnKO-1" target="HpR09Z0VUhK30DgWYnKO-4" edge="1">
@@ -6071,8 +6077,8 @@
         <mxCell id="zEiXfWZF2IqDbp42a-4K-10" value="&lt;font color=&quot;#616161&quot;&gt;Indexでアクセスする&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" parent="1" vertex="1">
           <mxGeometry x="845" y="12.5" width="323" height="145" as="geometry" />
         </mxCell>
-        <mxCell id="uNzSVHyFKAZ9tl-e01Rp-1" value="&lt;font style=&quot;font-size: 12px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;カメラの描画&lt;br&gt;GPUリソース管理&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#616161;" parent="1" vertex="1">
-          <mxGeometry x="501" y="265" width="120" height="40" as="geometry" />
+        <mxCell id="uNzSVHyFKAZ9tl-e01Rp-1" value="&lt;p style=&quot;line-height: 100%;&quot;&gt;&lt;font style=&quot;font-size: 12px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;カメラの描画&lt;br&gt;GPUリソース管理&lt;/font&gt;&lt;/p&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=12;fontColor=#616161;spacing=2;" parent="1" vertex="1">
+          <mxGeometry x="500" y="251" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="ywPEVMKK7WS6dEtKQUDi-1" value="&lt;font style=&quot;font-size: 11px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;RPcore&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="767" y="148" width="60" height="30" as="geometry" />
@@ -6100,9 +6106,6 @@
               <mxPoint x="445" y="190" />
             </Array>
           </mxGeometry>
-        </mxCell>
-        <mxCell id="43vuXvZxMehk5fRdyvCi-8" value="&lt;font color=&quot;#616161&quot; style=&quot;font-size: 10px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(URPA)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="462" y="169.5" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="43vuXvZxMehk5fRdyvCi-13" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="723" y="76" width="100" height="46" as="geometry" />
@@ -6282,6 +6285,15 @@
         <mxCell id="XOGPAVaJzgv_Uc0fS2uj-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;外部から取得できる？→&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="12" y="62" width="150" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="dvZ2XL7EP-oPmn7-smZj-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;font-size: 9px;&quot;&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;&lt;font style=&quot;font-size: 9px;&quot; color=&quot;#67ab9f&quot;&gt;URPA&lt;/font&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;.&lt;/font&gt;&lt;font style=&quot;font-size: 9px;&quot;&gt;CreateRenderers()&lt;/font&gt;&lt;br&gt;&lt;/font&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="409" y="180" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="3iCN-BIbI3aZD_8m3vlE-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=#333333;arcSize=11;" vertex="1" parent="1">
+          <mxGeometry x="500" y="217" width="126" height="81" as="geometry" />
+        </mxCell>
+        <mxCell id="3iCN-BIbI3aZD_8m3vlE-2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=#333333;arcSize=19;" vertex="1" parent="1">
+          <mxGeometry x="599" y="471" width="178" height="58" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
@@ -6317,7 +6329,7 @@
             <mxPoint x="155" y="590" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="eH8RDbzXVm_y7X-rzRZ4-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#ad9c68&quot;&gt;SortCameras&lt;/font&gt;(cams)&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;size=0.05555555555555555;verticalAlign=top;" parent="1" vertex="1">
+        <mxCell id="eH8RDbzXVm_y7X-rzRZ4-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#ad9c68&quot;&gt;SortCameras&lt;/font&gt;(cams)&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;strokeColor=#9673a6;strokeWidth=2;fillColor=#e1d5e7;size=0.05555555555555555;verticalAlign=top;" parent="1" vertex="1">
           <mxGeometry x="170" y="210" width="180" height="40" as="geometry" />
         </mxCell>
         <mxCell id="eH8RDbzXVm_y7X-rzRZ4-11" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#67ab9f&quot;&gt;Action&amp;lt;Ctx, List&amp;lt;Cams&amp;gt;&amp;gt;&lt;/font&gt; &lt;font style=&quot;font-size: 14px;&quot; color=&quot;#ad9c68&quot;&gt;beginContextRendering&lt;/font&gt;を.&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#ad9c68&quot;&gt;Invoke&lt;/font&gt;(ctx, cams)&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;size=0.03076923076923077;" parent="1" vertex="1">
@@ -7091,6 +7103,85 @@
         <mxCell id="6J0zIEaXHd7tJ-9qG4wx-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;&lt;font color=&quot;#616161&quot;&gt;抜けているが、&lt;/font&gt;&lt;br&gt;&lt;font color=&quot;#67ab9f&quot;&gt;VFX&lt;/font&gt;&lt;/font&gt;&lt;font color=&quot;#616161&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;.&lt;/font&gt;&lt;font color=&quot;#67ab9f&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;VFXManager&lt;/font&gt;&lt;font color=&quot;#616161&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;.&lt;/font&gt;&lt;font color=&quot;#ad9c68&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;PrepareCamera&lt;/font&gt;&lt;font color=&quot;#616161&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(～camera, cameraXRSettings)&lt;br&gt;もカメラ毎に呼んでいる&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="620" y="50.5" width="420" height="60" as="geometry" />
         </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-1" value="Cam" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="720" y="120" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-2" value="UniAddCamData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="875" y="120" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-3" value="SR renderer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="770" y="220" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-5" value="frameData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="890" y="220" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-6" value="UniCamData" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="180" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-7" value="" style="endArrow=classic;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-1" target="Um9y3JcQYbRfqnmieWTg-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="820" y="160" as="sourcePoint" />
+            <mxPoint x="870" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-9" value="" style="endArrow=classic;html=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-1" target="Um9y3JcQYbRfqnmieWTg-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="770" y="180" as="sourcePoint" />
+            <mxPoint x="820" y="130" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="760" y="170" />
+              <mxPoint x="825" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-10" value="" style="endArrow=classic;html=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-2" target="Um9y3JcQYbRfqnmieWTg-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="755" y="160" as="sourcePoint" />
+            <mxPoint x="820" y="190" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="930" y="180" />
+              <mxPoint x="825" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-11" value="&lt;font style=&quot;font-size: 20px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;.&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="869" y="224" width="30" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-12" value="" style="endArrow=classic;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-1" target="Um9y3JcQYbRfqnmieWTg-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="840" y="170" as="sourcePoint" />
+            <mxPoint x="890" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-13" value="" style="endArrow=none;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;exitX=0.75;exitY=1;exitDx=0;exitDy=0;endFill=0;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1070" y="110" as="sourcePoint" />
+            <mxPoint x="1036" y="194" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="990" y="170" />
+              <mxPoint x="1010" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-14" value="" style="endArrow=none;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;exitX=0.75;exitY=0;exitDx=0;exitDy=0;endFill=0;" edge="1" parent="1" source="Um9y3JcQYbRfqnmieWTg-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1000" y="210" as="sourcePoint" />
+            <mxPoint x="1036" y="194" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="990" y="200" />
+              <mxPoint x="1010" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-15" value="&lt;font color=&quot;#ad9c68&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;TryGetComp&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="769" y="112" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-18" value="&lt;font color=&quot;#ad9c68&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;GetRenderer&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="775" y="183" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Um9y3JcQYbRfqnmieWTg-19" value="&lt;font color=&quot;#ad9c68&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;CreateCamData&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="913" y="182" width="120" height="30" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
@@ -7377,20 +7468,20 @@
         <mxCell id="zFHMMc8ZLjgtdgkftFLl-14" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="480" y="60" width="170" height="230" as="geometry" />
         </mxCell>
-        <mxCell id="zFHMMc8ZLjgtdgkftFLl-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#67ab9f&quot;&gt;UCD&lt;/font&gt; camData&lt;/font&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
-          <mxGeometry width="150" height="30" as="geometry" />
+        <mxCell id="zFHMMc8ZLjgtdgkftFLl-4" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#67ab9f&quot;&gt;UCD&lt;/font&gt; camData&lt;/font&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;size=13;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
+          <mxGeometry width="120" height="30" as="geometry" />
         </mxCell>
         <mxCell id="zFHMMc8ZLjgtdgkftFLl-5" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;TryGetCullParams&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;strokeColor=#d6b656;strokeWidth=2;fillColor=#fff2cc;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
           <mxGeometry y="50" width="170" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="zFHMMc8ZLjgtdgkftFLl-7" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;cullParams&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
-          <mxGeometry y="100" width="150" height="30" as="geometry" />
+        <mxCell id="zFHMMc8ZLjgtdgkftFLl-7" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;cullParams&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;size=12;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
+          <mxGeometry y="100" width="100" height="30" as="geometry" />
         </mxCell>
         <mxCell id="zFHMMc8ZLjgtdgkftFLl-8" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;ctx.Cull&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;strokeColor=#d6b656;strokeWidth=2;fillColor=#fff2cc;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
           <mxGeometry x="20" y="150" width="90" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="zFHMMc8ZLjgtdgkftFLl-9" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#67ab9f&quot;&gt;URenD&lt;/font&gt;.cullResults&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
-          <mxGeometry y="200" width="170" height="30" as="geometry" />
+        <mxCell id="zFHMMc8ZLjgtdgkftFLl-9" value="&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#67ab9f&quot;&gt;URenD&lt;/font&gt;.cullResults&lt;/span&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;rounded=1;shadow=0;sketch=1;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#82b366;strokeWidth=2;fillColor=#d5e8d4;align=left;size=12;" parent="zFHMMc8ZLjgtdgkftFLl-14" vertex="1">
+          <mxGeometry y="200" width="150" height="30" as="geometry" />
         </mxCell>
         <mxCell id="zFHMMc8ZLjgtdgkftFLl-10" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;width=3.255813953488372;endWidth=5.44;endSize=1.6390697674418606;" parent="zFHMMc8ZLjgtdgkftFLl-14" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
@@ -8800,7 +8891,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="xXVktaxXx9spMrKo4QdB" name="ページ28">
-    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1687" dy="993" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10992,8 +11083,8 @@
         <mxCell id="jN-uB4u-_Tih03O0IL7n-9" value="" style="group;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;sketch=1;curveFitting=1;jiggle=2;container=0;" parent="1" vertex="1" connectable="0">
           <mxGeometry x="812" y="550" width="330" height="260" as="geometry" />
         </mxCell>
-        <mxCell id="jN-uB4u-_Tih03O0IL7n-5" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;font-size: 14px;&quot;&gt;各リソースを設定すると、&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;BRTT&lt;/font&gt; m_Type&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;int&lt;/font&gt; m_NameID&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;int&lt;/font&gt; m_InstanceID&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;IntPtr&lt;/font&gt; m_BufferPointer&lt;br style=&quot;font-size: 14px;&quot;&gt;BRTTを直和型として機能し、&lt;br style=&quot;font-size: 14px;&quot;&gt;残りの3つに設定が振り分けられるが、&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#ad9c68&quot;&gt;ReadOnly&lt;/font&gt;であり、エンジン内部で利用&lt;br style=&quot;font-size: 14px;&quot;&gt;されるだけなので&lt;font color=&quot;#ad9c68&quot;&gt;気にする必要はない&lt;/font&gt;&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="1" vertex="1">
-          <mxGeometry x="812" y="640" width="260" height="170" as="geometry" />
+        <mxCell id="jN-uB4u-_Tih03O0IL7n-5" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;font-size: 14px;&quot;&gt;各リソースを設定すると、&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;BRTT&lt;/font&gt; m_Type&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; ⟪正¦PN¦RT¦RP¦BT⟫&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;int&lt;/font&gt; m_NameID&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; PN&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;int&lt;/font&gt; m_InstanceID&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;⟪RT¦RP¦BT⟫&lt;br style=&quot;font-size: 14px;&quot;&gt;&amp;nbsp; &amp;nbsp; &lt;font color=&quot;#67ab9f&quot;&gt;IntPtr&lt;/font&gt; m_BufferPointer&amp;nbsp; RP&lt;br style=&quot;font-size: 14px;&quot;&gt;BRTTを直和型として機能し、&lt;br style=&quot;font-size: 14px;&quot;&gt;残りの3つに設定が振り分けられるが、&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#ad9c68&quot;&gt;ReadOnly&lt;/font&gt;であり、エンジン内部で利用&lt;br style=&quot;font-size: 14px;&quot;&gt;されるだけなので&lt;font color=&quot;#ad9c68&quot;&gt;気にする必要はない&lt;/font&gt;&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;/font&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="1" vertex="1">
+          <mxGeometry x="812" y="640" width="340" height="170" as="geometry" />
         </mxCell>
         <mxCell id="jN-uB4u-_Tih03O0IL7n-6" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;font-size: 14px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#67ab9f&quot;&gt;RenderTargetIdentifier&lt;/font&gt;は、&lt;br style=&quot;font-size: 14px;&quot;&gt;シェーダーで利用する全ての&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#ad9c68&quot;&gt;リソースをまとめ&lt;/font&gt;、&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#ad9c68&quot;&gt;サブリソースの指定&lt;/font&gt;は出来、&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#7ea6e0&quot;&gt;struct型&lt;/font&gt;である&lt;br&gt;&lt;font style=&quot;color: rgb(97, 97, 97); font-size: 14px;&quot;&gt;(implicitで、&lt;/font&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;font color=&quot;#616161&quot;&gt;各リソースは適切に&lt;/font&gt;&lt;font color=&quot;#67ab9f&quot;&gt;RTI&lt;/font&gt;&lt;font color=&quot;#616161&quot;&gt;に変換される)&lt;/font&gt;&lt;/font&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=14;" parent="1" vertex="1">
           <mxGeometry x="812" y="550" width="330" height="100" as="geometry" />
@@ -11004,7 +11095,7 @@
         <mxCell id="jN-uB4u-_Tih03O0IL7n-2" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;&quot;&gt;&lt;font color=&quot;#ad9c68&quot; style=&quot;font-size: 14px;&quot;&gt;RenderTarget&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;/font&gt;&lt;font color=&quot;#616161&quot; style=&quot;font-size: 12px;&quot;&gt;(BRTT.RenderTexture)&lt;/font&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#d79b00;fillColor=#ffe6cc;fontSize=14;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="212" y="310" width="170" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="jN-uB4u-_Tih03O0IL7n-3" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;BRTT.&lt;br&gt;⟪&lt;font color=&quot;#ad9c68&quot;&gt;CurrentActive&lt;/font&gt;¦&lt;br&gt;&lt;font color=&quot;#ad9c68&quot;&gt;CameraTarget&lt;/font&gt;¦&lt;br&gt;&lt;font color=&quot;#ad9c68&quot;&gt;Depth&lt;/font&gt;⟫&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#d79b00;fillColor=#ffe6cc;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="jN-uB4u-_Tih03O0IL7n-3" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;BRTT.&amp;nbsp;&lt;font style=&quot;font-size: 10px;&quot;&gt;(正の値)&lt;/font&gt;&lt;br&gt;⟪&lt;font color=&quot;#ad9c68&quot;&gt;CurrentActive&lt;/font&gt;¦&lt;br&gt;&lt;font color=&quot;#ad9c68&quot;&gt;CameraTarget&lt;/font&gt;¦&lt;br&gt;&lt;font color=&quot;#ad9c68&quot;&gt;Depth&lt;/font&gt;⟫&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#d79b00;fillColor=#ffe6cc;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="82" y="310" width="120" height="70" as="geometry" />
         </mxCell>
         <mxCell id="jN-uB4u-_Tih03O0IL7n-4" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot; style=&quot;&quot;&gt;&lt;font color=&quot;#ad9c68&quot; style=&quot;font-size: 14px;&quot;&gt;RenderBuffer&lt;br style=&quot;font-size: 14px;&quot;&gt;&lt;/font&gt;&lt;font color=&quot;#616161&quot; style=&quot;font-size: 12px;&quot;&gt;(BRTT.BufferPtr)&lt;/font&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#d79b00;fillColor=#ffe6cc;fontSize=14;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
@@ -11182,6 +11273,9 @@
         </mxCell>
         <mxCell id="kF3wbTNTCvcA9h25YEjy-1" value="&lt;font color=&quot;#616161&quot;&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;RenderTexture, Textureも&lt;br&gt;implicitで変換できる。&lt;br&gt;Set＠❰Render&lt;/font&gt;❱&lt;/font&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;&lt;font color=&quot;#616161&quot;&gt;Texture(..)もある&lt;/font&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="50" y="232" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Hmh8QKDiPCwdRJXcXoFz-1" value="&lt;font style=&quot;font-size: 10px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(RP==RB)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1052" y="644" width="80" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -12425,6 +12519,9 @@
         </mxCell>
         <mxCell id="rk-cq14_V1cC73lPKpj_-4" value="&lt;div&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;UNITY_MATRIX＠❰_I❱⟪_M¦_V¦_P¦＠❰_＠❰I❱T❱_MV¦_VP¦_MVP⟫&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;UNITY_PREV_MATRIX＠❰_I❱_M&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;←↑を使う&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="1205" y="803" width="380" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pfmML7zfDOUYSc2WfDn1-1" value="&lt;font style=&quot;font-size: 10px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;{&lt;/font&gt;&lt;font style=&quot;font-size: 10px;&quot; color=&quot;#ad9c68&quot;&gt;radiance&lt;/font&gt; = lightColor * (lightAttenuation * NdotL)}&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1356" y="165" width="290" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -14074,6 +14171,9 @@
               <mxPoint x="277" y="379" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="BG4NAv7xP5zh-ujhwMwd-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(RTとShaderは固定)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="20" y="38" width="140" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

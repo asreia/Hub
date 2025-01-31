@@ -170,7 +170,7 @@
         - `DontValidateIndices`:
           - `mesh.SetIndexBufferData(..)`時、`Indexバッファ`が`Vertexバッファ`の**レンジ内のIndex**を指しているか検証する。事をしない。
         - `DontRecalculateBounds`:
-          - `mesh.SetSubMesh(..)`時、`SubMeshDescriptor.⟪bounds¦firstVertex¦vertexCount⟫`を**自動計算**する
+          - `mesh.SetSubMesh(..)`時、`SubMeshDescriptor.⟪bounds¦firstVertex¦vertexCount⟫`を**自動計算**する。事をしない。
         - `DontNotifyMeshUsers`:
           - `SetSubMesh(..), Set⟪Vertex¦Index⟫BufferData(..)`時、`mesh.bounds`?の変更を`Renderer`に**通知しない**。後で`mesh.MarkModified`で通知できる
         - `DontResetBoneBounds`:

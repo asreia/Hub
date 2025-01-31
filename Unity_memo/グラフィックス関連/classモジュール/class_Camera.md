@@ -1,7 +1,8 @@
 # Camera (Behaviour継承)
 
-主に、**depth**, **cameraType**, **cullingMask**, **⟪active¦target⟫Texture**, **clearFlags**, **allow⟪HDR¦MSAA¦DynamicResolution⟫** **⟪worldToCamera¦projection⟫Matrix**
-     **GetAllCameras(..)**, **Sort**, **描画位置**, **depthTextureMode**
+主に、**depth**, **cameraType**, **cullingMask**, **Sort**, **GetAllCameras(..)**,
+     **⟪active¦target⟫Texture**, **clearFlags**, **depthTextureMode**, **allow⟪HDR¦MSAA¦DynamicResolution⟫**, **描画位置**,
+     **⟪worldToCamera¦projection⟫Matrix**
 
 ## Static変数
 

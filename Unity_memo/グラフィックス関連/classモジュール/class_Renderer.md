@@ -2,7 +2,7 @@
 
 ## Renderer (Component継承)
 
-主に、**rendererPriority**, **renderingLayerMask**, `⟪｡⟦local⟧To⟦World⟧｡⟫Matrix`, **Material**
+主に、**rendererPriority**, **renderingLayerMask**, `⟪｡⟦local⟧To⟦World⟧｡⟫Matrix`, **Material**, isVisible, レンダリング方法に関する設定
 
 ### Instance変数
 
@@ -12,14 +12,14 @@
   - `bool enabled`: 単にこの`Renderer`の**有効無効**? (>有効にした場合、レンダリングされた 3D オブジェクトが表示されます)
   - `bool forceRenderingOff`: >特定のコンポーネントのレンダリングをオフにすることができます。?
 - **優先度**
-  - `int` **rendererPriority**:
+  - `int` **rendererPriority**: `enum SortingCriteria.RendererPriority`?
     - >描画順序。順序は昇順(**レンダリング順序**: Camera.depth => SRPass.renderPassEvent => `Renderer.rendererPriority`? => Material.renderQueue)
 - **Layer系**
   - `uint` **renderingLayerMask**:
     - `context.DrawRenderers(..)`に渡す`struct FilteringSettings`との**論理積**で**描画**。(名前は`ProjectSettings/タグとレイヤー`で設定)
     - **Rendering Layers**にも関係がある。影響を `与える側(Light,Decal,Shadow)`と`受ける側(Renderer)`の**論理積**で**描画**
     - ↑の2つは、どちらも`renderingLayerMask`を使うが、`DrawRenderers(..)`と`RT renderingLayerMask(Deferredのみ?)`で使われ方が違うと思われる
-  - SortingLayer:
+  - SortingLayer: `enum SortingCriteria.SortingLayer`?
     >**SortingGroupComponent**は、`GameObject`を**SpritRenderer**と一緒にグループ化し、その中でSpriteを描画する順序を制御できます。
     >1つの`GameObject`であるかのように、同じSortingGroup内のSpritRendererを一緒に描画します。(`レンダリング順序`のどこに差し込まれるかは分からん(`renderQueue`を変更してる?))
     [Sorting Layer ＞ Order In Layer❰sortingOrder❱ ＞ Z値](https://tsubakit1.hateblo.jp/entry/2016/12/28/231836)

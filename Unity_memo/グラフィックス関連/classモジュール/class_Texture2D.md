@@ -1,7 +1,7 @@
 # Texture2D (Texture継承)
 
-主に、`.ctor`, `TextureFormat format`, `Apply(..)`(｡`CPUテクスチャ`(`Texture.isReadable==True`) => `GPUテクスチャ`｡),
-      `ReadPixels(..)`, `⟪Get¦Set⟫Pixels(..)`, `⟪Get¦Set⟫PixelData<T>(..)`
+主に、`.ctor`, `TextureFormat format`,
+      `Apply(..)`(｡`CPUテクスチャ`(`Texture.isReadable==True`) => `GPUテクスチャ`｡), `ReadPixels(..)`, `⟪Get¦Set⟫Pixels(..)`, `⟪Get¦Set⟫PixelData<T>(..)`
 
 ## Static変数
 
