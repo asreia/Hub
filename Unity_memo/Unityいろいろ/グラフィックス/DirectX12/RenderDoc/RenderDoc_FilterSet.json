@@ -1,0 +1,35 @@
+{
+    "current": "$action()",
+    "filters": [
+        [
+            "Default",
+            "$action()"
+        ],
+        [
+            "numIndices",
+            "$action(numIndices > 6)"
+        ],
+        [
+            "Actions and Barriers",
+            "$action() Barrier"
+        ],
+        [
+            "Hide Copies & Clears",
+            "$action() -Copy -Clear"
+        ],
+        [
+            "$param()",
+            "$param(RootParameterIndex: 2)"
+        ],
+        [
+            "$parent()",
+            "$parent(GUITexture.Draw)"
+        ],
+        [
+            "Required and Exclude",
+            "+(Depth Render) +\"GameView RT\" -7"
+        ]
+    ],
+    "rdocFilterSet": 1,
+    "version": 2
+}
