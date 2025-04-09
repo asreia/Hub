@@ -28,7 +28,7 @@
     3. _cmdQueue->ExecuteCommandLists
   - `SetGraphicsRoot⟪CB¦SR¦UA⟫View`でセットする場合は、`R_Resource`のある範囲(View)ではなく、`R_Resource`の**全範囲がバインド**される
   - **Buffer**は**シェーダー側**で**型を定義**するが、**Texture**は**DXGI_FORMAT**で**型を定義**
-  - `Texture2D<float4>`は`DXGI_FORMAT`の型が`float4`にキャストされると考えて良い？  (変換順:`R8G8B8A8` => `UNORM` => `<float4>`かな)
+  - `Texture2D<float4>`は`DXGI_FORMAT`の型が`float4`にキャストされると考えて良い？  (変換順:`R8G8B8A8` => `UNORM` => `<float4>`かな。代入(`float4 = Texture2D`)と何が違う?)
     GPT:シェーダー側で `float4` にキャストされるのは正しい認識ですが、その際に `DXGI_FORMAT` に応じた適切な変換が行われる
     - 例 1: `DXGI_FORMAT_R8G8B8A8_UNORM`
       - フォーマット: `8 ビット`の `RGBA 値`（各チャネルは `0～255 の整数値`）を格納します。
@@ -75,7 +75,7 @@
       - `UINT Count`: **サンプル点**の数。`⟪1～32⟫`。(多くのハードウェアは**2の累乗に最適化**され`MSAAx8`までサポート)
       - `UINT Quality`: その`Count`数についての**品質レベル**。(通常は`0`が設定され、品質は**ハードウェア依存**)
     - `UINT BufferCount`: 通常は**バックバッファー**と**フロントバッファー**で`2`が設定される
-    - `DXGI_FORMAT Format`: `DXGI_FORMAT_R8G8B8A8_UNORM✖❰_SRGB❱`『`_SRGB`を付けないのはディスプレイで**逆ガンマされない**かららしい?
+    - `DXGI_FORMAT Format`: `DXGI_FORMAT_R8G8B8A8_UNORM✖❰_SRGB❱`『`_SRGB`を付けないのは、**シェーダーガンマ**してディスプレイに送ってディスプレイ逆ガンマするみたい
       - `DXGI_FORMAT_⟪R16G16B16A16_FLOAT¦『HDR10?』R10G10B10A2_UNORM⟫`は**HDRディスプレイ**
     - `BOOL Stereo`: `TRUE`にすると**XR用**に**バッファ数が2倍**になる
     - その他: `DXGI_USAGE BufferUsage; DXGI_SCALING Scaling; DXGI_SWAP_EFFECT SwapEffect; DXGI_ALPHA_MODE AlphaMode; UINT Flags;`
@@ -95,6 +95,51 @@
 
 #### R_Resource
 
+- **アライメント**
+  - **リソース**: Alignment (`D_⟪DEFAULT＠❰MSAA❱¦SMALL⟫_RESOURCE_PLACEMENT_ALIGNMENT`)
+    `4MB`: **MSAA**
+    `64KB`: テクスチャ(一般)
+    `4KB`: CreatePlacedResource(..)を使った**小さいテクスチャ(64KB以下)**
+    `4KB`: バッファ (`D_RESOURCE_DIMENSION_BUFFER`)
+    - **バッファ** (1リソース = 複数バッファ 可能)
+      - **Vertexバッファ(VBV)**
+        - `任意Byte`(Address)
+          - `任意Byte`(struct): (`IASetVertexBuffers(..)`: `StrideInBytes`)
+            - `4Byte`(member): (`DXGI_FORMAT`) (class_Mesh.md/G:126 を参照)
+      - **Indexバッファ(IBV)**
+        - `⟪2¦4⟫Byte`(Address)
+          - `⟪2¦4⟫Byte`(member): (`DXGI_FORMAT_R⟪32¦16⟫_UINT`)
+      - **Constantバッファ(CBV)**
+        - `256Byte`(Address): (`D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT`)
+          - `256Byte`(struct): cbuffer
+            - `2～16Byte`(member): **cbufferアライメントルール**
+      - **Structuredバッファ(SRV,UAV)**
+        - `16Byte`(Address): (自動適用?)
+          - `16Byte`(struct): (`D_BUFFER_⟪SR¦UA¦RT⟫V`: `StructureByteStride`)
+            - `2～16Byte`(member): **Structuredアライメントルール**
+      - **Rawバッファ(SRV,UAV)**
+        - `16Byte`(Address): (`D3D12_RAW_UAV_SRV_BYTE_ALIGNMENT`)
+          - `4Byte`(member)
+    - **テクスチャ(SRV,UAV)** (1リソース = 1テクスチャ)
+      - `512Byte`: サブリソース＆プレーン (`D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT`)
+        - `256Byte`: 行(width, RowPitch) (`D3D12_TEXTURE_DATA_PITCH_ALIGNMENT`)
+          - `1～16Byte`: ピクセル (`DXGI_FORMAT`)
+- **アライメントルール**
+  - cbufferアライメントルール: (`#pack(cbuffer)`)
+    - memberが＄16境界＝❰16Byteアライメント境界❱を**跨ぐ場合**は自動的にパディングが詰められmemberが**_∫16境界∫にアライメント**される。
+    - **各データ型**(struct以外)のアライメントは**その型のサイズ**でアライメントされる。
+    - CBuffer内の**struct**は、**無条件で∫16境界∫**にアライメントされる。
+    - **行列**(float3x4など)は、**行列と各列ベクトル要素**も**無条件で∫16境界∫**にアライメントされる。
+    - **配列**は行列と似ていて、**配列と各配列要素**も**無条件で∫16境界∫**にアライメントされる。
+    - (全体的に∫16境界∫にアライメントされるのみであって、memberやstructや行列や配列 の**後方**は普通に詰められる(structとかのサイズは特に無い感じ))
+  - Structuredアライメントルール: (`#pack(structured)`)
+    - **各データ型**(struct以外)のアライメントは**その型のサイズ**でアライメントされる。(**∫16境界∫**のアライメントは**無い**)
+  - C#アライメントルール (ShaderLab: `Inspect.Stack(data); Console.WriteLine(sizeof(Data));`)
+    - **各データ型**(struct以外)のアライメントは**その型のサイズ**でアライメントされる。
+    - `入れ子のstruct`の**アライメント**は、その`入れ子のstruct`の全てのメンバの型の**最大サイズの単位**
+    - `struct`の**サイズ**は、`入れ子のstruct`のメンバも含めた全てのメンバの型の**最大サイズの単位**
+    - [C#アライメント規則](https://sharplab.io/#v2:C4LgTgrgdgNAJiA1AHwAICYCMBYAUKgZgAIMiBhIgbzyNrtoGdhIBjYIgSSigFMwARAIbBBNenWq5x0ksQBmAGwD2wonGGCCAbiIB6XZgBsYmXUJqlEAEYKeajQBYd+9A5PiAvu/pNW7AMrMEGwQYDxwQiLeEtHS5gwAFkpg7OoiAAzOuumx4uaKKqkamFluUqZmxInJRSLoWQAcufTmXLwCGkQAltx8kYJZRs2VRNUp9iIArFkE6MO0+g455dJeK7JE0AyCcnYkRiQORACygj0AFACU7pKmgX6h4f0TgkQAvES8AO5XWrlcDAADjw2AA6QKCFgAa3OaUElz+6xamAAnOcGF0AF48JRyc73YLAR4RDSXBHuNYeIA)
+
 `R_Resource`の構成: `((((((Component) * ComponentCount) * SubPixelCount) * Resolution) * PlaneSlice) * MipMapLevels) * TextureArray`
 
 - ☆`R_Device->`**CreateCommittedResource**`(D_HEAP_PROPERTIES,., D_RESOURCE_DESC, D_RESOURCE_STATES, D_CLEAR_VALUE, out R_Resource)`:
@@ -106,6 +151,7 @@
       - `READBACK`: >**Map**で**GPU=>CPU**に転送するメモリ。**GPUの計算結果をCPUに読み込む**際に使用します。(**CUSTOM**:`WRITE_BACK`,`L1`)
       - `CUSTOM`: >カスタムヒープタイプ。`CPUPageProperty`と`MemoryPoolPreference`を明示的に指定する。
   - **struct D_RESOURCE_DESC**:
+    - `UINT64 Alignment`: `4MB`:MSAA, `64KB`:一般, `4KB`:64KB以下 (`0`は通常、テクスチャ:`64KB`バッファ:`4KB`) (`D_⟪DEFAULT＠❰MSAA❱¦SMALL⟫_RESOURCE_PLACEMENT_ALIGNMENT`)
     - **enum D_RESOURCE_DIMENSION** `Dimension`: `D_RESOURCE_DIMENSION～`
       - `_UNKNOWN`: 未定義
       - `_BUFFER`: **Buffer**。`Buffer`の場合は`DXGI_FORMAT_UNKNOWN`で`Width`に**バイト数**を設定(`sizeof(MyStruct)`など(`256バイト`アライメントらしい?))
@@ -154,7 +200,7 @@
     `D_⟪CPU¦GPU⟫_DESCRIPTOR_HANDLE`に**ビューのオフセット**(`D_DESCRIPTOR_HEAP_TYPE`)を足す
 - **ビュー**を作成して**ヒープ**の**ハンドル**に詰める
   (`R_Resource`を`D_⟪｡⟪SR¦UA¦RT¦DS¦CB⟫_VIEW_DESC｡¦｡SAMPLER_DESC｡⟫`をもとに**ビューを作り**`D_CPU_DESCRIPTOR_HANDLE`に**詰める**)
-  - ☆`R_Device->`**Create⟪SR¦UA¦RT¦DS⟫View**`(R_Resource, 『UAVのみ』＠❰R_CounterResource❱, D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC, 『setToAddress』 D_CPU_DESCRIPTOR_HANDLE)`
+  - ☆`R_Device->`**Create⟪SR¦UA¦RT¦DS⟫View**`(R_Resource, 『UAVのみ』＠❰『カウンター』R_Resource❱, D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC, 『setToAddress』 D_CPU_DESCRIPTOR_HANDLE)`
     - **struct D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC**:
       ★大体、**DXGI_FORMAT**, `union{`**MipMapLv範囲**, **_ARRAY範囲**, **PlaneSlice**`}`。(つまり、Format, u{SubResource, PlaneSlice} (Format, u{バッファ選択}))
       - `DXGI_FORMAT`
@@ -171,15 +217,15 @@
       - ★`union{次元}`『`D_⟪SR¦UA¦RT¦DS⟫V_DIMENSION`により選択される。(**ビューx次元**の組み合わせ数)
         - **struct D_BUFFER_⟪SR¦UA¦RT⟫V**:
           - `UINT FirstElement; UINT NumElements`: `FirstElement` ～ `FirstElement`+`NumElements`-1。`Element`は↓の単位
-          - `『⟪SR¦UA⟫のみ』＠❰UINT StructureByteStride ❱`: >構造体の1つの要素のサイズ(バイト単位)。>`DXGI_FORMAT`は DXGI_FORMAT_UNKNOWN に設定され、無視されます。
+          - `『⟪SR¦UA⟫のみ』＠❰UINT StructureByteStride ❱`: >構造体の1つの要素のサイズ(アライメント**16Byte単位**)。>`DXGI_FORMAT`は DXGI_FORMAT_UNKNOWN に設定され、無視されます。
           - `『⟪SR¦UA⟫のみ』＠❰enum D_BUFFER_⟪SR¦UA⟫V_FLAGS Flags❱`:
             - `D_BUFFER_UAV_FLAG_NONE`: `StructureByteStride` と シェーダー`RWStructuredBuffer<～>`を使用。`DXGI_FORMAT`は`DXGI_FORMAT_UNKNOWN`を設定
-            - `D_BUFFER_UAV_FLAG_RAW`: `StructureByteStride`は不使用。シェーダー`RWByteAddressBuffer`を使用。`DXGI_FORMAT`は`DXGI_FORMAT_R32_TYPELESS`を設定
-              `FirstElement; NumElements`は**4バイト単位**になる
+            - `D_BUFFER_UAV_FLAG_RAW`: `StructureByteStride`は不使用。シェーダー`RWByteAddressBuffer`を使用。`DXGI_FORMAT`は`DXGI_FORMAT_R32_TYPELESS`(RenderDocで確認した(ビュー))を設定
+              (`FirstElement; NumElements`は**4バイト単位**になる)
           - `『UAのみ』＠❰UINT64 CounterOffsetInBytes❱`: >UAVカウンタのオフセット(バイト単位)。UAVがカウンタを持つ場合、このフィールドはカウンタの位置を指定します。
           - **使い方**: (`CBV`を`SR`や`UA`で**置き換える**ことは可能)
-            - `SR`: **シェーダー**で、`StructuredBuffer<MyStruct>`や`Buffer<float>`で参照
-            - `UA`: **RW**`StructuredBuffer<MyStruct> myBuffer`や**RW**`ByteAddressBuffer myBuffer`で参照
+            - `SR`: Structured:`StructuredBuffer<MyStruct> myBuffer`, Raw:`ByteAddressBuffer myBuffer` で参照
+            - `UA`: Structured:**RW**`StructuredBuffer<MyStruct> myBuffer`, Raw:**RW**`ByteAddressBuffer myBuffer` で参照
             - `RT`: `R_GraphicsCommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr)`(1ピクセル1Element。1次元にどう描画するかは少々不明)(`BUFFER`を`RT`として利用する**特殊なケース**)
         - **struct D_TEX⟪1D¦2D⟫＠❰\_ARRAY❱_⟪SR¦UA¦RT¦DS⟫V**: Mip, Array, Plane
           - `『SRのみ』＠❰UINT MostDetailedMip; UINT MipLevels; FLOAT ResourceMinLODClamp❱`: Max(`MostDetailedMip`,`ResourceMinLODClamp`) ～ `MostDetailedMip`+`MipLevels`-1
@@ -281,7 +327,8 @@
 
 ### R_Fence
 
-`R_Fence`は、GPUの**コマンドの完了**を**CPUがチェック**するためのオブジェクト。
+`R_Fence`は、GPUの**コマンドの完了(Signal)**を**_⟪CPU¦GPU⟫がチェック**するためのオブジェクト。
+`Wait(..)` => `ExecuteCommandLists(..)` => `Signal(..)` の順でキューに積む。
 
 - フェンス作成
   - ☆`R_Device->`**CreateFence**`(UINT64 fenceValue,.,out R_Fence)`
@@ -340,7 +387,7 @@
 ### R_PipelineState (PSO)
 
 - ☆`R_Device->`**CreateGraphicsPipelineState**`(., out R_PipelineState)`
-  - **struct D_GRAPHICS_PIPELINE_STATE_DESC**: 他の所の設定と**重複**しているのは、**最適化**のためらしい(パイプラインをバシッと決める)
+  - **struct D_GRAPHICS_PIPELINE_STATE_DESC**: 主に、シェーダーコード, ∮RenderingState∮(カリング,ADS)。他の所の設定と**重複**しているのは、**最適化**のためらしい(パイプラインをバシッと決める)
     - ルートシグネチャー: **struct R_RootSignature** `pRootSignature`:
       `CreateRootSignature(.., out R_RootSignature)`を**最適化**のためココでも設定(`SetGraphicsRootSignature(..)`でも設定される)。`## ルートシグネチャー`を参照
     - HLSLシェーダーコード: **struct D_SHADER_BYTECODE** `⟪VS¦PS¦DS¦HS¦GS⟫`: コンパイルしたシェーダー(`D3DCompileFromFile(.., out ID3DBlob ppCode,.)`)を設定
@@ -380,7 +427,7 @@
         - `_LINE`: ライン
         - `_TRIANGLE`: 三角形
         - `_PATCH`: >テッセレーションを使った曲面生成や、GPU側で頂点補間を行うような高度なジオメトリ処理に用いられます。
-    - インプットレイアウト: **struct D_INPUT_LAYOUT_DESC** `InputLayout`:
+    - インプットレイアウト: **struct D_INPUT_LAYOUT_DESC** `InputLayout`: `struct InputLayout{DXGI_FORMAT Semantic, ..}`のようなもの
       - **struct D_INPUT_ELEMENT_DESC**[] `pInputElementDescs`:
         - 『変数名』 `LPCSTR SemanticName`; `UINT SemanticIndex`: `: ❰SemanticName❱❰SemanticIndex❱`(例: `: TEXCOORD0`は、`TEXCOORD`==`❰SemanticName❱`, `0`==`❰SemanticIndex❱`(省略可))
         - 『型』     `DXGI_FORMAT Format`: **フォーマット**
@@ -647,7 +694,7 @@
                 - `UINT ThreadGroupCountZ`
           - `_VERTEX_BUFFER_VIEW`: `R_GraphicsCommandList->`**IASetVertexBuffers**`(..)`: に対応
             - union{_VERTEX_BUFFER_VIEW} `VertexBuffer` => `(..)`
-              - `UINT Slot`:
+              - `UINT Slot`
             - 引数 => `(..)`
               - **struct D_VERTEX_BUFFER_VIEW**:
                 - `D_GPU_VIRTUAL_ADDRESS BufferLocation`

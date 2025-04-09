@@ -135,6 +135,7 @@
         - `int` **stream**: `Vertexバッファ`,**インターリーブ** の **単位**。(Unityは4つまでサポートしている。デフォルト:`stream=0`)
   - `SetVertexBufferData(⟪｡⟪NativeArray¦List⟫<T>¦T[]｡⟫ data, int dataStart, int vertexBufferStart, int count, int stream, MeshUpdateFlags flags)`:
     - この`Mesh`の`Vertexバッファ`に`data`を設定します。(`dataStart`:`data`開始位置, `count`:`data`の要素数, `vertexBufferStart`:`Vertexバッファ`の開始位置)
+    - **C#のアライメント**による**パディング**に影響を受ける可能性がある(マーシャリング)
   - `SetIndexBufferParams(int indexCount, IndexFormat format)`:
     - この`Mesh`の**Indexバッファを生成**するための、**Index数**(`indexCount`)と**IndexFormat**(`format`)を指定する
     - `enum IndexFormat`: ⟪`UInt16`¦`UInt32`⟫

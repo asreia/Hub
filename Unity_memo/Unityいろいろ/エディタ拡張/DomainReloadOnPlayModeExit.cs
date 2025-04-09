@@ -17,3 +17,17 @@ public static class DomainReloadOnPlayModeExit {
       };
   }
 }
+
+public static class GraphicsBufferExt
+{
+    static uint[] copyCounter = new uint[1];
+    static GraphicsBuffer copyCounterBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, sizeof(uint));
+
+    public static uint GetCounterValue(this GraphicsBuffer buffer)
+    {
+        if(buffer.target != GraphicsBuffer.Target.Append) throw new ArgumentException($"引数 {nameof(buffer)} が {GraphicsBuffer.Target.Append} ではありません");
+        GraphicsBuffer.CopyCount(buffer, copyCounterBuffer, 0);
+        copyCounterBuffer.GetData(copyCounter);
+        return copyCounter[0];
+    }
+}

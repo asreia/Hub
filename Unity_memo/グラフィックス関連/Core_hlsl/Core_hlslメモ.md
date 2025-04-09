@@ -401,7 +401,7 @@ struct LightData
         float4x4 unity_ObjectToWorld; // オブジェクトからワールド座標への変換行列
         float4x4 unity_WorldToObject; // ワールド座標からオブジェクトへの変換行列
         float4 unity_LODFade; // xは[0,1]の範囲内でフェード値。yは16レベルに量子化されたx
-        real4 unity_WorldTransformParams; // wは通常1.0、または負スケール変換の場合-1.0
+        real4 unity_WorldTransformParams; //●// wは通常1.0、または負スケール変換の場合-1.0
 
         // レンダリングレイヤー
         float4 unity_RenderingLayer; // 最初のチャネル（x）のみ有効なデータを含み、floatはasuint()で再解釈して元の32ビット値を抽出する必要があります。
@@ -487,7 +487,7 @@ float _AlphaToMaskAvailable; // Alpha-to-coverageモード: Pass{AlphaToMask On 
   //AlphaToCoverageEnable(DirectX12メモ.md/G:421)と、SharpenAlpha(..)(Common.hlsl/G:1773)を使っている?<https://youtu.be/htzYbOZ-an0?t=321>
     //>URPではAlpha-to-Coverageをそのまま使うのではなく、輪郭のピクセルだけに限定して適用するような処理が組まれています。
 
-half4 _AdditionalLightsCount; // シーン内の追加ライトの数を格納するパラメータ (### ライト/アディショナルライト/G:398 参照)
+half4 _AdditionalLightsCount; // シーン内の追加ライトの数を格納するパラメータ (### ライト/アディショナルライト/G:378 参照)
 
 #define _InvCameraViewProj unity_MatrixInvVP // カメラのビュープロジェクション行列の逆行列
 
@@ -675,11 +675,11 @@ real4 unity_ShadowColor;
   //.shaderでshader_feature, multi_compileで#defineするShaderKeyword: _ALPHATEST_ONなど (Unity defined keywordsを除く)
 ```
 
-- **主要HLSL**
+- **主要HLSL** (`#include "Packages/com.unity.render-pipelines.⟪core¦universal⟫/⟪ShaderLibrary¦Shaders⟫/｢ファイル名｣.hlsl"`)
   - **Unity機構系**
     - **インスタンシング機構**
       - UnityInstancing.hlsl: インスタンシング機構
-        - UnityDOTSInstancing.hlsl: DOTSインスタンシング機構(使い方参考:LitInput.hlsl): `UNITY_ACCESS_DOTS_INSTANCED_PROP`や`LoadDOTSInstancedData`などの関数を通して
+        - UnityDOTSInstancing.hlsl: DOTSインスタンシング機構(使い方参考:`LitInput.hlsl`): `UNITY_ACCESS_DOTS_INSTANCED_PROP`や`LoadDOTSInstancedData`などの関数を通して
           `ByteAddressBuffer unity_DOTSInstanceData`にアクセス(マクロがカオス！(でも頑張ればいけるかも知れないが優先度低))
       - DOTS.hlsl: `#include_with_pragmas`するやつ (`#pragma multi_compile _ DOTS_INSTANCING_ON`10行)
     - **Forward+機構**
@@ -712,7 +712,7 @@ real4 unity_ShadowColor;
         - GlobalSamplers.hlsl: `SAMPLER(sampler_⟪Point¦Linear⟫⟪Clamp¦Repeat⟫)`
         - ShaderTypes.cs.hlsl: `struct LightData{position; color; attenuation; spotDirection; occlusionProbeChannels; layerMask;};`
         - SurfaceData.hlsl: `struct SurfaceData{albedo; specular; metallic; smoothness; normalTS; emission; occlusion; alpha; clearCoatMask; clearCoatSmoothness;};`
-  - **ライブラリ系**(`#include Core.hlsl`は必要)
+  - **ライブラリ系**(`#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"`は必要)
     - **Debug系**
       - Debug.hlsl: 色や数字ツール と ❰MipMapLv,オーバードロー❱などの可視化関数 `real3 GetIndexColor(int index), bool SampleDebugFont＠Number⟪2¦3¦All⟫Digits(int2 pixCoord, uint number)`
       - ShaderDebugPrint.hlsl: マウスの左ボタンが押されたとき、マウスカーソル下のピクセルの値をコンソールに出力。(｢tag｣: ｢value｣ のように)
@@ -802,7 +802,7 @@ real4 unity_ShadowColor;
   - `UNITY_REVERSED_Z`, `UNITY_UV_STARTS_AT_TOP`, `UNITY⟪_NEAR¦_RAW_FAR⟫_CLIP_VALUE`: これだけ気をつけてコード書く
   - 効率的な描画
     - `PLATFORM_SUPPORTS_NATIVE_RENDERPASS`: Native Render Pass
-    - `DOTS_INSTANCING_ON`, `UNITY_DOTS_INSTANCING_ENABLED`: SRPBatcher ＆ Instancing
+    - `DOTS_INSTANCING_ON`, `UNITY_DOTS_INSTANCING_ENABLED`: Instancing
     - `USE_FORWARD_PLUS`, `_FORWARD_PLUS`: Light, ReflectionProbe
   - `PLATFORM_SUPPORTS_PRIMITIVE_ID_IN_PIXEL_SHADER`: SV_PrimitiveID ?
   - LIGHT
