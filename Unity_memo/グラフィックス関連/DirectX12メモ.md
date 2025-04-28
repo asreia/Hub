@@ -646,7 +646,7 @@
 
 - `SOSetTargets`
 
-###### ドローコール
+###### ドローコール,ディスパッチ,コピー,破棄
 
 - ☆`R_GraphicsCommandList->`**DrawIndexedInstanced**`(..)`: サブメッシュ毎にInstancingする
   - IBV範囲(サブメッシュ)
@@ -733,6 +733,12 @@
 
 - `Dispatch`
 
+- `Copy⟪｡Resource¦Tiles｡¦｡⟪Buffer¦Texture⟫Region｡⟫`
+
+- `R_GraphicsCommandList->DiscardResource(..)`: `R_Resource`を**破棄**する
+  - `R_Resource`: 破棄する`R_Resource`を指定
+  - `D_DISCARD_REGION`: 破棄する**矩形**と**SubResource**を指定。(`nullptr`を設定すると全体を破棄)
+
 ##### その他
 
 ###### コマンドリスト操作
@@ -759,14 +765,6 @@
 ###### バリア
 
 - ☆`R_GraphicsCommandList->`**ResourceBarrier**`(D_RESOURCE_BARRIER[] pBarriers)`: **### D_RESOURCE_BARRIER**を参照
-
-###### コピーとリソース破棄
-
-- `Copy⟪｡Resource¦Tiles｡¦｡⟪Buffer¦Texture⟫Region｡⟫`
-
-- `R_GraphicsCommandList->DiscardResource(..)`: `R_Resource`を**破棄**する
-  - `R_Resource`: 破棄する`R_Resource`を指定
-  - `D_DISCARD_REGION`: 破棄する**矩形**と**SubResource**を指定。(`nullptr`を設定すると全体を破棄)
 
 ###### プロファイリング
 

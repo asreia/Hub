@@ -18,12 +18,16 @@
   - Resource操作系
     - Convert**Texture**_Internal
       - Copy**Texture**_Internal
+    - Copy**Buffer**Impl
+    - Copy**CounterValue**⟪CC¦GC¦CG¦GG⟫
+    - Internal_**GenerateMips**
+    - Internal_**ResolveAntiAliasedSurface**
   - ShaderKeyword Set系
     - Set⟪｡Global『GlobalKeyword』｡¦｡⟪Material¦Compute⟫『LocalKeyword』｡⟫**Keyword**
   - uniformデータSet系
     - Set**Global**⟪Float¦Int¦Integer¦Vector¦Color¦Matrix⟫
       - Set**Global**⟪Float¦Vector¦Matrix⟫**Array**＠❰ListImpl❱
-      - Set**Global**Texture_Impl
+      - Set**Global**⟪Texture_Impl¦❰GraphicsBuffer❱Internal⟫
       - Set⟪｡⟪View¦Projection⟫**Matrix**｡¦｡ViewProjection**Matrices**｡⟫
     - Setup**CameraProperties**_Internal
   - レンダリングステートSet系
@@ -32,6 +36,7 @@
     - ⟪Enable¦Disable⟫**ScissorRect**
     - SetGlobal**DepthBias**
     - Set**ShadowSamplingMode**
+    - Set**Wireframe**
   - レンダーターゲットSet系
     - Set**RenderTarget**
       - Clear**RenderTarget**
@@ -39,11 +44,14 @@
     - Internal_Draw**Renderer**＠❰List❱
       - Internal_Draw**Mesh**
       - Internal_Draw**MeshInstanced**IndirectGraphicsBuffer
+      - Internal_**DispatchCompute**＠❰Indirect＠❰GraphicsBuffer❱❱
     - **Blit**_⟪Texture¦Identifier⟫
   - GPU機能系
     - ⟪Create¦WaitOn⟫**GPUFence**_Internal
+    - ⟪｡⟪Begin¦End⟫Render｡¦｡NextSub｡⟫**Pass**_Internal
   - Unity Utility系
     - Set**ExecutionFlags**
+      - **ValidateAgainstExecutionFlags**
     - Internal_**RequestAsyncReadback**_⟪1～9⟫
       - WaitAll**AsyncReadbackRequests**
     - ⟪Begin¦End⟫**Sample**＠⟪_CustomSampler¦_ProfilerMarker⟫

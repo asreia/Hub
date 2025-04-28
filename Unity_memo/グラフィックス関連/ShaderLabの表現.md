@@ -274,6 +274,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                         ⟪『入力(in) (モデルデータ(ジオメトリ)の方にSemanticsが付いていてそれと対応する?)
                                             『頂点インデックス
                                             SV_VertexID(unit)『VertexTextureFetch(VTF)で使うやつ(テクスチャによる頂点アニメーション)『> uint の必要があります
+                                                             『単純に頂点処理の連番でありIndexバッファの内容と同じではない
                                             『位置(P)
                                             ¦POSITION(float4)『位置ベクトル
                                             『接空間(TBN)『位置と合わせるとTBNP(アフィン) ?

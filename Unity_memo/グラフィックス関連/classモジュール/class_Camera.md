@@ -2,7 +2,7 @@
 
 主に、**depth**, **cameraType**, **cullingMask**, **Sort**, **GetAllCameras(..)**,
      **⟪active¦target⟫Texture**, **clearFlags**, **depthTextureMode**, **allow⟪HDR¦MSAA¦DynamicResolution⟫**, **描画位置**,
-     **⟪worldToCamera¦projection⟫Matrix**
+     **⟪worldToCamera¦projection⟫Matrix**, **cullingMatrix**
 
 ## Static変数
 
@@ -60,7 +60,7 @@
   - **Layer単位のカリング距離**
     - `float[] layerCullDistances`: **gameObject.layer単位**の**カリング距離**。
     - `bool layerCullSpherical`: カメラに対して↑のLayer単位のカリングを**球体**で実行するか。(カメラのnear-farクリップの距離ではないという意味?)
-    - `Matrix4x4 cullingMatrix`: すべてのカリングクエリに使うための`Camera`のカスタムMatrixを設定します。(フラスタムカリング用のMatrix?)
+    - `Matrix4x4 cullingMatrix`: `ctx.Cull(..)`で使用する**AABBフラスタムカリング用Matrix**。(`デフォルト: mull(projectionMatrix, worldToCameraMatrix)`)
       - (`ResetCullingMatrix()`でリセット)
   - 現在URPで使われているか分からん
     - `ulong overrideSceneCullingMask`: どのオブジェクトをどのSceneから描画するかを決定するための`CullingMask`を設定します。
