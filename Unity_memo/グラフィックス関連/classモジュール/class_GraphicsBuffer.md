@@ -73,7 +73,7 @@
     - めんどくさそうなので触れないでおく。**Draw,Dispatch系の引数しか積めない**
 
 - プロパティ
-  - **.ctor(target, usageFlags, count, stride)**:
+  - **.ctor(target, ＠❰usageFlags❱, count, stride)**:
     - `GraphicsBuffer.Target target`(ReadOnly): `.ctor(～)`時に組み合わせ可能。↑の`GraphicsBuffer.Target～`を参照
     - `GraphicsBuffer.UsageFlags usageFlags`(ReadOnly):
       - `enum UsageFlags`: {`None`, `LockBufferForWrite`}: ↓↓の`UsageFlags.LockBufferForWrite`を参照 (**直接バッファに書き込む**)

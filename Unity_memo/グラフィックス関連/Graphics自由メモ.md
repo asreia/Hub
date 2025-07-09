@@ -61,7 +61,7 @@
   - GraphicsModules
     - ok:RenderTexture, ok:RenderTargetIdentifier, ok:RTHandle, o:RenderGraph, ok:CommandBuffer, frameData, ok:ScriptableRenderContext
     - ok:Camera, ok:Light, ok:MeshFilter, ok:MeshRenderer, ok:Material, ok:Shader
-    - o:FrameDebugger, o:RenderDoc, o:RenderingViewer, o:Profiler,
+    - o:FrameDebugger, ok:RenderDoc, o:RenderingViewer, o:Profiler,
     - ●Internal_**Draw**⏎『全て、BatchRendererGroup(BRG)(UnityのMDI機構?)に置き換えれるらしい。(rRG->drawCommandsでUnity描画パイプラインに差し込まれる?)(GPU Instancing(SSBO(ByteAddressBuffer **unity_DOTSInstanceData**; <= GraphicsBuffer?))、Job/NativeArray、カメラカリング、SRPBatcherフレンドリー(Meshを固定しInstanceコールする?(**SRPBatcherはCbufferとMeshを変える**))、Hybrid Renderer V2の基盤)(シェーダーはDOTS Instancingをサポートしている必要がある, BatchID毎にInstanceコールしている)(https://blog.virtualcast.jp/blog/2019/10/batchrenderergroup/)
       - bRGにMeshとMaterial(CBuffer,DOTS Instancingシェーダー)と\[メタデータ(PropertyToID)とGraphicsBuffer]を渡し、カメラカリングし、BatchID毎にInstance描画する
       - DOTS Instancingシェーダー: SV_InstanceID -> uniform InstanceIndex = uint property\[SV_InstanceID] -> graphicsBuffer\[InstanceIndex] でInstanceデータにアクセス?

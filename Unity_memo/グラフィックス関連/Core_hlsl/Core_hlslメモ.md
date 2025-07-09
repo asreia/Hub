@@ -89,7 +89,7 @@
 #define SAMPLER_CMP(samplerName)              SamplerComparisonState samplerName
 ```
 
-- テクスチャ＆サンプラー宣言: `＠❰_SHADOW❱_PARAM`を**テクスチャ宣言**の最後に付けると`, SAMPLER＠❰_CMP❱(samplerName)`が追加される
+- テクスチャ＆サンプラー宣言: `＠❰_SHADOW❱_PARAM(textureName, samplerName)`を**テクスチャ宣言**の最後に付けると`, SAMPLER＠❰_CMP❱(samplerName)`が追加される
 
 #### ロード, サンプリング
 

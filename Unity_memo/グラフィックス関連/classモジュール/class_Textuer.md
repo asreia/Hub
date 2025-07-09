@@ -1,6 +1,6 @@
 # Texture (UnityObject継承)
 
-主に、**Resource Desc**, **Texture Sampler**, `isReadable`, `GraphicsTextureDescriptorFlags`
+主に、**ResourceDesc**, **TextureSampler**, `isReadable`, `GraphicsTexture`
 
 ## Static変数
 
@@ -48,7 +48,7 @@
 
 ## Instance変数
 
-- **Resource Desc**
+- **ResourceDesc**
   - `enum TextureDimension dimension`: >Textureの**次元数** (Read-Only)
     - ⟪`Unknown`¦`None`¦`Any`¦`Tex⟪2D¦3D⟫`¦`Cube`¦⟪`Tex2D`¦`Cube`⟫`Array`⟫
   - `GraphicsFormat graphicsFormat`: ピクセルの**型** (`Texture2D`の場合`GPUテクスチャ`のフォーマット?)
@@ -57,7 +57,7 @@
     - `int width`: >**幅** (Read-Only).
     - `int height`: >**高さ** (Read-Only).
   - `int mipmapCount`: >**MipMapレベル数** (Read-Only).
-- **Texture Sampler**
+- **TextureSampler**
   - `FilterMode filterMode`: >`Texture`の**フィルタリングモード**。
     - `enum FilterMode`: ⟪`Point`¦％?`Bilinear`¦`Trilinear`⟫(<https://someiyoshino.info/entry/2022/01/30/171912>)
   - `enum TextureWrapMode wrapMode`: >テクスチャ座標の折り返しモード(Texture Addressing Mode)。**Set**:全ての軸に設定。**Get**:`wrapModeU`と同じ
@@ -69,8 +69,8 @@
     - (>`Direct3D 11 API`には、異方性フィルタリングを使用すると`Trilinear`が**有効**になってしまうという**制限**があります。)
     - (anisoLevel 値が `1` から `9` の間で、**Quality Settings** の `Anisotropic Filtering` が `Forced On` に設定されている場合、Unity は anisoLevel を **9** に設定します。(`0`は無効))
     - (考察: `Trilinear`＆`anisoLevel`の場合、**サンプリング数** = 2(`Bilinear`) x 2(`MipMap補間`) x anisoLevel数 ?)
-- **GraphicsTexture**
-  - `class GraphicsTexture` `graphicsTexture`: >GPUにアップロードされた**テクスチャリソース**を表す。(Read-Only).
+- **GraphicsTexture** (Unity 2022.1 以降に導入された**新しい機能**)
+  - `class GraphicsTexture` `graphicsTexture`: >**GPUにアップロード**された**R_Resource**の**ビュー**を表す。(Read-Only).
     - `static GraphicsTexture active`: **現在アクティブ**な`GraphicsTexture`。`static RenderTexture active`のようなもの
       - (**Set**するにはテクスチャ作成時に`GraphicsTexture.descriptor.flags`で`GraphicsTextureDescFlags.RenderTarget`を有効にする)
     - `GraphicsTextureDescriptor descriptor`: UnityがGraphicsTextureを作成するために使用するすべての情報が含まれています。(`D3D12_RESOURCE_DESC`。RTDescにも似ている)
@@ -84,10 +84,10 @@
       - `int arrayLength`: `TextureDimension.`⟪`Tex2D`¦`Cube`⟫`Array`の時の要素数 (CubeはCube数 * 6 ?)
       - `int numSamples`: **MSAA**のサンプル数
         - 1以上でMSAA有効。`GraphicsTextureDescriptorFlags.RenderTarget`を設定する必要がある。`GraphicsTextureDescriptorFlags.RandomWriteTarget`と互換性は無い
-      - `enum GraphicsTextureDescriptorFlags flags`: >`GraphicsTexture`の**レンダリング**および**読み取り/書き込みアクセス** モード。
-        - `None`: >デフォルト。この`GraphicsTexture`からサンプリングできる。(`class Texture2D`?)
-        - `RenderTarget`: >この`GraphicsTexture`を**レンダーターゲット**として**設定**し、レンダリングできるようにします。
-        - `RandomWriteTarget`: `ShaderModel5.0`のシェーダーで、この`GraphicsTexture`への**ランダム書き込みアクセス**を**許可**します。(`class RenderTexture`?)
+      - `enum` **GraphicsTextureDescriptorFlags** `flags`: >`GraphicsTexture`の**レンダリング**および**読み取り/書き込みアクセス** モード。
+        - `None`: >デフォルト。この`GraphicsTexture`からサンプリングできる。(`class Texture2D`,`SRV`)
+        - `RenderTarget`: >この`GraphicsTexture`を**レンダーターゲット**として**設定**し、レンダリングできるようにします。(`class RenderTexture`,`RTV`)
+        - `RandomWriteTarget`: `ShaderModel5.0`のシェーダーで、この`GraphicsTexture`への**ランダム書き込みアクセス**を**許可**します。(`class RenderTexture.enableRandomWrite`,`UAV`)
     - `enum GraphicsTextureState state`: >`GraphicsTexture` の**現在の状態**。レンダリング スレッドで構築、初期化、または破棄される `GraphicsTexture` の状態を記述します。
       (↓は上から順に実行される感じがするがよく分からない(.png => Texture.ctor => 作成キュー => .pngをDXT等に変換＆作成完了 => 破棄キュー => 破棄 かな?))
       - `Constructed`: >`GraphicsTexture` **コンストラクタ**(.ctor?)が実行を開始しました。
@@ -96,7 +96,7 @@
       - `DestroyQueued`: >`GraphicsTexture`はレンダリングスレッドで**破壊のキュー**に入っているが、まだ完了していない。
       - `Destroyed`: >`GraphicsTexture`がレンダースレッド上で**完全に破壊**された。
 - **その他情報**
-  - `bool isReadable`: `Texture2D.GetPixels(..)`など**CPU上で操作**する場合にtrueである必要がある(GPU上の操作は関係ない)
+  - `bool isReadable`: `Texture2D.GetPixels(..)`など**CPU上で操作**する場合にtrueである必要がある(GPU上の操作は関係ない(新API))
     - インポートのデフォルトでは`false`。スクリプトからでは`true`。`false`にするには`Texture2D.Apply(.., makeNoLongerReadable:false)`をする
   - `bool isDataSRGB`: >テクスチャが**sRGB色空間**の場合、`true` (Read-Only) (`GraphicsFormat.～_SRGB`になって描画時、ガンマ<=>リニア変換されると思われる)
   - `uint updateCount`: >このカウンターはTextureが**更新**されると**インクリメント**される。

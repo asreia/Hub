@@ -50,11 +50,11 @@
 
 ## Shader情報
 
-- Shader
+- **Shader**
   - `Shader Shader.Find(string ｢ShaderName｣)`
   - `Material.ctor(⟪Shader shader¦Material src⟫)`
   - `Shader material.shader`
-- Tags{..}
+- **Tags{..}**
   - `ShaderTagId shader.Find❰Pass❱｡｡｡｡｡TagValue(＠❰int subshaderIndex,❱ int passIndex, ｡｡｡｡｡ShaderTagId tagName)`: Pass{Tags{..}}
   - `ShaderTagId shader.Find❰Subshader❱TagValue(｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡｡int subshaderIndex, ShaderTagId tagName)`: Subshader{Tags{..}}
   - `material.SetOverrideTag(string tagKey, string tagValue)`: `tags{..}`内の`tagKey`を`tagValue`で更新する?
@@ -65,7 +65,7 @@
   - PassIndex
     - `int ｡｡｡material.FindPass｡｡｡(string ｢ShaderPassName｣)`
     - `string material.GetPassName(int ｡｡｡｢ShaderPassIndex｣)`
-- その他
+- **その他**
   - `string Shader.globalRenderPipeline`
   - `int ⟪material¦shader⟫.renderQueue`
   - `bool material.enableInstancing`

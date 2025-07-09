@@ -10,7 +10,7 @@ Globalに関する項目が多い
 - `int globalMaximumLOD`: >すべてのシェーダーのシェーダーLOD(Shaderの`SubShader{..}`に付いている**LODの上限値**(上から、この数値以下のSubShaderが選択される))
 - `string globalRenderPipeline`: ShaderのSubShaderに付いているTags{"RenderPipeline" = ｢Name｣}の｢Name｣またはØな値にマッチし、上からマッチしたSubShaderを選択する?
   - (つまり、globalRenderPipeline != ｢Name｣以外はマッチ?)
-  - `RenderPipelineAsset<TRenderPipeline>.renderPipelineShaderTag => typeof(TRenderPipeline).Name`で設定される
+  - `RenderPipelineAsset<TRenderPipeline>.renderPipelineShaderTag => typeof(TRenderPipeline).Name`で設定される (こう設定されるから、設定されている場合は、gRP == ｢Name｣では?)
 - `int maximumChunksOverride`: メモリにロードする圧縮Shaderバリアントチャンクの最大数。
   - **正の値**:チャンクの最大数。**0**:全てのチャンク。**負の値**:PlayerSettings.GetDefaultShaderChunkCountに従う(プレイヤー->デフォルトチャンク数?)
 

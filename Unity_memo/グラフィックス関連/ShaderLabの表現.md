@@ -1,10 +1,11 @@
 # ShaderLabの表現
 
+//☆←検索 //網羅した雛形.shader作る
 <!-- ```shaderlab -->
 
 Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層を作れる『`Shader Shader.Find(string ｢ShaderName｣)`で検索
 {
-    Properties
+    Properties //☆
     {
         ⟦∫LRetInd∫┃～⟧❰｡｡∮PROPERTY_ATTRIBUTE∮ ｢PropertyName｣ (｡"｢PropertyShowName｣" ∮PROPERTY_TYPE∮｡) = ∮PROPERTY_LITERAL∮｡｡❱
             ＃PROPERTY_TYPE   ＝≪○¦PT⟪Int｡｡｡｡¦Float｡｡｡｡¦Range∮VECTOR2∮¦Color｡｡｡｡｡｡¦Vector｡｡｡｡｡¦2D｡｡｡｡｡｡｡｡｡｡¦Cube｡｡｡｡｡｡｡¦3D｡｡｡｡｡｡｡｡⟫≫『スカラー、ベクトル、テクスチャ。(行列が無い)
@@ -35,7 +36,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
         『SubShaderのTags (https://docs.unity3d.com/ja/2023.2/Manual/SL-SubShaderTags.html)
         『`ShaderTagId FindSubshaderTagValue(int subshaderIndex, ShaderTagId tagName)`:
             『`subshaderIndex`の`tagName`を**キー**に、その**バリュー**の**ShaderTagIdを返す**?
-        ＠❰Tags
+        ＠❰Tags //☆
         {
             『↓なくなったっけ？
             ＠❰"Queue" = "⟪Background『1000』¦Geometry『2000(デフォルト)』¦AlphaTest『2450』¦Transparent『3000』¦Overlay『4000』⟫＠❰+⟪～⟫❱"❱
@@ -63,7 +64,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
             『`int FindPass(string ｢ShaderPassName｣)`: `｢ShaderPassName｣`から`ShaderPassIndex`を返します。(存在しない場合は、-1)
             『`string GetPassName(int ShaderPassIndex)`: ↑の逆射。`ShaderPassIndex`から`｢ShaderPassName｣`を返します。(存在しない場合は、空文字列)
             ⟪『Passの種類
-                Pass
+                Pass //☆
                 {
                     ∮DEFINE_PASS∮
                 }
@@ -74,7 +75,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                 ＃DEFINE_PASS＝≪『Passの実装
                     『`ShaderTagId FindPassTagValue(＠❰int subshaderIndex,❱ int passIndex, ShaderTagId tagName)`:
                         『⟪アクティブなSubShader¦`subshaderIndex`⟫の`passIndex`の`tagName`を**キー**に、その**バリュー**の**ShaderTagIdを返す**?(PassのTags{..})
-                    ❰『Passの名前とタグ付け
+                    ❰『Passの名前とタグ付け //☆
                         『
                         『Passの名前
                         ＠❰Name "｢ShaderPassName｣"❱
@@ -91,9 +92,9 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                     『
                     ❰『GPUへの命令
                         『
-                        ∮RENDERING_STATE∮
+                        ∮RENDERING_STATE∮ //☆
                         『
-                        『シェーダーコード
+                        『シェーダーコード //☆
                         ∮START_SHADER_CODE∮
                             『
                             ∮SHADER_CODE∮
@@ -172,7 +173,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                     ≫『RENDERING_STATE_終わり
                     『
                     ＃CG_SHADER_CODE＝≪
-                        ❰『定義部
+                        ❰『定義部 //☆
                             ∮PreProcess∮
                             ⟦∫LRetInd∫┃～⟧⟪『シェーダーバリアントの条件分岐系(#if)が噛む
                                 ∮VariableDefine∮✖❰∮:Semantics∮『多分使えない』❱
@@ -184,7 +185,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         ❰『マクロ定義部
                             ＃PreProcess＝≪
                                 ⟦∫LRetInd∫┃～⟧❰⟪
-                                    ❰『プラグマ系
+                                    ❰『プラグマ系 //☆
                                         ❰#pragma ❱⏎『(https://docs.unity3d.com/ja/2023.2/Manual/SL-PragmaDirectives.html)
                                         ⟪
                                             ❰『各シェーダーステージの使用の宣言とその関数名を指定
@@ -269,7 +270,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                     『10     Direct3D9 シェーダーモデル3.0 (#pragma target 3.0)
                                     『16     OpenGL ES 3.0
                                     『32     Direct3D10 シェーダーモデル4.0 (#pragma target 4.0)
-                                ⟪
+                                ⟪ //☆
                                     ⟪Vertex『主に、TBNP、UV、Colorなど
                                         ⟪『入力(in) (モデルデータ(ジオメトリ)の方にSemanticsが付いていてそれと対応する?)
                                             『頂点インデックス
@@ -334,7 +335,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                 ⟫
                             ≫
                             ＃DataType＝≪
-                                ⟪
+                                ⟪ //☆
                                     ｢StructType｣『構造体
                                     『
                                     ¦＃∮Scalar＝≪⟪『スカラー
@@ -401,7 +402,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                         ∮Implement∮
                                     }
                                         ＃InOut＝≪『outが教科書4P83のLitPassFragment関数で使われていたが、構造体で返せば良くない？
-                                            ⟪
+                                            ⟪ //☆
                                                 in      『入力セマンティクス(引数のデフォルト)
                                                 ¦out    『出力セマンティクス(戻り値のデフォルト?)(C#と同じ挙動で参照渡しで変更が呼び出し元に反映されるみたい)
                                                 ¦inout  『入出力セマンティクス

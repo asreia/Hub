@@ -20,7 +20,7 @@
     - `DSV`: デプス,ステンシル
 
 - 考察メモ
-  - 効率的な描画: (((`InstancingDraw`) => `SubMesh`) => `VBV,IBV`) => `Shader` (右に行くほど**切り替えコスト**が高い)
+  - 効率的な描画: ((((`InstancingDraw`) => `SubMesh`) => `VBV,IBV`) => `Shader`) => `RT` (右に行くほど**切り替えコスト**が高い)
     - "=>"は優先順位で、左辺で描画するモノがなくなったら右辺を切り替えて描画する
   - CPU,GPU並列処理
     1. Fence
@@ -230,7 +230,7 @@
         - **struct D_TEX⟪1D¦2D⟫＠❰\_ARRAY❱_⟪SR¦UA¦RT¦DS⟫V**: Mip, Array, Plane
           - `『SRのみ』＠❰UINT MostDetailedMip; UINT MipLevels; FLOAT ResourceMinLODClamp❱`: Max(`MostDetailedMip`,`ResourceMinLODClamp`) ～ `MostDetailedMip`+`MipLevels`-1
           - `『SR以外』＠❰UINT MipSlice❱`: >ミップマップチェーン内の**MipMapLv**を指定
-          - `『_ARRAYのみ』＠❰UINT FirstArraySlice; UINT ArraySize❱`: `FirstArraySlice` ～ `FirstArraySlice` + `ArraySize`-1
+          - `『_ARRAYのみ』＠❰UINT FirstArraySlice; UINT ArraySize❱`: `FirstArraySlice` ～ `FirstArraySlice` + `ArraySize`-1 (MRTする場合、`ArraySize = 1`にして個別にRTVを作る必要がある)
           - `『2Dのみ,DS以外』＠❰UINT PlaneSlice❱`: >2Dテクスチャのプレーンインデックス。ビューがどのプレーンにアクセスするかを指定します。(各プレーンは**メモリ空間的に分離**している)
             - 例:`DXGI_FORMAT_NV12` の場合:
               - `PlaneSlice = 0` で**Yプレーン**（輝度チャンネル）にアクセス。
@@ -338,11 +338,11 @@
     `R_CommandQueue`が**実行完了**すると`R_Fence = fenceValue`される
   - ☆`R_GraphicsCommandList->`**Signal**`(R_Fence, UINT64 fenceValue)`
     `Signal`の`R_GraphicsCommandList`版。(>より細かいタイミングで GPU 上での操作を完了するタイミングを示すことができます。)
-- CPUコンプリート確認
+- ⟪CPU¦GPU⟫コンプリート確認
   - ☆`R_Fence->`**GetCompletedValue**`()`
     `R_Fence`の**フェンス値**を取得する。(`Signal`で`R_Fence = fenceValue`されたかを**チェック**するために使う)
   - ☆`R_CommandQueue->`**Wait**`(R_Fence, UINT64 fenceValue)`
-    `R_Fence`が`R_Fence`>= `fenceValue`になるまで、`R_CommandQueue`の実行を待機する。(CPUをブロックしない)
+    `R_Fence`が`R_Fence`>= `fenceValue`になるまで、`R_CommandQueue`の実行を待機する。(GPUでチェックし待機)
   - ☆`R_Fence->`**SetEventOnCompletion**`(UINT64 fenceValue, HANDLE)`
     `R_Fence`が`R_Fence`>= `fenceValue`になったら、`HANDLE`の**イベント**を実行する。(CPUをブロックしない)
 

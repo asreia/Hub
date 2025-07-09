@@ -7,7 +7,7 @@
   - `SetBufferCounterValue`: Append/Consumeバッファのカウンター値を設定
   - `BuildRayTracingAccelerationStructure`: レイトレ用加速構造を構築
   - `ReleaseTemporaryRT`: 一時的なレンダーテクスチャを解放
-- SetPass系
+- **SetPass系**
   - RenderingState系
     - `SetViewport`: ビューポートを設定
     - `EnableScissorRect / DisableScissorRect`: シザー矩形を有効化/無効化
@@ -70,8 +70,8 @@
     - Keyword系
       - `SetKeyword / EnableKeyword / DisableKeyword`: ローカルまたはグローバルなキーワードを設定/有効化/無効化
       - `EnableShaderKeyword / DisableShaderKeyword`: 名前指定でシェーダーキーワードを有効/無効に
-- Action系
-  - DrawCall系
+- **Action系**
+  - DrawCall系 (別ファイルにする?)
     - **Draw⟪Mesh¦Procedural⟫**
       - `Draw`**Mesh**`＠❰Instanced＠❰⟪Indirect¦Procedural⟫❱❱`
         `(`
@@ -80,7 +80,7 @@
             `＠❰Matrix4x4＠❰[]❱ matrix❱, ＠❰MaterialPropertyBlock properties❱`『**ShaderProperty**。⟪Indirect¦Procedural⟫は`matrix`が無い
           『❰Instanced＠❰Procedural❱❱
             `＠❰int count❱`『**Instance数**。❰Procedural❱は❰Indirect❱の`bufferWithArgs`を`count`に変えたもの
-          『❰Indirect❱
+          『❰Instanced❰Indirect❱❱
             `＠❰GraphicsBuffer bufferWithArgs, ＠❰int argsOffset❱❱`『**引数バッファ**
         `)`
       - `Draw`**Procedural**`＠❰Indirect❱`
@@ -90,9 +90,9 @@
             `Matrix4x4 matrix, ＠❰MaterialPropertyBlock properties❱`『**ShaderProperty**
             `＠❰GraphicsBuffer indexBuffer❱,`『**Indexバッファ**
           『✖❰Indirect❱
-            `＠❰int indexCount, ＠❰int instanceCount❱❱,`『**Index数**と**Instance数**。✖❰Indirect❱
+            `＠❰int indexCount, ＠❰int instanceCount❱❱,`『**Index数**と**Instance数**
           『❰Indirect❱
-            `＠❰GraphicsBuffer bufferWithArgs, ＠❰int argsOffset❱❱`『**引数バッファ**。❰Indirect❱`❰int indexCount, int instanceCount❱`を詰める
+            `＠❰GraphicsBuffer bufferWithArgs, ＠❰int argsOffset❱❱`『**引数バッファ**。`❰int indexCount, int instanceCount❱`を詰める
         `)`
       - 引数説明
         - `＠❰Matrix4x4＠❰[]❱ matrix❱`: 多分`UNITY_MATRIX_M`を設定している
@@ -117,9 +117,9 @@
           - **CullingResults** `cullingResults`: `struct CullingResults`: 描画対象となる**可視オブジェクトセット**。`ctx.Cull(ref ScriptableCullingParameters『カメラ』)`を設定
           - **FilteringSettings** `filteringSettings`: `struct FilteringSettings`: **可視オブジェクトセット**のフィルタリング方法
             - `static FilteringSettings defaultValue`: フィルタリングをしない設定の値
-            - `.ctor(Nullable<RenderQueueRange> renderQueueRange = RenderQueueRange.all, int layerMask, uint renderingLayerMask, int excludeMotionVectorObjects『⟪％❰0❱¦1⟫』)`:
+            - `.ctor(Nullable<RenderQueueRange> renderQueueRange = RenderQueueRange.all, int layerMask, uint renderingLayerMask, int excludeMotionVectorObjects 『⟪％❰0❱¦1⟫』)`:
             - `uint batchLayerMask`: **Unity側が構築したBRG**の**Batchレイヤー**の**ビットマスク**。BRGのBatchをスイッチして簡単に最適化できるが、Unity側が作ったBRGがよく分からない
-            - `Tags{"LightMode" = "MotionVectors"}`がある`Material`での**描画有無**。(動いているかは、`UNITY_MATRIX_MV`が**前回のフレームと違うか**)
+            - `Tags{"LightMode" = "MotionVectors"}`がある`Material`での**描画有無**。(動いているかは、`UNITY_MATRIX_MV`が**前回のフレームと違うか**を確認する)
               - `bool excludeMotionVectorObjects`: `true`: **動いている**オブジェクトを**除外**
               - `bool forceAllMotionVectorObjects`: `true`: **止まっている**オブジェクトを**強制描画**
             - `int layerMask`: `Camera.cullingMask`(**GameObject.layer**)をさらにフィルタリングするビットマスク
@@ -151,12 +151,12 @@
               - `Matrix4x4 worldToCameraMatrix`:
             - `bool enableDynamicBatching`,`％❰false❱`: 動的バッチングの有効化
             - `bool enableInstancing`,`％❰true❱`: GPUインスタンシングの有効化
-            - `Material fallbackMaterial`: 条件不一致時に使うフォールバックマテリアル
+            - `Material fallbackMaterial`: (`.ctor(ShaderTagId shaderPassName, .)`との?)条件不一致時に使うフォールバックマテリアル
             - `int lodCrossFadeStencilMask`: LODクロスフェード用ステンシルマスク（32bit int）
             - `int mainLightIndex`: メインライトとして使うライトのインデックス（-1で無効）
             - `Material overrideMaterial`: マテリアルをオーバーライドする場合のマテリアル
             - `int overrideMaterialPassIndex`: overrideMaterialのどのパスを使用するか（例：0 = Base Pass）
-            - `Shader overrideShader`: シェーダーをオーバーライドする場合のシェーダー
+            - `Shader overrideShader`: シェーダーをオーバーライドする場合のシェーダー //new Material(overrideShader) ?
             - `int overrideShaderPassIndex`: overrideShaderのどのパスを使用するか
             - `PerObjectData perObjectData`: per-objectごとに取得するデータ（Transform, LightProbe, LightIndex等）
             - `ShaderTagId GetShaderPassName(int index)`: シェーダ パスの名前を取得します
@@ -210,15 +210,15 @@
 - synchronize系
   - Fence系
     ```CSharp
-    computeCmd.SetExecutionFlags(CommandBufferExecutionFlags.AsyncCompute); //Compute処理しか使わないコマンドのみ追加可能にする
+    computeCmd.SetExecutionFlags(CommandBufferExecutionFlags.AsyncCompute); //Computeコマンドのみ追加可能にする
     //～Computeコマンド追加～
-    GraphicsFence fence = computeCmd.CreateAsyncGraphicsFence(); //直前の全てのAction系?の実行の完了を追跡
-    graphicsCmd.WaitOnAsyncGraphicsFence(fence); //fenceの完了を待つコマンドを追加
-    ctx.ExecuteCommandBufferAsync(computeCmd, ComputeQueueType.Default); //コンピュートキューにコマンドが積まれる
-    ctx.ExecuteCommandBuffer(graphicsCmd); //グラフィックスキューにコマンドが積まれる
-      //enum ComputeQueueType: ⟪Default『1フレーム内』¦Background『数フレーム』¦Urgent『グラフィックスキューより高優先度』⟫
+    GraphicsFence fence = computeCmd.CreateAsyncGraphicsFence();            //直前の全てのAction系?の実行の完了を追跡  //->CreateFence(..), ->Signal(..)
+    graphicsCmd.WaitOnAsyncGraphicsFence(fence);                            //fenceの完了を待つコマンドを追加         //->Wait(..)
+    ctx.ExecuteCommandBufferAsync(computeCmd, ComputeQueueType.Default);    //Computeキューにコマンドが積まれる
+    ctx.ExecuteCommandBuffer(graphicsCmd);                                  //Graphicsキューにコマンドが積まれる
+      //enum ComputeQueueType: ⟪Default『1フレーム内』¦Background『数フレーム』¦Urgent『Graphicsキューより高優先度』⟫
     ctx.Submit(); //コマンド実行
-    if(fence.passed){/*fenceまでのComputeコマンド完了後の処理*/} //GraphicsFenceは.passedしか持っていない。DirectX12API: `R_Fence->GetCompletedValue()`
+    if(fence.passed){/*.CreateAsyncGraphicsFence()までのコマンド完了後の処理*/} //GraphicsFenceは.passedしか持っていない。//R_Fence->GetCompletedValue()
     ```
     Fenceを使わなくてもバリア的な同期は取れるみたい。**ctxのキュー**と**Graphicsクラスのキュー**は内部で**同じキューを使っている**みたい
     - `Create＠❰Async❱GraphicsFence(..)`: DirectX12API: `R_Device->CreateFence(..)`, `R_CommandQueue->Signal(..)`
@@ -230,20 +230,21 @@
       - `enum CommandBufferExecutionFlags`: ⟪`.None`¦`AsyncCompute`⟫: `AsyncCompute`: Computeコマンド以外のコマンドをセットすると例外スロー
   - AsyncReadback系
     - `RequestAsyncReadback＠❰IntoNative⟪Slice¦Array⟫❱`
-      `(＠❰ref Native⟪Slice¦Array⟫<T> output,『❰IntoNative⟪Slice¦Array⟫❱の場合』❱⟪`『`✖❰IntoNative⟪Slice¦Array⟫❱`の場合、Unityが一時的に確保して次のフレームで破棄してしまう
+      `(＠❰ref Native⟪Slice¦Array⟫<T> output,『❰IntoNative⟪Slice¦Array⟫❱の場合』❱`『`✖❰IntoNative⟪Slice¦Array⟫❱`の場合、Unityが一時的に確保して次のフレームで破棄してしまう
+      `⟪`
         `GraphicsBuffer src ＠❰, int size, int offset❱『バイト単位`
-        `¦Texture src ＠❰｡, int mipIndex ＠❰, int x, int width, int y, int height, int z, int depth❱ ＠❰⟪Texture¦Graphics⟫ dstFormat❱｡❱`
-          『`dstFormat`: `src`と違う場合は自動変換(`src: R16G16B16A16_SFloat → dstFormat: R8G8B8A8_UNorm`など) (`DirectXTex`を使っている?)
-      `⟫, Action<AsyncGPUReadbackRequest> callback)`:
-      `src`の内容をCPUメモリ(⟪**Unity**が用意した`NativeArray`¦**ユーザー**が用意した`output`⟫)
-      への**読み戻し**(`Readback`)を**リクエスト**し、登録された`callback`を呼び出す。
+        `¦Texture src ＠❰｡, int mipIndex ＠❰, int x, int width, int y, int height, int z, int depth❱ ＠❰⟪Texture¦Graphics⟫Format dstFormat❱｡❱`
+          『`dstFormat`: `src.graphicsFormat`と違う場合は自動変換(`src: R16G16B16A16_SFloat → dstFormat: R8G8B8A8_UNorm`など) (`DirectXTex`を使っている?)
+      `⟫`
+      `, Action<AsyncGPUReadbackRequest> callback)`:
+      `src`の内容をCPUメモリ(⟪**ユーザー**が用意した`output`¦**Unity**が用意した`NativeArray`⟫)への**読み戻し**(`Readback`)を**リクエスト**し、登録された`callback`を呼び出す。
       - `struct AsyncGPUReadbackRequest`:
         - プロパティ
           - `done`,`hasError`: `done`で非同期の完了をチェック(不要)し、`hasError`で`Readback`が**成功したか**チェックする。[.done](https://youtu.be/7tjycAEMJNg?t=4660)
           - `bool forcePlayerLoopUpdate`: >Editor上で使用され、GPUリクエストが進行中の間に**Playerループを更新し続ける**かどうか。(Playerループで`Update()`を呼ぶ)
-          - `width`,`height`: `width`,`height`は`RequestAsyncReadback～(..)`の`値`がそのまま入る。(`GraphicsBuffer`の場合は`width`=`size`)
+          - `width`,`height`: `RequestAsyncReadback～(..)`の`width`,`height`の`値`がそのまま入る。(`GraphicsBuffer`の場合は`width`=`size`)
           - `depth`,`layerCount`: `depth`= `⟪『3D』depth¦『2DArray』1⟫`, `layerCount`= `⟪『3D』1¦『2DArray』depth⟫`
-          - `layerDataSize`: `layerDataSize`=`width * height * depth * ⟪offset¦dstFormat⟫` (総データサイズ = `layerDataSize` * `layerCount`)
+          - `layerDataSize`: `layerDataSize`=`width * height * depth * ⟪src.graphicsFormat¦dstFormat⟫` (総データサイズ = `layerDataSize` * `layerCount`)
         - メソッド
           - `NativeArray<T> GetData<T>(int layer)`: `done`=true,`hasError`=false 時、`Readback`したデータにアクセスできる。`layer`で`layerCount`のレイヤーを取得する
           - `Update()`: **リクエストが完了したか**をチェックし完了した場合は`AsyncGPUReadbackRequest.done=true`などをするメソッド

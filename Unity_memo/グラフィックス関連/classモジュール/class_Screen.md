@@ -1,6 +1,6 @@
 # Screen (継承なし) (UnityEngine名前空間)
 
-多分、スワップチェインのリソース設定
+多分、スワップチェイン(`BRTT.CameraTarget`)のリソース設定
 主に、**解像度**, **MSAA**, `GetDisplayLayout(List<DisplayInfo> displayLayout)`, `FullScreenMode`, `float brightness`
       \[`SetResolution(..)`, `SetMSAASamples(..)`](`BRTT.⟪CameraTarget¦Depht⟫`を変えれる?)
 
@@ -10,7 +10,7 @@
 ## Static変数
 
 - **解像度**
-  - `int ⟪width¦height⟫`: >ピクセル単位(**解像度**)のスクリーンの⟪幅¦高さ⟫ (Read-Only) (`BRTT.CameraTarget`?)
+  - `int ⟪width¦height⟫`: >ピクセル単位(**解像度**)のスクリーンの⟪幅¦高さ⟫ (Read-Only) (`BRTT.CameraTarget`(多分、**スワップチェイン**にBlitされる`内部RenderTexture`))
   - `struct Resolution currentResolution`: >現在の画面の解像度 (Read-Only) (実際の**ディスプレイ実物**の解像度?(**物理デバイス**))
     - `int ⟪width¦height⟫`: >`物理デバイス`?の解像度
     - `RefreshRate refreshRateRatio` >`物理デバイス`?のリフレッシュレート(Hz)
@@ -18,7 +18,7 @@
   - `Resolution[] resolutions`: >`物理デバイス`がサポートしている全ての`FullScreenMode.ExclusiveFullScreen`時の**解像度**を返します。(Read-Only)
     - `SetResolution(..)`で設定する用
 - **MSAA**
-  - `int msaaSamples`: >要求されたスクリーンバッファのMSAAサンプルカウントを取得する。 (`BRTT.CameraTarget`?)
+  - `int msaaSamples`: >要求されたスクリーンバッファのMSAAサンプルカウントを取得する。 (`BRTT.CameraTarget`,`BRTT.Depth`)
     - >`SetMSAASamples(..)`によって最後に要求されたMSAAサンプルカウントを取得する。
 
 - メインウインドウ?がある物理デバイス情報
@@ -51,7 +51,7 @@
 - `SetResolution(int width, int height, FullScreenMode fullscreenMode, RefreshRate preferredRefreshRate)`:
   - 主に**解像度**(`Screen.⟪width¦height⟫`)の**切り替え**だが、`Screen.⟪fullScreen¦fullScreenMode⟫`と`Screen.mainWindowDisplayInfo?.refreshRate`も切り替えれる
 - `SetMSAASamples(int numSamples)`: >Unity **SwapChain**のMSAAサンプル数を切り替えます。(>0はQuality設定の値を使用)
-  - `SwapChain`という記述があるので`Screen` == `BRTT.CameraTarget` == `SwapChain` ?
+  - `SwapChain`という記述があるので`Screen` == `BRTT.CameraTarget`,`BRTT.Depth` == `SwapChain`
 - `GetDisplayLayout(List<DisplayInfo> displayLayout)`: >**接続されているディスプレイ**の`DisplayInfo`情報を取得します。
 - `AsyncOperation MoveMainWindowTo(ref DisplayInfo display, Vector2Int position)`:
   - >指定された`display`の左上隅を基準として、指定された`position`にメインウィンドウを**移動**する。(`mainWindowPosition`の移動?)

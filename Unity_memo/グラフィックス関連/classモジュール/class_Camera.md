@@ -1,7 +1,7 @@
 # Camera (Behaviour継承)
 
 主に、**depth**, **cameraType**, **cullingMask**, **Sort**, **GetAllCameras(..)**,
-     **⟪active¦target⟫Texture**, **clearFlags**, **depthTextureMode**, **allow⟪HDR¦MSAA¦DynamicResolution⟫**, **描画位置**,
+     **⟪target¦active⟫Texture**, **clearFlags**, **depthTextureMode**, **allow⟪HDR¦MSAA¦DynamicResolution⟫**, **描画位置(ViewPort?)**,
      **⟪worldToCamera¦projection⟫Matrix**, **cullingMatrix**
 
 ## Static変数
@@ -68,16 +68,24 @@
     - `int eventMask`: `Camera`のイベントを発動できるレイヤーを選択するためのマスク。(分からん)
 
 - **カメラとテクスチャに関する情報**
-  - **描画位置**(ViewPort?)
+  - **描画位置(ViewPort?)**
     - `Rect ＠❰pixel❱Rect`: 画面上の **⟪正規(0～1)¦ピクセル(解像度)⟫座標**でどこに`Camera`が描画されるか。
     - `int ＠❰scaled❱pixel⟪Width¦Height⟫`: `Camera`の解像度の`⟪Width¦Height⟫`幅。(`ViewPort.⟪x¦y⟫`) (`❰scaled❱`は、**ダイナミック解像度**のスケーリングを**考慮する**) (Read-Only)
   - ●`Vector3` **velocity**: `Camera`のワールド空間での速度を取得します（読み取り専用）。
 
 - **テクスチャ設定**
   - `Camera`の`RenderTexture`
-    - `RenderTexture` **activeTexture**: >この`Camera`の一時的な`RenderTexture`ターゲットを取得します。(**実際のRT?**(Read-Only?))
-    - `RenderTexture` **targetTexture**: >移動先のレンダーテクスチャ(`null`の場合は`BRTT.CameraTarget`だっけ?) (**オフスクリーンのRTを設定/取得する用?**)
+    - メモ
+      - `camera.targetTexture = rt;`をセットし`camera.Render();`をすると、
+        `camera.activeTexture = camera.targetTexture;`される。(多分)
+        `camera.Render()`は、`rt`に描画後`元のRT`に戻すので`RenderTexture.active`は変わらない。
+      - 基本的に`camera.targetTexture`と`camera.activeTexture`は`camera.Render()`のみに影響があるが、
+        **URPでも互換性**のため、`camera.targetTexture`と`camera.activeTexture`はURPでもサポートされている。
+      - `camera.targetTexture = null;`の場合は、`BRTT.CameraTarget`に描画される。
+      - **URPでは**、`camera.Render()`は使われず`camera`の情報を使って`cmd.DrawRendererList(｢camera｣, ..)`で描画する。
+    - `RenderTexture` **targetTexture**: >移動先のレンダーテクスチャ (**オフスクリーンのRTを"設定"**)
       - `SetTargetBuffers(RenderBuffer＠❰[]❱ colorBuffer, RenderBuffer depthBuffer)`で、**MRT**など詳細に設定できるみたい
+    - `RenderTexture` **activeTexture**: >この`Camera`の一時的な`RenderTexture`ターゲットを取得します。(**このCameraの描画先RTを"取得"**)
     - `bool forceIntoRenderTexture`: (**Built-in?**)>`Camera`の描画をRT(`targetTexture`?)に強制されるかどうか。
   - `int targetDisplay`: この`Camera`を指定されたディスプレイにレンダリングする。(`int`にどう設定する?)
   - **allow**
