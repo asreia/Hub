@@ -43,10 +43,18 @@
   - **Sort**
     - `enum OpaqueSortMode opaqueSortMode`: オブジェクトを不透明にするソーティングモード
       - `⟪Default¦FrontToBack¦NoDistanceSort⟫`
+      - メモ
+        `FrontToBack`は`SortingCriteria.QuantizedFrontToBack`であり、
+        `NoDistanceSort`は`SortingCriteria.⟪⟦Front⟧To⟦Back⟧⟫`を指定しない。
+        `Default`はGPUによって通常(NVIDIAやAMD)は`FrontToBack`が有効だが、
+        `Z Pre Pass`を常に行うGPU(PowerVRやApple GPU)では`NoDistanceSort`にする。
     - `ResetTransparencySortSettings()`でリセット
       - `enum TransparencySortMode transparencySortMode`: ソートモードの透明オブジェクト。
         - `⟪Default¦Perspective¦Orthographic¦↓CustomAxis(or GraphicsSettings)⟫`
-      - `Vector3` `transparencySortAxis`: オブジェクト(`Renderer`)を描画順のソートする時に使用する軸(`Axis`) (**Built-inかも?**)
+      - `Vector3` `transparencySortAxis`: オブジェクト(`Renderer`)を描画順のソートする時に使用する軸(`Axis`)。(`SortingSettings.customAxis`)
+      - メモ
+        `⟪Perspective¦Orthographic¦CustomAxis⟫`は`DistanceMetric.⟪Perspective¦Orthographic¦CustomAxis⟫`と同じであり、
+        `Default`は`camera.orthographic`が`true`なら`Orthographic`、`false`なら`Perspective`となる。
   - **Built-In,レガシー機能**
     - RenderingPath
       - `RenderingPath actualRenderingPath`: 現在使われているレンダリングパス(Read-Only)。
@@ -154,7 +162,7 @@
 
 - **Copy, Culling, Frustum**
   - `CopyFrom(Camera other)`: `other`の設定パラメータをこの`Camera`に**コピー**する(`Transform`と`Layer`もコピーされる)
-  - `bool TryGetCullingParameters(＠❰bool stereoAware,❱ out ScriptableCullingParameters cullingParameters)`:
+  - `bool` **TryGetCullingParameters**`(＠❰bool stereoAware,❱ out ScriptableCullingParameters cullingParameters)`:
     - `Camera`の`ScriptableCullingParameters`を取得する。(`ctx.Cull(ref cullParams)`のようなもの?)
   - `CalculateFrustumCorners(Rect viewport, float z, Camera.MonoOrStereoscopicEye eye, Vector3[] outCorners)`:
     - `viewport`座標と`Camera`の深度(`z`)が与えられると、`View`空間の`Frustum`の4つの`Corner`(クラスタの面のようなもの)を計算して`outCorners`に入れる。(Forward+のクラスタ?)

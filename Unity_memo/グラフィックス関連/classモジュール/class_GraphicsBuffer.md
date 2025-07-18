@@ -71,6 +71,7 @@
     - `Target.Raw`で**代用**できるし存在している理由がよく分からない
   - `.IndirectArgument`: SRV,UAV
     - めんどくさそうなので触れないでおく。**Draw,Dispatch系の引数しか積めない**
+  - `.Copy⟪Source¦Destination⟫`: `cmd.CopyBuffer(GraphicsBuffer source, GraphicsBuffer dest)`で使用 (>GPUによって効率的にコピーされます。)
 
 - プロパティ
   - **.ctor(target, ＠❰usageFlags❱, count, stride)**:
@@ -91,7 +92,7 @@
 - メソッド
   - **Release**`()`: バッファーを解放する
   - バッファへのアクセス
-    - **SetData**`(⟪NativeArray<T>¦List<T>¦Array⟫ data, ＠❰int managedBufferStartIndex, int graphicsBufferStartIndex, int count❱)`
+    - **SetData**`(⟪NativeArray<T>¦List<T>¦Array⟫ data ＠❰, int managedBufferStartIndex, int graphicsBufferStartIndex, int count❱)`
       - `graphicsBuffer{(graphics～graphics + count) * sizeof(data[0])} = data[managed..managed + count-1]`: `dataの範囲`をそのまま`オフセット(graphics)`して`graphicsBuffer`に入れる
       - `❰int managedBufferStartIndex, int graphicsBufferStartIndex, int count❱`を省略した場合は、`(0, 0, data.Length)`になると思われる
       - `⟪managed¦graphics⟫BufferStartIndex`と`count`は`sizeof(data[0])`の**単位**
@@ -118,7 +119,8 @@
         - `int countWritten`: バッファに書き込まれた要素の数
     - **Target.Append**:
       - **SetCounterValue**`(uint counterValue)`: **カウンターを設定**する
-      - (static)**CopyCount**`(GraphicsBuffer src, GraphicsBuffer dst, int dstOffsetBytes)`: `src`の**カウンター**を`dst`の`dstOffsetBytes`された位置に**コピー**する
+      - (static)**CopyCount**`(GraphicsBuffer src, GraphicsBuffer dst, int dstOffsetBytes)`
+        :`src`の**カウンター**を`dst`の`dstOffsetBytes`された位置に**コピー**する。(`dst`=`new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, sizeof(uint))`)
 
 - アライメント
   - **アライメントルール**

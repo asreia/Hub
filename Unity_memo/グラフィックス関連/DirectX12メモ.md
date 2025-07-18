@@ -411,6 +411,7 @@
         `ScaledBias = SlopeScaledDepthBias * MaxDepthSlope`
         `FinalDepthBias = clamp(ScaledBias + DepthBias, -DepthBiasClamp, DepthBiasClamp)`
         `NewDepth = depth + FinalDepthBias`
+        設定は深度バッファの解像度(32bitなど)の精度単位(precision unit)で基本的に整数で設定する
         - `INT DepthBias`: **DSVのデプス**に加算する
         - `FLOAT SlopeScaledDepthBias`: カメラの視線に対して**ポリゴンの傾き**に応じて加算する
         - `FLOAT DepthBiasClamp`: 最終的な`Bias`を`-DepthBiasClamp`～`DepthBiasClamp`で`Clamp`する
@@ -602,7 +603,7 @@
       - `FLOAT ⟪Min¦Max⟫Depth`: デプス範囲
 
 - ☆`R_GraphicsCommandList->`**RSSetScissorRects**`(..)`
-  ラスタライズ時に指定したスクリーン空間の範囲に**クランプ**する
+  ラスタライズ時に指定したスクリーン空間の範囲に**クランプ**する (クランプ外のPixelシェーダーは起動しない)
   - **D_RECT**[] `pRects`
 
 ###### シェーダーリソースSet

@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2025-07-08T10:24:27.198Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="Nx4aenqbYU2Y3w4c3q6a" version="21.7.5" type="device" pages="43">
+<mxfile host="Electron" modified="2025-07-16T08:15:08.881Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="LHNi4B8GJ5U2X5rOusaQ" version="21.7.5" type="device" pages="43">
   <diagram id="c6NIqjE_sVigoFiQtTPQ" name="ページ1">
     <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -5461,7 +5461,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Mu--hBcgyWx8USnrrwoU-2" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;Materialプロパティ&lt;br&gt;&lt;font color=&quot;#616161&quot; style=&quot;font-size: 10px;&quot;&gt;Properties{..}&lt;/font&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#666666;fillColor=#f5f5f5;fontColor=#333333;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="Mu--hBcgyWx8USnrrwoU-2" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;MaterialProperty&lt;br&gt;&lt;font color=&quot;#616161&quot; style=&quot;font-size: 10px;&quot;&gt;Properties{..}&lt;/font&gt;&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#666666;fillColor=#f5f5f5;fontColor=#333333;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="1250" y="50" width="130" height="40" as="geometry" />
         </mxCell>
         <mxCell id="Mu--hBcgyWx8USnrrwoU-3" value="" style="endArrow=none;html=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=1;endFill=0;curved=1;" parent="1" edge="1">
@@ -5695,8 +5695,23 @@
         <mxCell id="0OLF60JKqtwA8tdZjBGd-1" value="&lt;div style=&quot;color: rgb(212, 212, 212); background-color: rgb(30, 30, 30); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px;&quot;&gt;cmd.&lt;span style=&quot;color: #dcdcaa;&quot;&gt;DrawRendererList&lt;/span&gt;(&lt;span style=&quot;color: #9cdcfe;&quot;&gt;rendererList&lt;/span&gt;)&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="5" y="218" width="290" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="fIoJuL6MBJGMXQ359bPG-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;Instancing→SubMesh→Mesh→Shader→RT&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="fIoJuL6MBJGMXQ359bPG-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;Instancing→SubMesh→Mesh→Shader→RT&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="562.5" y="920" width="290" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sKOGIzP3i4fwBP2qJ6vm-1" value="" style="endArrow=block;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;startArrow=diamond;startFill=1;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="Hrjal78DUobDIs1YE1ly-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="625" y="640" as="sourcePoint" />
+            <mxPoint x="705" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sKOGIzP3i4fwBP2qJ6vm-2" value="&lt;p data-pm-slice=&quot;1 1 []&quot;&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;renderer.SetPropertyBlock(block)&lt;/font&gt;&lt;/p&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="425" y="658" width="230" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sKOGIzP3i4fwBP2qJ6vm-3" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;↓ECSでは消えてくれる&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="435" y="578" width="150" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PU92TGvGF8ss2HK3jkbV-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;Shader側をまとめてPropertyと呼ぶことにする&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1105" y="8" width="270" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -6156,7 +6171,7 @@
         <mxCell id="43vuXvZxMehk5fRdyvCi-18" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;Features&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="43vuXvZxMehk5fRdyvCi-19" vertex="1">
           <mxGeometry x="23" y="11" width="80" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="6nDZQITiixTFvYUZfKjM-3" value="" style="endArrow=block;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;startArrow=diamond;startFill=1;endFill=1;exitX=1.006;exitY=0.361;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" target="6nDZQITiixTFvYUZfKjM-1" edge="1" source="X9vtZWp23H8-rrNgMFnz-8">
+        <mxCell id="6nDZQITiixTFvYUZfKjM-3" value="" style="endArrow=block;html=1;rounded=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=2;startArrow=diamond;startFill=1;endFill=1;exitX=1.006;exitY=0.361;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="X9vtZWp23H8-rrNgMFnz-8" target="6nDZQITiixTFvYUZfKjM-1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="628.74" y="245.76999999999998" as="sourcePoint" />
             <mxPoint x="889" y="248" as="targetPoint" />
@@ -6380,6 +6395,9 @@
         </mxCell>
         <mxCell id="I_Cy5jnTMsHFwv257Vrn-2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=7;" parent="I_Cy5jnTMsHFwv257Vrn-3" vertex="1">
           <mxGeometry width="447" height="282" as="geometry" />
+        </mxCell>
+        <mxCell id="IZHlS8BmFE1igRmPqoJP-1" value="&lt;p style=&quot;line-height: 70%; font-size: 6px;&quot;&gt;&lt;font color=&quot;#616161&quot; style=&quot;font-size: 6px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;GraphicsSettings.&lt;br&gt;currentRenderPipeline&lt;/font&gt;&lt;/p&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="363" y="89" width="90" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
@@ -9611,7 +9629,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="ONH86bkPSiUYJDZadxX-" name="ページ29">
-    <mxGraphModel dx="1687" dy="993" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -14262,7 +14280,7 @@
         <mxCell id="BG4NAv7xP5zh-ujhwMwd-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(RTとShaderは固定)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="20" y="38" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="5eOCYmkn8kSsqRnXXKOg-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(&lt;/font&gt;&lt;font color=&quot;#67ab9f&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;R_RootSignature&lt;/font&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;も&lt;/font&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;設定可能)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="5eOCYmkn8kSsqRnXXKOg-1" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(&lt;/font&gt;&lt;font color=&quot;#67ab9f&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;R_RootSignature&lt;/font&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;も&lt;/font&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;設定可能)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="488" y="211" width="200" height="30" as="geometry" />
         </mxCell>
       </root>
