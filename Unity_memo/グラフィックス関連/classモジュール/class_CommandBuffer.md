@@ -1,10 +1,15 @@
 # CommandBuffer (非UnityObject, UnityEngine.CoreModule.dll)
 
+[](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Rendering.CommandBuffer.html)
 - `cmd`実行可能なメソッド
   :`⟪ctx¦Graphics⟫.ExecuteCommandBuffer＠❰Async❱(CommandBuffer cmd ＠❰, ComputeQueueType queueType❱)`,
   `camera.AddCommandBuffer(CameraEvent evt, CommandBuffer cmd)`,
   `light.AddCommandBuffer(LightEvent evt, CommandBuffer cmd ＠❰, ShadowMapPass shadowPassMask❱)`
-- `ctx.ExecuteCommandBuffer(cmd)`は`cmd`を積むだけ。`ctx.Submit()`で積まれた`cmd`の全ての処理が開始される
+- `ctx.ExecuteCommandBuffer(cmd)`: `cmd`を積むだけ。(`ctx.ExecuteCB(cmd)`は`cmd`を**キャッシュして使い回す**ことができる。`⟪Begin¦End⟫Event(｢cmdName｣)`が自動的に挿入される)
+- `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`LocalProperty`(`⟪material¦compute⟫.Set～(..)系`)が**反映される単位**)
+  - `Properties{..}`に**含めない**と`GlobalProperty`となる(`cmd.SetGlobal～(..)`)
+  - `Properties{..}`に**含める**と`Local(Material)Property`となる(`mat.Set～(..)`,`MaterialPropertyBlock`)
+- [cmdは、各Action後に設定などを自動で元に戻すことはない。設定は次のActionにも引き継がれる。必要に応じて手動で元に戻す必要がある。](https://chatgpt.com/c/68819d44-de38-8329-a5ee-e4a7fdf831d6)
 
 - CommandBuffer系
   - `.ctor()`: 新しい空の`cmd`を**作成**する。
@@ -21,17 +26,26 @@
     - `BuildRayTracingAccelerationStructure(RayTracingAccelerationStructure accelerationStructure, Vector3 relativeOrigin)`
       :加速構造(`accelerationStructure`)を構築
 - **SetPass系**
-  :設定は基本的に`ctx.ExecuteCommandBuffer(cmd)`実行後に**リセット**する (個別で設定する場合は、`ShaderLab/∮RenderingState∮`, `RenderStateBlock` を使う)
+  :設定は基本的に**Actionを実行**したら**元に戻す**。(`cmd.SetGlobal～(..)系`と同様で**エディター再起動まで設定がGPUにキャッシュ**される)
+  (個別で設定する場合は、`ShaderLab/∮RenderingState∮`, `RenderStateBlock` を使う)
   - RenderingState系
     - カリング
-      - `SetInvertCulling(bool invertCulling)`: **カリング反転**。`invertCulling=true`で**BackFaceカリング**を**反転**。(DirectXの**Z反転対策**は`FrontCCW`で合わせている?)
+      - `SetInvertCulling(bool invertCulling)`*ok*: **カリング反転**(`％false`)。しかし実際は、
+        *DirectX12*の**Front CCW**を操作する:
+          `BRTT.CameraTarget`への描画時:`true`:**オン**
+          `RenderTexture`への描画時:`true`:**オフ**
+        (`cmd.SetGlobal～(..)系`と同様で**エディター再起動まで設定がGPUにキャッシュ**される) (`GUITexture.Draw`は`Cull Mode:None`(両面描画))
     - ビューポート、シザー
-      - `SetViewport(Rect pixelRect)`: **ビューポート設定**。`pixelRect`(スクリーン空間)に**ストレッチ**する。(**アクティブRT変更時**、その**rt解像度にリセット**される) (1つのみ, depthは無い)
-      - `EnableScissorRect(Rect scissor)`: **シザー設定**。`pixelRect`(スクリーン空間)に**クランプ**する。(1つのみ, クランプ外のPixelシェーダーは起動しない)
-        - `DisableScissorRect()`: ↑で設定したシザー設定を**無効**にする
+      :**原点は左下**。(でも*DirectX12*では左上に原点が変換されている) [](images\Viewport_ScissorRect.png)
+      - `SetViewport(Rect pixelRect)`*ok*: **ビューポート設定**。`pixelRect`(スクリーン空間)に**ストレッチ**する。(1つのみ, depthの範囲指定は無し)
+        :**アクティブRT変更時**、その**rtスクリーンサイズ**に**リセット**
+        *DirectX12*で`D_VIEWPORT.TopLeftY`の**下限値が0でクランプ**されるという**バグ**がある[](images\SetViewport_bug.png)
+      - `EnableScissorRect(Rect scissor)`*ok*: **シザー設定**。`scissor`(スクリーン空間)に**クランプ**する。(1つのみ, クランプ外のPixelシェーダーは起動しない)
+        - `DisableScissorRect()`: ↑で設定したシザー設定を**無効**にする (忘れると他のパス(`GUITexture.Draw`など)でもシザーされてしまう)
     - シャドー関係
-      - `SetGlobalDepthBias(float bias, float slopeBias)`:Globalな**デプスバイアス**を設定。設定は深度バッファの解像度(32bitなど)の**精度単位**(precision unit)で基本的に整数で設定する
-          :DirectX12に対して`bias`は`DepthBias`、`slopeBias`は`SlopeScaledDepthBias`と同じ。(`DepthBiasClamp`は無い)
+      - `SetGlobalDepthBias(float bias, float slopeBias)`*ok*:Globalな**デプスバイアス**を設定。[](images\SetGlobalDepthBias.png)
+        :設定は深度バッファのFormat精度(32bitなど)の**精度単位**(precision unit)で基本的に整数で設定する
+        DirectX12に対して`bias`は`DepthBias(符号反転)`、`slopeBias`は`SlopeScaledDepthBias(符号反転)`と同じ。(`DepthBiasClamp`は無い)
       - `SetShadowSamplingMode(RTI shadowmap, ShadowSamplingMode mode)`: `Texture`の**シャドウサンプリングモード**を設定。(**シャドウマップ**を**サンプリング**したい場合に設定(`RawDepth`))
         :`class Texture`が**シャドウマップ**か**通常のテクスチャ**かは、Unity内部で設定される。(`シャドウマップ`になるパターン: `Light`による影の生成, `LightEvent.AfterShadowMap`)
         - `enum ShadowSamplingMode`: DirectX12では`D_SAMPLER_DESC/D_COMPARISON_fUNC`に対応する。
@@ -39,7 +53,9 @@
           - `RawDepth`: **シャドウマップ**を**サンプリング**したい場合の設定。HLSLで`SamplerState`,`shadowMap.Sample～(..)`を使う。
           - `None`: **通常のテクスチャ**のデフォルト。
     - ワイヤーフレーム
-      - `SetWireframe(bool enable)`: **ワイヤーフレーム描画**を設定。(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`)
+      - `SetWireframe(bool enable)`*ok*: **ワイヤーフレーム描画**を設定。[](images\SetWireframe.png)
+        :(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`) (`GUITexture.Draw`は`true`に明示的に指定されてると思われる(`false`にならない))
+        `Wireframe`は、線の太さは1px固定であり、CGでよく見る*ワイヤーフレーム表現*は、実際には`Wireframe`描画機能を使わず、**ジオメトリシェーダー**などで描画されている。
     - XR関係
       - `SetSinglePassStereo(SinglePassStereoMode mode)`: シングルパスステレオを設定
       - `SetInstanceMultiplier(uint multiplier)`: インスタンス数に乗算する値を設定
@@ -56,7 +72,9 @@
         `＠○⟦, RenderBuffer○¦⟪Load¦Store⟫Action ＠⟪color¦depth⟫○¦⟪Load¦Store⟫Action⟧,`『⟪Load¦Store⟫Action
         `＠❰int mipLevel＠❰, CubemapFace cubemapFace＠❰, int depthSlice❱❱❱)`『**サブリソース**(無い場合は、RTI(rIt, mipLevel, cubeFace, depthSlice)を使う): >描画先**RTを設定**。
         :`color`バッファと`depth`バッファは**同じ解像度**である必要があるので、`mipLevel != 0`の場合はそれと同じ解像度の`depth`バッファを用意する必要がある。(ミップマップ生成はカラーバッファのみ)
-        `cmd`実行中のみ**RT**が切り替わり、`ctx.ExecuteCommandBuffer(cmd)`で`cmd`の実行が終わると**元のRT**に戻る。
+        ✖❰`cmd`実行中のみ**RT**が切り替わり、`ctx.ExecuteCommandBuffer(cmd)`で`cmd`の実行が終わると**元のRT**に戻る。❱
+          **戻らない**。**Unity公式**が、>コマンドバッファーの実行中にアクティブなレンダーターゲットを明示的に保持する必要はありません(現在のレンダーターゲットが保存とリストアをあとでします)。
+          という事から勘違いしたと思われ、実験したところ`ctx.Submit()`を超えても**戻らなかった**。恐らく**Unity公式**は、Unity内部の`RenderPipeline`内部で**元に戻している**という意味だと思う。
     - NativeRenderPass系 (Unity.Drawio/ページ44 参照) (MetalやVulkanでは前提機能)
       - `BeginRenderPass(int width, int height ＠❰, int volumeDepth❱, int samples,`
         `NativeArray<AttachmentDescriptor> attachments, int depthAttachmentIndex, NativeArray<SubPassDescriptor> subPasses ＠❰, ReadOnlySpan<byte> debugNameUtf8❱)`
@@ -89,7 +107,7 @@
       - `EndRenderPass()`: **NativeRenderPassを終了**し、**アタッチメント**を**テクスチャとして参照**できるようになる
       - `static bool ThrowOnSetRenderTarget`:`true`:`cmd.SetRenderTarget(..)`された時に**例外をスロー**する。(主に、**NativeRenderPass**を使用中に実行されるのを防ぐため)
   - Property系
-    - ShaderProperty系 (設定は**C#コンパイルも跨ぐ**(GPUバッファだから?))
+    - ShaderProperty系 (設定は**C#コンパイルも跨ぐ**(GPUバッファだから?)) (**Global**Property(↓多分全て)は`Properties{..}`に含まれて**いない**`ShaderProperty`を**設定**する)
       - 基本ShaderProperty_Set
         - `SetGlobal⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫`
           `(int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: `Global`ShaderPropertyを設定
@@ -110,9 +128,9 @@
           `(⟪Compute¦RayTracing⟫Shader shader ＠❰, int kernelIndex ❱, int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: ⟪`Compute`¦`RayTracing`⟫ShaderPropertyを設定
           :`Compute`Shaderで`⟪Buffer¦Texture⟫`を設定する場合は`int kernelIndex`が必要。
           後は大体`SetGlobal`と同じ。
-      - VP_Matrix,プレーン (**Draw～(..)系**の描画前に設定する)
-        - `SetupCameraProperties(Camera camera)`: `camera`からVP_Matrixとクリッププレーンを設定
-          :↓,↓↓の **ビューMatrix**,**プロジェクションMatrix** と **クリッピングプレーン**(`float4 unity_CameraWorldClipPlanes[6]`) を設定
+      - VP_Matrix,クリッププレーン (**Draw～(..)系**の描画前に設定する)
+        - `SetupCameraProperties(Camera camera)`: `camera`から*VP_Matrix*と*クリッププレーン*を設定
+          :↓,↓↓の **ビューMatrix**,**プロジェクションMatrix** と **クリッププレーン**(`float4 unity_CameraWorldClipPlanes[6]`) を設定
         - `SetViewMatrix(Matrix4x4 view)`: ビューMatrix を設定 (`unity_MatrixV`)
           >Unityの`View`空間はOpenGLの規約と一致していて、カメラの前方方向が **-Z方向** なのです。
         - `SetProjectionMatrix(Matrix4x4 proj)`: プロジェクションMatrix を設定 (`glstate_matrix_projection`)
@@ -128,9 +146,9 @@
       - Rayトレーシング
         - `Set＠❰Global❱RayTracingAccelerationStructure(⟪RayTracingShader rayTracingShader¦ComputeShader computeShader, int kernelIndex⟫, int nameID, RayTracingAccelerationStructure accelerationStructure)`:
           :加速構造(`accelerationStructure`)をシェーダーに設定
-    - ShaderKeyword系 (これは`ctx.ExecuteCommandBuffer(cmd)`でリセット?)
+    - ShaderKeyword系 (✖❰これは`ctx.ExecuteCommandBuffer(cmd)`でリセット❱ **維持される**(GPUキャッシュ?))
       - `SetKeyword(⟪｡ref GlobalKeyword keyword¦⟪Material material¦ComputeShader computeShader⟫, ref LocalKeyword keyword｡⟫, bool value)`
-        :⟪`GlobalKeyword`¦`LocalKeyword`⟫の**ShaderKeyword**の状態(`value`)を設定する
+        :⟪`GlobalKeyword`¦`LocalKeyword`⟫の**ShaderKeyword**の状態(`value`)を設定する。(`シェーダーバリアント.md` を参照)
 - **Action系**
   - Clear系
     - `ClearRenderTarget(RTClearFlags clearFlags, Color＠❰[]❱ backgroundColor＠❰s❱, float depth = 1.0, uint stencil = 0)`: RTを**クリア**
@@ -146,15 +164,17 @@
       - `CopyTexture(RTI src ＠○⟦, int src⟪Element＃⟪Mip＃⟪X¦Y¦Width¦Height⟫⟫⟫⟧, RTI dst ＠○⟦, int dst⟪Element＃⟪Mip＃⟪X¦Y⟫⟫⟫⟧)`
         :テクスチャのコピー。`src`と`dst`は**サイズ**と**フォーマット**が一致していること。DirectX12API:`R_GraphicsCommandList->CopyTextureRegion(..)`
         (`src`と`dst`が両方とも`texture.isReadable`が`true`ならば、CPU上でもコピーする可能性がある)
-      - `ConvertTexture(RTI src ＠❰, int srcElement❱, RTI dst ＠❰, int dstElement❱)`
-        :`src`から`dst`へ**Blitしてコピー**。`src`と`dst`は`＠❰非❱RenderTarget`どちらでも良く、`解像度`と`DXGI_FORMAT`が異なっていても良い。
+      - `ConvertTexture(RTI src ＠❰, int srcElement❱, RTI dst ＠❰, int dstElement❱)`*ok*
+        :`src`から`dst`へ**Blitしてコピー**。`src`は`＠❰非❱RenderTarget`どちらでも良く、`dst`は`Texture2D`であり`BCn`などの圧縮フォーマットでは**ない**こと。
+        `src`と`dst`が`解像度`と`DXGI_FORMAT`が異なっていても良い。
           (内部的には、`[src]`=`Blit`=>`[dstTempRT]`=`CopyTexture`=>`[dst]`をしている(`Blit`を使っているがURPでも使用可能))
+          (`src`も`dst`も`BRTT.CameraTarget`は**使用不可**(恐らく`BRTT.～`すべてだめ))
     - バッファ系
       - `CopyBuffer(GraphicsBuffer source, GraphicsBuffer dest)`: >GPUによって効率的にコピーされます。
         :条件: `⟪source¦dest⟫.Target.⟪CopySource¦CopyDestination⟫`が必要。`source`と`dest`で`count * stride`が一致している必要がある。
       - `CopyCounterValue(GraphicsBuffer src, GraphicsBuffer dst, uint dstOffsetBytes)`
         :`src`の**カウンター**を`dst`の`dstOffsetBytes`された位置に**コピー**する。(`GraphicsBuffer.CopyCount(..)`と同じ)
-        ((`dst`=`new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, sizeof(uint))`))
+        (`dst`=`new GraphicsBuffer(GraphicsBuffer.Target.Raw, 1, sizeof(uint))`)
   - (テクスチャ更新)
     - `IncrementUpdateCount(RTI dest)`: `texture.updateCount`を**インクリメント**するだけ。(**cmd経由**で`texture`を直接更新した場合に使う)
 - synchronize系
@@ -183,7 +203,7 @@
       `(＠❰ref Native⟪Slice¦Array⟫<T> output,『❰IntoNative⟪Slice¦Array⟫❱の場合』❱`『`✖❰IntoNative⟪Slice¦Array⟫❱`の場合、Unityが一時的に確保して次のフレームで破棄してしまう
       `⟪`
         `GraphicsBuffer src ＠❰, int size, int offset❱『バイト単位`
-        `¦Texture src ＠❰｡, int mipIndex ＠❰, int x, int width, int y, int height, int z, int depth❱ ＠❰⟪Texture¦Graphics⟫Format dstFormat❱｡❱`
+        `¦Texture src ＠❰｡, int mipIndex ＠❰, int x, int width, int y, int height, int z, int depth❱ ＠❰, ⟪Texture¦Graphics⟫Format dstFormat❱｡❱`
           『`dstFormat`: `src.graphicsFormat`と違う場合は自動変換(`src: R16G16B16A16_SFloat → dstFormat: R8G8B8A8_UNorm`など) (`DirectXTex`を使っている?)
       `⟫`
       `, Action<AsyncGPUReadbackRequest> callback)`

@@ -153,7 +153,8 @@
           :(`＠❰StructuredBuffer<uint>❱ _indexBuffer[SV_VertexID]`で参照できる)
     - `DrawOcclusionMesh(RectInt normalizedCamViewport)`:
       :ビューポートの範囲(`normalizedCamViewport`)に**VRデバイスが提供するOcclusion Mesh**(見えない部分のメッシュ)を**深度バッファ**に**Nearクリップ面で描画**する
-    - `Blit`: **URP非推奨**。`DrawMesh(..)`などを使って**低レベル操作で実現**する。テクスチャを別のレンダーテクスチャにシェーダーを使ってコピー
+    - `Blit`*ok*: **URP非推奨**。`DrawMesh(..)`などを使って**低レベル操作で実現**する。テクスチャを別のレンダーテクスチャにシェーダーを使ってコピー
+      `cmd.Blit(rt, BRTT.CameraTarget)`は動いた。(`cmd.ConvertTexture(..)`が使えないときは有用かも)
   - Dispatch系
     - `DispatchCompute(ComputeShader computeShader, int kernelIndex, ⟪｡○⟦, ┃int threadGroups⟪X¦Y¦Z⟫⟧｡¦｡GraphicsBuffer indirectBuffer, uint argsOffset｡⟫)`
       :Computeシェーダーを実行する

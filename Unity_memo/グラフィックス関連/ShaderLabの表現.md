@@ -25,7 +25,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                 ＃Color_ATT＝≪∮ALL_ATT∮≫
                 ＃Vector_ATT＝≪∮ALL_ATT∮＠❰\[Gamma]❱≫
                 ＃2D_ATT＝＃3D_ATT＝＃Cube_ATT＝≪∮ALL_ATT∮∮2D_3D_Cube_ATT∮≫
-                    ＃2D_3D_Cube_ATT＝≪＠❰\[NoScaleOffset]❱＠❰\[Normal]❱＠❰\[HDR]❱＠❰\[PreRenderData]❱≫
+                    ＃2D_3D_Cube_ATT＝≪＠❰\[NoScaleOffset]❱＠❰\[Normal]❱＠❰\[HDR]❱＠❰\[PerRendererData]『MaterialPropertyBlock』❱≫
                     ＃ALL_ATT＝≪＠❰\[HideInspector]❱＠❰\[Header(｢ShowString｣)]❱＠❰\[｡Space＠❰(⟪～⟫)❱｡]❱≫
     }
 
@@ -121,10 +121,12 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                         『Zファイティング回避 (glPolygonOffset関数) (URPAssetのDepthBias,NormalBiasはシェーダー制御っぽい(教科書4P40))
                         ＠❰Offset ❰⟪float┃～⟫『％0Factor』,⟪float┃～⟫『％0Units』❱『Zファイティングが発生した場合、Unitsを⟪1¦-1⟫にしダメだったらFactorも⟪1¦-1⟫にしてみる
                         『
-                        『アルファブレンディング Color(RGB(∮BlendOp∮(Src * ∮SrcFactor∮, Dst * ∮DstFactor∮)),A(∮AlphaOp∮(SrcA * ∮SrcFactorA∮, DstA * ∮DstFactorA∮)))
+                        『アルファブレンディング
+                        Color(RGBA(∮BlendOp∮(Src * ∮SrcFactor∮, Dst * ∮DstFactor∮)))『この場合⟪Src¦Dst⟫はRGBA (つまり∮⟪Src¦Dst⟫Factor∮はAlpha(A)にも掛かる)
+                        Color(RGB(∮BlendOp∮(Src * ∮SrcFactor∮, Dst * ∮DstFactor∮)),A(∮AlphaOp∮(SrcA * ∮SrcFactorA∮, DstA * ∮DstFactorA∮)))『この場合⟪Src¦Dst⟫はRGB
                         ＠❰Blend Off❱『Offしかない?
-                        ＠❰Blend ∮SrcFactor∮ ∮DstFactor∮ ＠❰∮SrcFactorA∮ ∮DstFactorA∮❱❱『○¦SD⟪Src¦Dst⟫○¦A＠❰A❱ * ○¦SD⟪Src¦Dst⟫Factor○¦A＠❰A❱ (ブレンド前処理)
-                        ＠❰Blend ∮BlendOp∮ ＠❰∮AlphaOp∮❱❱                         『∮○¦A⟪Blend¦Alpha⟫Op∮(｡Src○¦A＠❰A❱ * ∮SrcFactor○¦A＠❰A❱∮, Dst○¦A＠❰A❱ * ∮DstFactor○¦A＠❰A❱∮｡)
+                        ＠❰Blend ∮SrcFactor∮ ∮DstFactor∮ ＠❰∮SrcFactorA∮ ∮DstFactorA∮❱❱ (ブレンド係数)
+                        ＠❰Blend ∮BlendOp∮ ＠❰∮AlphaOp∮❱❱                                  (ブレンド演算)
                             ＃SrcFactor＝＃DstFactor＝＃SrcFactorA＝＃DstFactorA＝≪
                                 ⟪
                                     ⟪One¦Zero⟫『⟪1¦0⟫
@@ -272,7 +274,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                                     『32     Direct3D10 シェーダーモデル4.0 (#pragma target 4.0)
                                 ⟪ //☆
                                     ⟪Vertex『主に、TBNP、UV、Colorなど
-                                        ⟪『入力(in) (モデルデータ(ジオメトリ)の方にSemanticsが付いていてそれと対応する?)
+                                        ⟪『入力(in) (モデルデータ(ジオメトリ)のデータの並びをDirectX12のD_INPUT_LAYOUT_DESCのSemanticNameに対応させる)
                                             『頂点インデックス
                                             SV_VertexID(unit)『VertexTextureFetch(VTF)で使うやつ(テクスチャによる頂点アニメーション)『> uint の必要があります
                                                              『単純に頂点処理の連番でありIndexバッファの内容と同じではない

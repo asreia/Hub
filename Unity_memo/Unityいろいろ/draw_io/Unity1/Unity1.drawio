@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2025-05-13T01:38:10.156Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="tZrwhpwCTuBUHGkqdiyL" version="21.7.5" type="device">
+<mxfile host="Electron" modified="2025-07-19T00:48:18.698Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="guRYeZkMa30IbG592rUC" version="21.7.5" type="device">
   <diagram name="ページ1" id="PmnMEiedi1nfhbx48ZEu">
     <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -591,49 +591,49 @@
         <mxCell id="FsoMMtfHhLz3N644Kt1Y-133" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Renderer&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=42;" parent="FsoMMtfHhLz3N644Kt1Y-134" vertex="1">
           <mxGeometry width="140" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-15" value="" style="group" vertex="1" connectable="0" parent="FsoMMtfHhLz3N644Kt1Y-134">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-15" value="" style="group" parent="FsoMMtfHhLz3N644Kt1Y-134" vertex="1" connectable="0">
           <mxGeometry x="520" y="290" width="350" height="450" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-1" value="" style="group" vertex="1" connectable="0" parent="sbP9O8HD0FoWGV81-NIt-15">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-1" value="" style="group" parent="sbP9O8HD0FoWGV81-NIt-15" vertex="1" connectable="0">
           <mxGeometry width="350" height="450" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-14" value="cmd.&lt;font style=&quot;border-color: var(--border-color);&quot; color=&quot;#ad9c68&quot;&gt;DrawRendererList&lt;/font&gt;(..);" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-14" value="cmd.&lt;font style=&quot;border-color: var(--border-color);&quot; color=&quot;#ad9c68&quot;&gt;DrawRendererList&lt;/font&gt;(..);" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="-10" y="-30" width="360" height="480" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-2" value="SortingLayer.value" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-2" value="SortingLayer.value" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry width="340" height="400" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-3" value="Material.renderQueue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-3" value="Material.renderQueue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="10.625" y="30" width="318.75" height="320" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-4" value="SortingCriteria.⟪⟦Front⟧To⟦Back⟧⟫" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=6;fontColor=#333333;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-4" value="SortingCriteria.⟪⟦Front⟧To⟦Back⟧⟫" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=6;fontColor=#333333;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="21.25" y="60" width="297.5" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-5" value="Order In Layer❰sortingOrder❱" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=9;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-5" value="Order In Layer❰sortingOrder❱" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=9;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="31.875" y="90" width="276.25" height="160" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-6" value="Renderer.rendererPriority" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-6" value="Renderer.rendererPriority" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="42.5" y="120" width="255" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-7" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-7" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="31.875" y="250" width="276.25" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-8" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-8" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="42.5" y="200" width="255" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-9" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;fontColor=#333333;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-9" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;fontColor=#333333;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="21.25" y="300" width="297.5" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-10" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-10" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="10.625" y="350" width="318.75" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-11" value="&lt;p style=&quot;line-height: 140%;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Renderer Component&lt;/font&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-11" value="&lt;p style=&quot;line-height: 140%;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Renderer Component&lt;/font&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="53.125" y="150" width="233.75" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-12" value="&lt;p style=&quot;line-height: 100%;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=middle;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-1">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-12" value="&lt;p style=&quot;line-height: 100%;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=middle;" parent="sbP9O8HD0FoWGV81-NIt-1" vertex="1">
           <mxGeometry x="53.125" y="171" width="233.75" height="19" as="geometry" />
         </mxCell>
-        <mxCell id="sbP9O8HD0FoWGV81-NIt-13" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" vertex="1" parent="sbP9O8HD0FoWGV81-NIt-15">
+        <mxCell id="sbP9O8HD0FoWGV81-NIt-13" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="sbP9O8HD0FoWGV81-NIt-15" vertex="1">
           <mxGeometry y="400" width="340" height="40" as="geometry" />
         </mxCell>
         <mxCell id="FsoMMtfHhLz3N644Kt1Y-148" value="" style="endArrow=classic;html=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=1;curved=1;" parent="1" edge="1">
@@ -646,42 +646,6 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-14" value="" style="group" parent="1" vertex="1" connectable="0">
-          <mxGeometry x="1310" y="730" width="320" height="400" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-15" value="cmd.&lt;font color=&quot;#ad9c68&quot;&gt;DrawRendererList&lt;/font&gt;(..);" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry width="320" height="400" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-16" value="SortingLayer.value" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;arcSize=4;verticalAlign=top;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="10" y="30" width="300" height="320" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-17" value="Material.renderQueue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=6;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="20" y="60" width="280" height="240" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-18" value="Order In Layer❰sortingOrder❱" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;arcSize=9;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="30" y="90" width="260" height="160" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-19" value="Renderer.rendererPriority" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=top;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="40" y="120" width="240" height="80" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-20" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="30" y="250" width="260" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-21" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="40" y="200" width="240" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-22" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="20" y="300" width="280" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-23" value="&lt;font style=&quot;font-size: 44px;&quot;&gt;..&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="10" y="350" width="300" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-24" value="&lt;p style=&quot;line-height: 140%;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Renderer Component&lt;/font&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=bottom;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="50" y="150" width="220" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-25" value="&lt;p style=&quot;line-height: 100%;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;verticalAlign=middle;" parent="XlvRvzIHcS2Y8bgPnUmv-14" vertex="1">
-          <mxGeometry x="50" y="171" width="220" height="19" as="geometry" />
-        </mxCell>
         <mxCell id="FsoMMtfHhLz3N644Kt1Y-149" value="" style="endArrow=classic;html=1;shadow=0;sketch=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;fontColor=default;strokeColor=#616161;strokeWidth=1;curved=1;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="668" y="496" as="sourcePoint" />
@@ -693,9 +657,6 @@
         </mxCell>
         <mxCell id="XlvRvzIHcS2Y8bgPnUmv-13" value="&lt;font style=&quot;font-size: 32px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;..&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="685" y="710" width="50" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="XlvRvzIHcS2Y8bgPnUmv-26" value="&lt;font style=&quot;font-size: 16px;&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;SortingCriteria.⟪⟦Front⟧To⟦Back⟧⟫&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1360" y="620" width="310" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

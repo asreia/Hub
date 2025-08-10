@@ -11,8 +11,7 @@
 - struct **LocalKeyword**: **一つのShader**のShaderKeywordを**有効,無効,確認**が(外部APIで)できる
   - ○`.ctor(Shader shader, string name)`: 指定されたShaderの**LocalKeyword**❰name❱を**作成**し返す(存在しない場合はエラー＆isValid==false)
   - `bool isDynamic`:  `#pragma dynamic_branch＠❰_local❱`でShaderKeywordが定義されているか(ReadOnly)
-  - ○`bool isOverridable`: trueの場合、**GlobalKeyword.Create**(string name)でGlobalKeywordが作られている?。(ReadOnly)
-    - GlobalKeywordは**有効(enable)のみ上書き可能**?((isOverridable &&) GlobalKeyword || LocalKeyword)
+  - ○`bool isOverridable`: trueの場合、`⟪shader_feature¦multi_compile⟫_local`の`_local`が付いて**いない**。つまり、**Global**から**論理和可能**。(ReadOnly)
   - `bool isValid`: このLocalShaderKeywordが**有効なObj**かを表す(ReadOnly) (LocalKeyword.ctor(shader,name)やShader.keywordSpace.FindKeyword(name)などで見つからないとfalseになる)
   - ○`string name`: ShaderKeywordの文字列(ReadOnly)
   - `ShaderKeywordType type` (ReadOnly)
@@ -91,18 +90,9 @@
   - `bool material.doubleSidedGI`
   - `MaterialGlobalIlluminationFlags material.globalIlluminationFlags`
 
-## 考察(ShaderとMaterial)===============================================================
-
-### ShaderKeywordの有効,無効,確認
-
-keywordSpace(Local)の中にGlobalKeywordも含む?(isOverridable)
-  ○(isOverridable &&) **GlobalKeyword || LocalKeyword**
-
-### ShaderPropertyの設定,取得
-
-ShaderPropertyは、Properties{..}含まれていればLocalProperty?。Set/Get(..)は、Local,Global独立 or 優先Local > Global or 上書き ?
+## SRP Batcherメモ
 
 - スクリプトからのプロパティ操作について (ナレッジ 32:44) (DOTS InstanceShader でも同じ?)
-  - SRP Batcher対応マテリアルに対してMaterial.SetColorなどでスクリプトからシェーダーのCBUFFER外のプロパティを操作している場合、予期せぬ挙動になる場合がある
-  - スクリプトから操作するプロパティはProperties{..}に宣言し、CBUFFERに含めるのが無難
+  - **SRP Batcher対応マテリアル**に対してMaterial.SetColorなどでスクリプトからシェーダーのCBUFFER外のプロパティを操作している場合、予期せぬ挙動になる場合がある
+  - スクリプトから操作するプロパティは**Properties{..}に宣言**し、**CBUFFERに含める**のが無難 (SRP Batcherは`LocalProperty`のみ対象?)
   - Inspectorから隠したい場合は[HideInInspector]アトリビュートを使う
