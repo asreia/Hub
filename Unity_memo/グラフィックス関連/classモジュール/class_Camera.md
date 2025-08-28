@@ -41,7 +41,7 @@
   - `int` **cullingMask**: `gameObject.layer`との**論理積**でその`gameObject`を**描画するか**決める
   - `Scene scene`: NULLでない場合、カメラは指定されたSceneの内容のみをレンダリングする。(EditorSceneManager.NewPreviewSceneで作成されたSceneのみサポート)
   - **Sort**
-    - `enum OpaqueSortMode opaqueSortMode`: オブジェクトを不透明にするソーティングモード
+    - `enum OpaqueSortMode opaqueSortMode`: 不透明のSortMode。(距離(`⟪⟦Front⟧To⟦Back⟧⟫`)を設定する)
       - `⟪Default¦FrontToBack¦NoDistanceSort⟫`
       - メモ
         `FrontToBack`は`SortingCriteria.QuantizedFrontToBack`であり、
@@ -49,9 +49,10 @@
         `Default`はGPUによって通常(NVIDIAやAMD)は`FrontToBack`が有効だが、
         `Z Pre Pass`を常に行うGPU(PowerVRやApple GPU)では`NoDistanceSort`にする。
     - `ResetTransparencySortSettings()`でリセット
-      - `enum TransparencySortMode transparencySortMode`: ソートモードの透明オブジェクト。
-        - `⟪Default¦Perspective¦Orthographic¦↓CustomAxis(or GraphicsSettings)⟫`
-      - `Vector3` `transparencySortAxis`: オブジェクト(`Renderer`)を描画順のソートする時に使用する軸(`Axis`)。(`SortingSettings.customAxis`)
+      - `enum TransparencySortMode transparencySortMode`: 半透明のSortMode。(**⟪⟦Front⟧To⟦Back⟧⟫距離の計算方法**を設定する)
+        - `⟪Default¦Perspective¦Orthographic¦CustomAxis⟫` (デフォルトは、`GraphicsSettings.transparencySortMode`で設定される)
+      - `Vector3` `transparencySortAxis`: `CustomAxis`の時のオブジェクト(`Renderer`)の**描画順をソート**する時に使用する軸(`Axis`)。(`SortingSettings.customAxis`)
+        (デフォルトは、`GraphicsSettings.transparencySortAxis`で設定される)
       - メモ
         `⟪Perspective¦Orthographic¦CustomAxis⟫`は`DistanceMetric.⟪Perspective¦Orthographic¦CustomAxis⟫`と同じであり、
         `Default`は`camera.orthographic`が`true`なら`Orthographic`、`false`なら`Perspective`となる。

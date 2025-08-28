@@ -147,7 +147,7 @@
   - **struct D_HEAP_PROPERTIES**:
     - **enum D_HEAP_TYPE**: `D_HEAP_TYPE_～`:
       - `DEFAULT`: >**GPU専用メモリ**。リソースは**GPU側で高速にアクセス**。主にRT,Texture,Bufferなどに使用します。(**CUSTOM**:`NOT_AVAILABLE`,`L0`)
-      - `UPLOAD`: >**Map**で**CPU=>GPU**に転送するメモリ。**CPUからのデータアップロード**に使用されます。(**CUSTOM**:`WRITE_COMBINE`,`L0`)
+      - `UPLOAD`: >**Map**で**CPU=>GPU**に転送するメモリ。**CPUからのデータアップロード**に使用されます。(**CUSTOM**:`WRITE_COMBINE`,`L0`) (`_COMBINE`: まとめて送る)
       - `READBACK`: >**Map**で**GPU=>CPU**に転送するメモリ。**GPUの計算結果をCPUに読み込む**際に使用します。(**CUSTOM**:`WRITE_BACK`,`L1`)
       - `CUSTOM`: >カスタムヒープタイプ。`CPUPageProperty`と`MemoryPoolPreference`を明示的に指定する。
   - **struct D_RESOURCE_DESC**:
@@ -390,7 +390,7 @@
   - **struct D_GRAPHICS_PIPELINE_STATE_DESC**: 主に、シェーダーコード, ∮RenderingState∮(カリング,ADS)。他の所の設定と**重複**しているのは、**最適化**のためらしい(パイプラインをバシッと決める)
     - ルートシグネチャー: **struct R_RootSignature** `pRootSignature`:
       `CreateRootSignature(.., out R_RootSignature)`を**最適化**のためココでも設定(`SetGraphicsRootSignature(..)`でも設定される)。`## ルートシグネチャー`を参照
-    - HLSLシェーダーコード: **struct D_SHADER_BYTECODE** `⟪VS¦PS¦DS¦HS¦GS⟫`: コンパイルしたシェーダー(`D3DCompileFromFile(.., out ID3DBlob ppCode,.)`)を設定
+    - HLSLシェーダーコード: **struct D_SHADER_BYTECODE** `⟪VS¦PS¦DS¦HS¦GS⟫`: コンパイルしたシェーダー(`D3DCompileFromFile(.., out ID3DBlob ppCode,.)`)を設定 (*PS*は外せる。Unityは外せない)
       - `void* pShaderBytecode`: `ID3DBlob`の**先頭アドレス**。`ID3DBlob->GetBufferPointer()`を設定する
       - `SIZE_T BytecodeLength`: `ID3DBlob`の**長さ**。`ID3DBlob->GetBufferSize()`を設定する
     - ★ラスタライザ: **struct D_RASTERIZER_DESC** `RasterizerState`:
@@ -557,7 +557,7 @@
 
 - ☆`R_GraphicsCommandList->`**OMSetRenderTargets**`(..)`:
   - `UINT NumRenderTargetDescriptors`: `pRenderTargetDescriptors`の配列の設定要素数 **または** `RTsSingleHandleToDescriptorRange == TRUE`時`R_DescriptorHeap`の設定要素数
-  - **struct D_CPU_DESCRIPTOR_HANDLE**[] `pRenderTargetDescriptors`: `RTV[]`を設定。`0`だと**デプス**のみ。`2`以上だと**MRT**
+  - **struct D_CPU_DESCRIPTOR_HANDLE**[] `pRenderTargetDescriptors`: `RTV[]`を設定。`0`だと**デプス**のみ(*PS*は動く)。`2`以上だと**MRT**
   - `BOOL RTsSingleHandleToDescriptorRange`: `TRUE`:`pRenderTargetDescriptors`に**要素が一つ**の配列を設定して、`R_DescriptorHeap`の範囲を設定する。(`D_DESCRIPTOR_RANGE`とは関係ない)
   - **struct D_CPU_DESCRIPTOR_HANDLE** `pDepthStencilDescriptor`: `DSV`を設定
 

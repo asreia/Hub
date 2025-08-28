@@ -2,34 +2,31 @@
 
 ## Renderer (Component継承)
 
-主に、**rendererPriority**, **renderingLayerMask**, `⟪｡⟦local⟧To⟦World⟧｡⟫Matrix`, **Material**, isVisible, レンダリング方法に関する設定
+主に、**描画順序**(`SortingCriteria`), **renderingLayerMask**, `⟪｡⟦local⟧To⟦World⟧｡⟫Matrix`, **Material**, isVisible, レンダリング方法に関する設定
 
 ### Instance変数
 
-#### 有効化と優先度とレイヤー
+#### 有効化と描画順序とrenderingLayerMask
 
 - **有効化**
   - `bool enabled`: 単にこの`Renderer`の**有効無効**? (>有効にした場合、レンダリングされた 3D オブジェクトが表示されます)
   - `bool forceRenderingOff`: >特定のコンポーネントのレンダリングをオフにすることができます。?
-- **優先度**
-  - `int` **rendererPriority**: `enum SortingCriteria.RendererPriority`?
-    - >描画順序。順序は昇順
-      - **レンダリング順序**:
-        **Camera**{`Camera.depth` => `UniversalAdditionalCameraData.cameraStack`} =>
-        **Renderer**{`RenderPassEvent` => `SRPass.RecodeRenderGraph(..)` => `RenderGraph.AddRenderPass<.>(..){builder.SetRenderFunc(..)}`} =>
-        **cmd.DrawRendererList**{`Material.renderQueue` => `Sorting Layer` => `Order In Layer❰sortingOrder❱` => `Renderer.rendererPriority`}
-- **Layer系**
-  - `uint` **renderingLayerMask**:
-    - `context.DrawRenderers(..)`に渡す`struct FilteringSettings`との**論理積**で**描画**。(名前は`ProjectSettings/タグとレイヤー`で設定)
-    - **Rendering Layers**にも関係がある。影響を `与える側(Light,Decal,Shadow)`と`受ける側(Renderer)`の**論理積**で**描画**
-    - ↑の2つは、どちらも`renderingLayerMask`を使うが、`DrawRenderers(..)`と`RT renderingLayerMask(Deferredのみ?)`で使われ方が違うと思われる
-  - SortingLayer: `enum SortingCriteria.SortingLayer`?(`renderQueue`は`オブジェクト`単位で同じにする必要がある?)
+- **描画順序** (`SortingCriteria`)
+  - メモ
     >**SortingGroupComponent**は、`GameObject`を**SpritRenderer**と一緒にグループ化し、その中でSpriteを描画する順序を制御できます。
-    >1つの`GameObject`であるかのように、同じSortingGroup内のSpritRendererを一緒に描画します。
+      1つの`GameObject`であるかのように、同じSortingGroup内のSpritRendererを一緒に描画します。
+  - **SortingLayer**: `enum SortingCriteria.SortingLayer`
     [Sorting Layer ＞ Order In Layer❰sortingOrder❱ ＞ Z値](https://tsubakit1.hateblo.jp/entry/2016/12/28/231836)<https://qiita.com/lycoris102/items/b620654192af4f695fb4>
-    - `int sortingLayerID`: >レンダラーの Sorting Layer の Unique ID(デフォルトは`0`)
-    - `string sortingLayerName`: >レンダラーの Sorting Layer の名前     ←↑ ProjectSettings/Tags and Layers/Sorting Layers の値を設定する
-    - `int sortingOrder`: `sortingLayer⟪ID¦Name⟫`内の描画順 (Layerが`オブジェクト`でOrderが`オブジェクト`のパーツのような)
+    [`static SortingLayer[] SortingLayer.layers`](https://docs.unity3d.com/ja/2023.2/ScriptReference/SortingLayer.html)
+    :⟪デフォルト¦存在しない*Name*⟫は、*Name*:`Default`,*ID*:`0` となる。`SortingLayer.layers`を設定する度に*ID*が**乱数**で設定される。
+    - `int sortingLayerID`: `sortingLayerName`の**識別ID**
+    - `string sortingLayerName`: `ProjectSettings/Tags and Layers/Sorting Layers`にある*Name*を設定する
+  - **sortingOrder** `enum SortingCriteria.CanvasOrder`
+    - `int sortingOrder`: *SortingLayer*内の描画順 (*Layer*が`オブジェクト`で*Order*が`オブジェクトのパーツ`のような) (デフォルト`0`、負の数ok)
+  - `int` **rendererPriority**: `enum SortingCriteria.RendererPriority` (デフォルト`0`、負の数ok)
+- `uint` **renderingLayerMask**:
+  - `context.DrawRenderers(..)`に渡す`struct FilteringSettings`との**論理積**で**描画**。(名前は`ProjectSettings/タグとレイヤー`で設定)
+  - **Rendering Layers**にも関係がある。シェーダー内で影響を `与える側(Light,Decal,Shadow)`と`受ける側(Renderer)`の**論理積**で**描画** (こっちがメインの機能?)
 
 #### Rendererの基本要素
 
@@ -48,14 +45,14 @@
       - **独自設定**を**解除**するには`Reset＠❰Local❱Bounds()`を呼ぶ
   - `Transform probeAnchor`: 設定すると**その位置**で`LightProbe`や`ReflectionProbe`を見つける。(**デフォルト(null?)**は`↑のbounds.center`?)
 - **Material**
-  - `Material＠❰[]❱ ＠❰shared❱Material＠❰s❱`
+  - `Material＠❰[]❱ ＠❰shared❱Material＠❰s❱`  [↓renderer.material.get](images\renderer_material_get.png)
     - `✖❰shared❱`は、`Renderer`が参照している`Material`を**クローン**(シャローコピー?)して返す。(`Material`への変更は**独立**)
       - 正確には`this.＠❰shared❱Material = new Material(this.sharedMaterial)`つまり、**クローン**した`Material`を`this`(**自分自身**)に**Set**しそれを**返している(Get)**
         - そして、`new Material(..)`による**クローン**(`UnityObject.Instantiate(obj)`とは処理が違う?)は **＠❰Set後❱最初の1回**しか行われない。(2回目以降は`❰shared❱`と挙動が同じ?)
       - そうなっているのは、元々`Material`を`Asset`として**複数**の`Renderer`と**共有されている状態**から**クローンして分離**し`Material`への**変更を独立**させるためと思われる
         - **挙動が複雑**なので`sharedMaterial＠❰s❱`と`new Material(..)`のみを使うのもありかも(<https://qiita.com/nigiri/items/19bc9af74d81e91935d4>)
     - `❰shared❱`は、`Renderer`が参照している`Material`をそのまま返す。(`Material`への変更は**共有**)
-    - `✖❰shared❱`と`❰shared❱`で、`Set{..}アクセッサ`は同じなので**Set方向は同じ**
+    - `✖❰shared❱`と`❰shared❱`で、`Set{..}アクセッサ`は同じなので**Set方向は同じ** (**独立**に⟪*guid*¦C#参照?⟫で`material`に参照) (`material＠❰s❱.get`以外は**正常動作**と思われる)
     - `✖❰s❱`は、`サブMesh`があり**複数**の`Material`がある場合、**最初**の`Material`のみ返すと思われる
     - `❰s❱`は、**全て**の`Material`を配列で返す
 

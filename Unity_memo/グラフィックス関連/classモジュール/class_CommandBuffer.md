@@ -54,7 +54,7 @@
           - `None`: **通常のテクスチャ**のデフォルト。
     - ワイヤーフレーム
       - `SetWireframe(bool enable)`*ok*: **ワイヤーフレーム描画**を設定。[](images\SetWireframe.png)
-        :(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`) (`GUITexture.Draw`は`true`に明示的に指定されてると思われる(`false`にならない))
+        :(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`) (`GUITexture.Draw`は`true`に明示的に指定されてると思われる(`false`にならない))←逆?
         `Wireframe`は、線の太さは1px固定であり、CGでよく見る*ワイヤーフレーム表現*は、実際には`Wireframe`描画機能を使わず、**ジオメトリシェーダー**などで描画されている。
     - XR関係
       - `SetSinglePassStereo(SinglePassStereoMode mode)`: シングルパスステレオを設定
@@ -146,7 +146,7 @@
       - Rayトレーシング
         - `Set＠❰Global❱RayTracingAccelerationStructure(⟪RayTracingShader rayTracingShader¦ComputeShader computeShader, int kernelIndex⟫, int nameID, RayTracingAccelerationStructure accelerationStructure)`:
           :加速構造(`accelerationStructure`)をシェーダーに設定
-    - ShaderKeyword系 (✖❰これは`ctx.ExecuteCommandBuffer(cmd)`でリセット❱ **維持される**(GPUキャッシュ?))
+    - ShaderKeyword系
       - `SetKeyword(⟪｡ref GlobalKeyword keyword¦⟪Material material¦ComputeShader computeShader⟫, ref LocalKeyword keyword｡⟫, bool value)`
         :⟪`GlobalKeyword`¦`LocalKeyword`⟫の**ShaderKeyword**の状態(`value`)を設定する。(`シェーダーバリアント.md` を参照)
 - **Action系**

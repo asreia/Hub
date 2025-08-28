@@ -38,7 +38,7 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
             『`subshaderIndex`の`tagName`を**キー**に、その**バリュー**の**ShaderTagIdを返す**?
         ＠❰Tags //☆
         {
-            『↓なくなったっけ？
+            『ある
             ＠❰"Queue" = "⟪Background『1000』¦Geometry『2000(デフォルト)』¦AlphaTest『2450』¦Transparent『3000』¦Overlay『4000』⟫＠❰+⟪～⟫❱"❱
                 『`int ⟪material¦shader⟫.renderQueue`: >シェーダーのレンダーキュー(ReadOnly)
             ＠❰"RenderType" = "⟪Opaque¦Transparent⟫"❱

@@ -26,6 +26,8 @@
 
 ### メソッド
 
+- `internal static Object FindObjectFromInstanceID(int instanceID)`: なんか発見した。`internal`だから反社が必要
+
 ## Component
 
 ## Behaviour
