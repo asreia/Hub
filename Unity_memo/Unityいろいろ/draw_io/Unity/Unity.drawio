@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2025-08-23T11:26:01.381Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.7.5 Chrome/114.0.5735.289 Electron/25.8.1 Safari/537.36" etag="kqCMmU6bT3Jsn_6IDflC" version="21.7.5" type="device" pages="43">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2" pages="43">
   <diagram id="c6NIqjE_sVigoFiQtTPQ" name="ページ1">
     <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -16936,7 +16936,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="0ko1gX0mmv_igJXstHW2" name="ページ43">
-    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -16995,8 +16995,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="fH6cTPH_ErgYEFMUtxZ4-29" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;2-way merge(cherry-pick)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="fH6cTPH_ErgYEFMUtxZ4-69" vertex="1">
-          <mxGeometry x="153" y="53" width="190" height="30" as="geometry" />
+        <mxCell id="fH6cTPH_ErgYEFMUtxZ4-29" value="&lt;span style=&quot;font-family: &amp;quot;UD デジタル 教科書体 NK-B&amp;quot;;&quot;&gt;パッチの適用&lt;/span&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(cherry-pick)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="fH6cTPH_ErgYEFMUtxZ4-69" vertex="1">
+          <mxGeometry x="163" y="53" width="170" height="30" as="geometry" />
         </mxCell>
         <mxCell id="fH6cTPH_ErgYEFMUtxZ4-30" value="cA" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;strokeWidth=2;shadow=0;fontFamily=UD デジタル 教科書体 NK-B;fontSize=16;" parent="fH6cTPH_ErgYEFMUtxZ4-69" vertex="1">
           <mxGeometry y="200" width="60" height="40" as="geometry" />
@@ -17037,8 +17037,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="fH6cTPH_ErgYEFMUtxZ4-41" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;2-way merge(revert)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="fH6cTPH_ErgYEFMUtxZ4-69" vertex="1">
-          <mxGeometry x="129" y="160" width="150" height="30" as="geometry" />
+        <mxCell id="fH6cTPH_ErgYEFMUtxZ4-41" value="&lt;span style=&quot;font-family: &amp;quot;UD デジタル 教科書体 NK-B&amp;quot;;&quot;&gt;パッチの適用&lt;/span&gt;&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;(revert)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="fH6cTPH_ErgYEFMUtxZ4-69" vertex="1">
+          <mxGeometry x="134" y="160" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="fH6cTPH_ErgYEFMUtxZ4-70" value="" style="group" parent="1" vertex="1" connectable="0">
           <mxGeometry x="20" y="150" width="399" height="170" as="geometry" />
