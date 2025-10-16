@@ -43,14 +43,14 @@
 ## Static関数
 
 - `SetGlobalAnisotropicFilteringLimits(int forcedMin, int globalMax)`: 異方性のリミットを設定します
-  - `ForcedMin`は強制された場合の最小。 `globalMax` は最大。 任意の場合に -1 を設定することでデフォルト値が使用されます。
+  - `forcedMin`は強制された場合の最小。 `globalMax` は最大。 任意の場合に -1 を設定することでデフォルト値が使用されます。
 - `SetStreamingTextureMaterialDebugProperties()`: このTexture を mipmap ストリーミングシステムで使用するマテリアルの mipmap ストリーミング**デバッグShaderPropertyを設定**します。
 
 ## Instance変数
 
 - **ResourceDesc**
   - `enum TextureDimension dimension`: >Textureの**次元数** (Read-Only)
-    - ⟪`Unknown`¦`None`¦`Any`¦`Tex⟪2D¦3D⟫`¦`Cube`¦⟪`Tex2D`¦`Cube`⟫`Array`⟫
+    - ⟪`Unknown`¦`None`¦`Any`¦⟪`Tex2D`¦`Cube`⟫＠❰`Array`❱¦`Tex3D`⟫
   - `GraphicsFormat graphicsFormat`: ピクセルの**型** (`Texture2D`の場合`GPUテクスチャ`のフォーマット?)
     - `GraphicsFormat`: `R8G8B8A8_SRGB`や`R16G16B16A16_SFloat`とかのやつ
   - **解像度** (`PlayerSettings.mipStripping`が有効な場合、許容する最高解像度での`Texture`の⟪幅¦高さ⟫)
@@ -83,7 +83,7 @@
       - `int depth`: `TextureDimension.Tex3D`の時の深さ (多分テクスチャ枚数)
       - `int arrayLength`: `TextureDimension.`⟪`Tex2D`¦`Cube`⟫`Array`の時の要素数 (CubeはCube数 * 6 ?)
       - `int numSamples`: **MSAA**のサンプル数
-        - 1以上でMSAA有効。`GraphicsTextureDescriptorFlags.RenderTarget`を設定する必要がある。`GraphicsTextureDescriptorFlags.RandomWriteTarget`と互換性は無い
+        - 2以上でMSAA有効。`GraphicsTextureDescriptorFlags.RenderTarget`を設定する必要がある。`GraphicsTextureDescriptorFlags.RandomWriteTarget`と互換性は無い
       - `enum` **GraphicsTextureDescriptorFlags** `flags`: >`GraphicsTexture`の**レンダリング**および**読み取り/書き込みアクセス** モード。
         - `None`: >デフォルト。この`GraphicsTexture`からサンプリングできる。(`class Texture2D`,`SRV`)
         - `RenderTarget`: >この`GraphicsTexture`を**レンダーターゲット**として**設定**し、レンダリングできるようにします。(`class RenderTexture`,`RTV`)

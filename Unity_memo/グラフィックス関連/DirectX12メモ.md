@@ -200,7 +200,7 @@
     `D_⟪CPU¦GPU⟫_DESCRIPTOR_HANDLE`に**ビューのオフセット**(`D_DESCRIPTOR_HEAP_TYPE`)を足す
 - **ビュー**を作成して**ヒープ**の**ハンドル**に詰める
   (`R_Resource`を`D_⟪｡⟪SR¦UA¦RT¦DS¦CB⟫_VIEW_DESC｡¦｡SAMPLER_DESC｡⟫`をもとに**ビューを作り**`D_CPU_DESCRIPTOR_HANDLE`に**詰める**)
-  - ☆`R_Device->`**Create⟪SR¦UA¦RT¦DS⟫View**`(R_Resource, 『UAVのみ』＠❰『カウンター』R_Resource❱, D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC, 『setToAddress』 D_CPU_DESCRIPTOR_HANDLE)`
+  - ☆`R_Device->`**Create⟪SR¦UA¦RT¦DS⟫View**`(R_Resource, ＠❰『カウンター(UAVのみ)』R_Resource❱, D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC, 『setToAddress』 D_CPU_DESCRIPTOR_HANDLE)`
     - **struct D_⟪SR¦UA¦RT¦DS⟫_VIEW_DESC**:
       ★大体、**DXGI_FORMAT**, `union{`**MipMapLv範囲**, **_ARRAY範囲**, **PlaneSlice**`}`。(つまり、Format, u{SubResource, PlaneSlice} (Format, u{バッファ選択}))
       - `DXGI_FORMAT`
@@ -262,8 +262,7 @@
       - `UINT MaxAnisotropy`: **最大**異方性レベル
       - `D_TEXTURE_ADDRESS_MODE Address⟪U¦V¦W⟫`
         - `enum D_TEXTURE_ADDRESS_MODE`: `D_TEXTURE_ADDRESS_MODE⟪_WRAP¦_MIRROR¦_CLAMP¦_BORDER¦_MIRROR_ONCE⟫`
-      - `FLOAT ⟪Min¦Max⟫LOD`: `clamp(｢MipMapLv｣, Min, Max)`
-      - `FLOAT MipLODBias`: `｢MipMapLv｣ + MipLODBias`
+      - `FLOAT MipLODBias, ⟪Min¦Max⟫LOD`: `clamp(｢MipMapLv｣ + MipLODBias, MinLOD, MaxLOD)`
       - `D_COMPARISON_fUNC`
         - `enum D_COMPARISON_FUNC`: `D_COMPARISON_FUNC⟪_NEVER¦_LESS¦_EQUAL¦_LESS_EQUAL¦_GREATER¦_NOT_EQUAL¦_GREATER_EQUAL¦_ALWAYS⟫`
         - `sM.z ⟪False¦<¦==¦<=¦>¦!=¦>=¦True⟫ sC.z`。`shadowMap.SampleCmp＠❰LevelZero❱(sampler, shadowCoord.xy, shadowCoord.z)`: `LevelZero`は`MipMapLv`:`0`を使用
@@ -328,7 +327,7 @@
 ### R_Fence
 
 `R_Fence`は、GPUの**コマンドの完了(Signal)**を**_⟪CPU¦GPU⟫がチェック**するためのオブジェクト。
-`Wait(..)` => `ExecuteCommandLists(..)` => `Signal(..)` の順でキューに積む。
+`Wait(..)` => `ExecuteCommandLists(..)` => `Signal(..)` の順で`R_CommandQueue`に積む。
 
 - フェンス作成
   - ☆`R_Device->`**CreateFence**`(UINT64 fenceValue,.,out R_Fence)`
@@ -517,9 +516,9 @@
 - ☆**D3DCompileFromFile**`(LPCWSTR pFileName, D3D_SHADER_MACRO[],., LPCSTR pEntryPoint, LPCSTR pTarget, UINT Flags1,., out ID3DBlob ppCode,.)`
   『シェーダーファイル(`pFileName`)をコンパイルし`ID3DBlob ppCode`を生成』
   - `LPCWSTR pFileName`: コンパイルする**HLSLファイルのパス**
+  - `LPCSTR pEntryPoint`: **エントリポイント関数名**(`vert`や`frag`など)
   - **struct D3D_SHADER_MACRO**[]:
     - `LPCSTR Name`; `LPCSTR Definition`: `#define ｢ Name ｣ ｢ Definition ｣`。(最後はnull終端(`{nullptr, nullptr}`)を入れる)
-  - `LPCSTR pEntryPoint`: **エントリポイント関数名**(`vert`や`frag`など)
   - `LPCSTR pTarget`: **ターゲットプロファイル**: `⟪vs¦ps¦gs¦hs¦ds¦cs⟫_⟪4_0¦4_1¦5_0¦5_1¦6_0⟫`
     **シェーダーモデル**
       `4_0`: DirectX 10

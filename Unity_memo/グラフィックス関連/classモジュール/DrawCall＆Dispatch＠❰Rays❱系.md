@@ -161,7 +161,7 @@
       - 引数説明
         - `＠❰Matrix4x4＠❰[]❱ matrix❱`: 多分`UNITY_MATRIX_M`を設定している
         - `int shaderPass`: デフォルト`-1`で**全てのパスを描画**する (URPでもcmdを直接操作しているので描画される)
-        - ❰Instanced❱: **インスタンシング**は`Material.enableInstancing`が`true`であること (インスペクターでも設定できる)
+        - ❰Instanced❱: **インスタンシング**は`Material.enableInstancing`が`true`であること (インスペクターでも設定できる) (追記:`.enableInstancing = false`でも普通に動く)
         - `＠❰MaterialPropertyBlock properties❱`: 4oはURPでも、**テクスチャや配列でなければSRP Batcherでも使える**と言っている
         - `GraphicsBuffer bufferWithArgs`: `argsOffset`を使って`D_DRAW_INDEXED_ARGUMENTS`を1個の選択できる。`DrawMeshInstancedIndirect(..)`時、`int submeshIndex`との競合は、
           :4o「メッシュバインド用にどのサブメッシュ(`int submeshIndex`)を選ぶかだけ教えてね。あとはバッファ(`bufferWithArgs`)の指示に従うから！」らしい
@@ -180,3 +180,271 @@
   - DispatchRays系
     - `SetRayTracingShaderPass`: レイ/ジオメトリ交差シェーダーに使うパスを指定
     - `DispatchRays`: RayTracingShaderを実行
+
+`new RendererListParams(cullingResults, drawingSettings, filteringSettings)`
+```Csharp
+void DrawRenderListTest(ScriptableRenderContext ctx, CommandBuffer cmd)
+{
+    if (renderLoopCounter == 0)
+    {
+        rendererObj_0 = GameObject.Find("RendererObj_0");
+        rendererObj_1 = GameObject.Find("RendererObj_1");
+        rendererObj_2 = GameObject.Find("RendererObj_2");
+        rendererObj_3 = GameObject.Find("RendererObj_3");
+        rendererMotionObj = GameObject.Find("RendererMotionObj");
+        Renderer rendererObj_renderer_0 = rendererObj_0.GetComponent<Renderer>();
+        Renderer rendererObj_renderer_1 = rendererObj_1.GetComponent<Renderer>();
+        Renderer rendererObj_renderer_2 = rendererObj_2.GetComponent<Renderer>();
+        Renderer rendererObj_renderer_3 = rendererObj_3.GetComponent<Renderer>();
+        Transform rendererObj_transform_0 = rendererObj_0.GetComponent<Transform>();
+        Transform rendererObj_transform_1 = rendererObj_1.GetComponent<Transform>();
+        Transform rendererObj_transform_2 = rendererObj_2.GetComponent<Transform>();
+        Transform rendererObj_transform_3 = rendererObj_3.GetComponent<Transform>();
+        rendererMotionObj_transform = rendererMotionObj.GetComponent<Transform>();
+        var rendererListMaterial = Resources.Load<Material>("Custom_RendererListShader");
+        var rendererListMaterial_1 = Resources.Load<Material>("Custom_RendererListShader_1");
+        var rendererListMotionMaterial = Resources.Load<Material>("Custom_RendererListMotionShader");
+        rendererListFallbackMaterial = Resources.Load<Material>("Custom_RendererListFallbackShader");
+        rendererListOverrideMaterial = Resources.Load<Material>("Custom_RendererListOverrideShader");
+        rendererListOverrideShader = Resources.Load<Shader>("RendererListOverrideShader");
+
+        if (!asset.matNullSwitch)
+        {
+            //同一シェーダーバリアント同一メッシュなのにInstancingに成っていない
+            rendererObj_renderer_0.material =
+            rendererObj_renderer_1.material =
+            rendererObj_renderer_2.material = rendererListMaterial;
+            rendererObj_renderer_3.material = rendererListMaterial_1;
+            rendererMotionObj.GetComponent<Renderer>().material = rendererListMotionMaterial;
+
+            rendererListMaterial.enableInstancing = true;
+        }
+        else
+        {
+            rendererObj_renderer_0.material =
+            rendererObj_renderer_1.material =
+            rendererObj_renderer_2.material =
+            rendererObj_renderer_3.material =
+            rendererMotionObj.GetComponent<Renderer>().material = null;
+        }
+
+        //renderer.sortingLayer
+        if (asset.sortingLayer)
+        {
+            rendererObj_renderer_0.sortingLayerName = "First Layer";  //0
+            rendererObj_renderer_1.sortingLayerName = "Second Layer"; //1
+            rendererObj_renderer_2.sortingLayerName = "Third Layer";  //2
+            rendererObj_renderer_3.sortingLayerName = "Fourth Layer"; //3
+            // Debug.Log($"SortingLayer.GetLayerValueFromName(\"Third Layer\"): {SortingLayer.GetLayerValueFromName("Third Layer")}"); //=>3 (SortingLayer.value)
+        }
+        else
+        {
+            rendererObj_renderer_0.sortingLayerName =
+            rendererObj_renderer_1.sortingLayerName =
+            rendererObj_renderer_2.sortingLayerName =
+            rendererObj_renderer_3.sortingLayerName = "Default";
+        }
+
+        //renderer.sortingOrder
+        if (asset.canvasOrder)
+        {
+            rendererObj_renderer_0.sortingOrder = 2; //3
+            rendererObj_renderer_1.sortingOrder = 0; //1
+            rendererObj_renderer_2.sortingOrder = 1; //2
+            rendererObj_renderer_3.sortingOrder = -1; //0
+        }
+        else
+        {
+            rendererObj_renderer_0.sortingOrder =
+            rendererObj_renderer_1.sortingOrder =
+            rendererObj_renderer_2.sortingOrder =
+            rendererObj_renderer_3.sortingOrder = 0;
+        }
+
+        //material.renderQueue
+        if (!asset.matNullSwitch)
+        {
+            if (asset.renderQueue)
+            {
+                //SubShader{Tags{"Queue" = "AlphaTest+100"『2550』}}
+                rendererObj_renderer_0.sharedMaterial = new Material(rendererObj_renderer_0.sharedMaterial) { renderQueue = -1 };   //3
+                rendererObj_renderer_1.sharedMaterial = new Material(rendererObj_renderer_1.sharedMaterial) { renderQueue = 2549 }; //2
+                rendererObj_renderer_2.sharedMaterial = new Material(rendererObj_renderer_2.sharedMaterial) { renderQueue = 2548 }; //1
+                rendererObj_renderer_3.sharedMaterial = new Material(rendererObj_renderer_3.sharedMaterial) { renderQueue = 2547 }; //0
+            }
+            else
+            {
+                //↓これらをコメントアウトしてもInstancingされない
+                rendererObj_renderer_0.sharedMaterial = new Material(rendererObj_renderer_0.sharedMaterial) { renderQueue = -1 }; //3
+                rendererObj_renderer_1.sharedMaterial = new Material(rendererObj_renderer_1.sharedMaterial) { renderQueue = -1 }; //2
+                rendererObj_renderer_2.sharedMaterial = new Material(rendererObj_renderer_2.sharedMaterial) { renderQueue = -1 }; //1
+                rendererObj_renderer_3.sharedMaterial = new Material(rendererObj_renderer_3.sharedMaterial) { renderQueue = -1 }; //0
+            }
+            // Debug.Log($"renderQueue: {rendererObj_renderer_0.material.renderQueue}, rawRenderQueue: {rendererObj_renderer_0.material.rawRenderQueue}, shader.renderQueue: {rendererObj_renderer_0.material.shader.renderQueue}");
+        }
+
+        //renderer.rendererPriority
+        if (asset.rendererPriority)
+        {
+            rendererObj_renderer_0.rendererPriority = 1;  //2
+            rendererObj_renderer_1.rendererPriority = 2;  //3
+            rendererObj_renderer_2.rendererPriority = 0;  //1
+            rendererObj_renderer_3.rendererPriority = -1; //0
+        }
+        else
+        {
+            rendererObj_renderer_0.rendererPriority =
+            rendererObj_renderer_1.rendererPriority =
+            rendererObj_renderer_2.rendererPriority =
+            rendererObj_renderer_3.rendererPriority = 0;
+        }
+
+        //gameObject.Transform
+        if (asset.backToFront)
+        {
+            //.backToFront用
+            rendererObj_transform_0.localPosition = new Vector3(0.0f, 1.5f, -7.0f);  //0
+            rendererObj_transform_1.localPosition = new Vector3(0.5f, 1.0f, -8.0f);  //2
+            rendererObj_transform_2.localPosition = new Vector3(0.0f, 0.5f, -7.5f);  //1
+            rendererObj_transform_3.localPosition = new Vector3(-0.5f, 1.0f, -8.5f); //3
+
+            //.QuantizedFrontToBack用
+            // rendererObj_transform_0.localPosition = new Vector3(0.0f, 1.5f, -7.0f);   //0
+            // rendererObj_transform_1.localPosition = new Vector3(0.5f, 1.0f, 90.0f);   //2
+            // rendererObj_transform_2.localPosition = new Vector3(0.0f, 0.5f, 40.0f);   //1
+            // rendererObj_transform_3.localPosition = new Vector3(-0.5f, 1.0f, 990.0f); //3
+        }
+        else
+        {
+            rendererObj_transform_0.localPosition = new Vector3(0.0f, 1.5f, -7.0f);
+            rendererObj_transform_1.localPosition = new Vector3(0.5f, 1.0f, -7.0f);
+            rendererObj_transform_2.localPosition = new Vector3(0.0f, 0.5f, -7.0f);
+            rendererObj_transform_3.localPosition = new Vector3(-0.5f, 1.0f, -7.0f);
+        }
+
+        //SortingCriteria.OptimizeStateChanges (稀にしか変化を観測できないが、しっかり機能している)
+        LocalKeyword optimizeStateChanges_Key = new LocalKeyword(rendererListMaterial.shader, "_OptimizeStateChanges_Key");
+        LocalKeyword optimizeStateChanges_Key_1 = new LocalKeyword(rendererListMaterial_1.shader, "_OptimizeStateChanges_Key");
+        if (!asset.matNullSwitch)
+        {
+            if (asset.optimizeStateChanges)
+            {
+                rendererObj_renderer_0.sharedMaterial.SetKeyword(optimizeStateChanges_Key, true);    //赤
+                rendererObj_renderer_1.sharedMaterial.SetKeyword(optimizeStateChanges_Key, true);    //赤
+                rendererObj_renderer_2.sharedMaterial.SetKeyword(optimizeStateChanges_Key, false);   //橙
+                rendererObj_renderer_3.sharedMaterial.SetKeyword(optimizeStateChanges_Key_1, false); //橙
+            }
+            else
+            {
+                //↓これらをコメントアウトしてもInstancingされない
+                rendererObj_renderer_0.sharedMaterial.SetKeyword(optimizeStateChanges_Key, false);
+                rendererObj_renderer_1.sharedMaterial.SetKeyword(optimizeStateChanges_Key, false);
+                rendererObj_renderer_2.sharedMaterial.SetKeyword(optimizeStateChanges_Key, false);
+                rendererObj_renderer_3.sharedMaterial.SetKeyword(optimizeStateChanges_Key_1, false);
+            }
+        }
+    }
+
+    cmd.SetupCameraProperties(camera);
+
+    //CullingResults
+    camera.TryGetCullingParameters(out ScriptableCullingParameters scriptableCullingParameters);
+    CullingResults cullingResults = ctx.Cull(ref scriptableCullingParameters);
+
+    //FilteringSettings
+    var filteringSettings = FilteringSettings.defaultValue; //フィルタリングをしない設定の値
+    filteringSettings.sortingLayerRange = new SortingLayerRange(0, 4);
+    filteringSettings.renderQueueRange = new RenderQueueRange(2000, 3000);
+    //`Camera.cullingMask`=>`camera.TryGetCullingParameters(..)～`からさらにフィルタリングしている
+    filteringSettings.layerMask = LayerMask.GetMask("six", "seven", "eight", "nine");
+    filteringSettings.renderingLayerMask = RenderingLayerMask.GetMask("Ren1", "Ren2", "Ren3", "Ren4", "RenShared");
+
+    //SortingSettings
+    var sortingSettings = new SortingSettings(camera);
+
+    sortingSettings.criteria = SortingCriteria.SortingLayer | SortingCriteria.CanvasOrder | SortingCriteria.RenderQueue | SortingCriteria.RendererPriority | SortingCriteria.BackToFront | SortingCriteria.OptimizeStateChanges;
+
+    sortingSettings.cameraPosition = new Vector3(0.0f, 1.0f, asset.cameraPositionZ);
+
+    //DrawingSettings
+    var drawingSettings = new DrawingSettings(ShaderTagId.none , sortingSettings);
+    drawingSettings.SetShaderPassName(9, new ShaderTagId("RendererListShaderTag"));
+    // drawingSettings.SetShaderPassName(3, new ShaderTagId("RendererListFallbackShaderTag")); //効果ない (`.fallbackMaterial`効かない)
+    if (!asset.fallbackMaterial)
+    {
+        drawingSettings.SetShaderPassName(1, new ShaderTagId("RendererListShaderTag_1")); //重複して描画される(意味は無さそう)
+        drawingSettings.SetShaderPassName(2, new ShaderTagId("RendererListShaderTag_1"));
+    }
+
+    drawingSettings.fallbackMaterial = rendererListFallbackMaterial; //フォールバックされなかった
+
+    rendererListOverrideMaterial.SetKeyword(new LocalKeyword(rendererListOverrideShader, "_OverrideShaderKeyword"), true); //効く (MaterialPropertyも効く)
+    if (asset.overrideMaterial)
+    {
+        drawingSettings.overrideMaterial = rendererListOverrideMaterial; 
+    }
+
+    //`⟪drawingSettings¦material⟫.enableInstancing = true`、同一`Mesh`、同一`シェーダーバリアント`、同列`SortingCriteria` で、効くはず..
+        //(`drawingSettings.enableInstancing`と`material.enableInstancing`の`2^2パターン`。`multi_compile_instancing`もやった。あと色々。試したけど変化なし)
+    drawingSettings.enableInstancing = true; 
+    // Debug.Log($"drawingSettings.enableInstancing: {drawingSettings.enableInstancing}"); //=>true (デフォルト)
+
+    var rendererListParams = new RendererListParams(cullingResults, drawingSettings, filteringSettings);
+
+    //各`ShaderTagId`(`tagValues`)毎の`∮RenderingState∮`(`stateBlocks`)を**オーバーライド**
+    rendererListParams.isPassTagName = false; //falseは、SubShaderのTags{..}を見る
+    // Debug.Log($"rendererListParams.isPassTagName: {rendererListParams.isPassTagName}"); //=>false (デフォルト)
+    rendererListParams.tagName = new ShaderTagId("SubShaderTagName");
+    rendererListParams.tagValues = new NativeArray<ShaderTagId>(2, Allocator.Temp)
+    {
+        [0] = new ShaderTagId("TagValue_0"), //RendererListShaderTag
+        [1] = new ShaderTagId("TagValue_1")
+    };
+    rendererListParams.stateBlocks = new NativeArray<RenderStateBlock>(2, Allocator.Temp)
+    {
+        [0] = new RenderStateBlock(RenderStateMask.Depth)
+        {
+            depthState = new DepthState(true, asset.depthTest? CompareFunction.LessEqual : CompareFunction.Always)
+        },
+        [1] = new RenderStateBlock(RenderStateMask.Depth | RenderStateMask.Blend)
+        {
+            depthState = new DepthState(true, asset.depthTest? CompareFunction.LessEqual : CompareFunction.Always),
+            blendState = new BlendState()
+            {
+                blendState0 = new RenderTargetBlendState()
+                {
+                    writeMask = ColorWriteMask.Blue | ColorWriteMask.Green,
+                    sourceColorBlendMode = BlendMode.SrcAlpha,
+                    destinationColorBlendMode = BlendMode.OneMinusSrcAlpha,
+                    colorBlendOperation = BlendOp.Add,
+                    sourceAlphaBlendMode = BlendMode.SrcAlpha,
+                    destinationAlphaBlendMode = BlendMode.OneMinusSrcAlpha,
+                    alphaBlendOperation = BlendOp.Add,
+                }
+            }
+        }
+    };
+
+    RendererList rendererList = ctx.CreateRendererList(ref rendererListParams);
+
+    cmd.DrawRendererList(rendererList);
+
+
+    //new ShaderTagId("MotionVectors")===============================================================
+    if (!asset.stopMotion) motionTimer += Time.deltaTime;
+    motionTimer %= 2.0f; //0.0f～2.0fの範囲に収める
+    var pos = rendererMotionObj_transform.localPosition;
+    pos.x = Mathf.Sin(motionTimer * Mathf.PI); //-1.0f～1.0fの範囲に収める
+    rendererMotionObj_transform.localPosition = pos;
+
+    var motionDrawingSettings = new DrawingSettings(new ShaderTagId("MotionVectors"), sortingSettings);
+    motionDrawingSettings.perObjectData = PerObjectData.MotionVectors;
+        //現在の drawSettings では PerObjectMotionVectors が設定されていないため、FilterSettings.forceAllMotionVectorObjects は無視されます。
+    filteringSettings.excludeMotionVectorObjects = asset.excludeMotionVectorObjects;
+    filteringSettings.forceAllMotionVectorObjects = asset.forceAllMotionVectorObjects;
+    var motionRendererListParams = new RendererListParams(cullingResults, motionDrawingSettings, filteringSettings);
+    RendererList motionRendererList = ctx.CreateRendererList(ref motionRendererListParams);
+
+    cmd.DrawRendererList(motionRendererList);
+}
+```

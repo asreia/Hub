@@ -53,7 +53,7 @@
       - `float dilatedRange`: エリアライトの場合はその**範囲**(非エリアライトの場合は`range`と`dilatedRange`は同じ)
 
 - **cookie, flare**
-  - `Texture cookie`: `cookie`の`Texture`。`Point Light`の場合は`CubeMap`になる。ベイクの場合は`EditorSettings.enableCookiesInLightmapper`を有効にする
+  - `Texture cookie`: `cookie`の`Texture`。`Point Light`の場合は`CubeMap`になる。ベイク(GI?)の場合は`EditorSettings.enableCookiesInLightmapper`を有効にする
   - `float cookieSize`: >`Directional Light`の`cookie`の`Size`
   - `Flare flare`: >`Light`に`flare`を使用する。
     - `class Flare (UnityObject 継承)`
@@ -80,8 +80,8 @@
     - `float shadowAngle`: `DirectionalLight`によって投影される`Shadow`のエッジに適用される人工的な柔らかさの量を制御します。 (Editor only).
     - `float shadowRadius`: ポイントライトまたはスポットライトによって投影される影のエッジに適用される人工的な柔らかさの量を制御します。 (Editor only).
   - バイアス (Zファイティング回避)
-    - `float shadowBias`: `ShadowMap`比較時の`Bias`
-    - `float shadowNormalBias`: `ShadowMap`比較時の`NormalBias`
+    - `float shadowBias`: シャドーキャスター時の`ShadowMap`へ描画するときに`Z`を調整する`Bias`
+    - `float shadowNormalBias`: シャドーキャスター時の`ShadowMap`へ描画するときに`Z`を調整する`NormalBias`
 
 - **CommandBuffer**
   - `int commandBufferCount`: この`Light`に設定する`cmd`の数 (Read Only)

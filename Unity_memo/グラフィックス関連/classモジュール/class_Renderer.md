@@ -6,14 +6,14 @@
 
 ### Instance変数
 
-#### 有効化と描画順序とrenderingLayerMask
+#### *有効化*と*描画順序*と*renderingLayerMask*
 
 - **有効化**
   - `bool enabled`: 単にこの`Renderer`の**有効無効**? (>有効にした場合、レンダリングされた 3D オブジェクトが表示されます)
   - `bool forceRenderingOff`: >特定のコンポーネントのレンダリングをオフにすることができます。?
 - **描画順序** (`SortingCriteria`)
   - メモ
-    >**SortingGroupComponent**は、`GameObject`を**SpritRenderer**と一緒にグループ化し、その中でSpriteを描画する順序を制御できます。
+    >**SortingGroupComponent**は、`GameObject`を**SpritRenderer**と一緒にグループ化し、その中でSpriteを描画する順序を制御できます。(`SortingLayer`＆`SortingOrder`っぽい)
       1つの`GameObject`であるかのように、同じSortingGroup内のSpritRendererを一緒に描画します。
   - **SortingLayer**: `enum SortingCriteria.SortingLayer`
     [Sorting Layer ＞ Order In Layer❰sortingOrder❱ ＞ Z値](https://tsubakit1.hateblo.jp/entry/2016/12/28/231836)<https://qiita.com/lycoris102/items/b620654192af4f695fb4>
@@ -26,7 +26,7 @@
   - `int` **rendererPriority**: `enum SortingCriteria.RendererPriority` (デフォルト`0`、負の数ok)
 - `uint` **renderingLayerMask**:
   - `context.DrawRenderers(..)`に渡す`struct FilteringSettings`との**論理積**で**描画**。(名前は`ProjectSettings/タグとレイヤー`で設定)
-  - **Rendering Layers**にも関係がある。シェーダー内で影響を `与える側(Light,Decal,Shadow)`と`受ける側(Renderer)`の**論理積**で**描画** (こっちがメインの機能?)
+  - **Rendering Layers**にも関係がある。シェーダー内で影響を`与える側(Light,Decal,Shadow)`と`受ける側(Renderer)`の**論理積**で**描画** (こっちがメインの機能?)
 
 #### Rendererの基本要素
 
@@ -112,7 +112,7 @@
       - `ForceNoMotion`: >追跡なし。動きのベクトルは0。(?)
       - `CameraAndObject`: は無いの?
 - **Occlusionカリング**
-  - `bool allowOcclusionWhenDynamic`: (最近の`GPU occlusion culling`でも使える?)
+  - `bool allowOcclusionWhenDynamic`:
     - >この`Renderer`で**dynamic occlusion culling**(被遮蔽物(`Static Occludee`))を実行するかのフラグ。(>壁の背後にいるキャラクターの周りに輪郭を描くなど、特定の効果を実現する場合は無効)
       - [動的ゲームオブジェクトによるオクルージョンカリング](https://docs.unity3d.com/ja/2023.2/Manual/occlusion-culling-dynamic-gameobjects.html)
         - `GameObject`Inspectorのm_Nameの横の▼は、`⟪Occluder¦Occludee⟫ Static`は↓のこと?

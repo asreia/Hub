@@ -2,7 +2,7 @@
 
 多分、スワップチェイン(`BRTT.CameraTarget`)のリソース設定
 主に、**解像度**, **MSAA**, `GetDisplayLayout(List<DisplayInfo> displayLayout)`, `FullScreenMode`, `float brightness`
-      \[`SetResolution(..)`, `SetMSAASamples(..)`](`BRTT.⟪CameraTarget¦Depht⟫`を変えれる?)
+      \[`SetResolution(..)`, `SetMSAASamples(..)`](`BRTT.⟪CameraTarget¦Depth⟫`を変えれる?)
 
 `UnityEngine.Device名前空間`にもクラス名もメンバも全く同じ`class Screen`があるが、それは**エディタ上でのプラットフォーム固有**のScreen情報であり、**Device Simulator**と一緒に使用される
 **ビルド**では`UnityEngine.Device`と`UnityEngine`の`class Screen`は**全く同じように動作**する

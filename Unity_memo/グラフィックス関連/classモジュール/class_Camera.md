@@ -48,14 +48,13 @@
         `NoDistanceSort`は`SortingCriteria.⟪⟦Front⟧To⟦Back⟧⟫`を指定しない。
         `Default`はGPUによって通常(NVIDIAやAMD)は`FrontToBack`が有効だが、
         `Z Pre Pass`を常に行うGPU(PowerVRやApple GPU)では`NoDistanceSort`にする。
-    - `ResetTransparencySortSettings()`でリセット
-      - `enum TransparencySortMode transparencySortMode`: 半透明のSortMode。(**⟪⟦Front⟧To⟦Back⟧⟫距離の計算方法**を設定する)
-        - `⟪Default¦Perspective¦Orthographic¦CustomAxis⟫` (デフォルトは、`GraphicsSettings.transparencySortMode`で設定される)
-      - `Vector3` `transparencySortAxis`: `CustomAxis`の時のオブジェクト(`Renderer`)の**描画順をソート**する時に使用する軸(`Axis`)。(`SortingSettings.customAxis`)
-        (デフォルトは、`GraphicsSettings.transparencySortAxis`で設定される)
+    - `enum TransparencySortMode transparencySortMode`: 半透明のSortMode。(**⟪⟦Front⟧To⟦Back⟧⟫距離の計算方法**を設定する) (`ResetTransparencySortSettings()`でリセット)
+      - `⟪Default¦Perspective¦Orthographic¦CustomAxis⟫` (デフォルトは、`GraphicsSettings.transparencySortMode`で設定される)
       - メモ
         `⟪Perspective¦Orthographic¦CustomAxis⟫`は`DistanceMetric.⟪Perspective¦Orthographic¦CustomAxis⟫`と同じであり、
         `Default`は`camera.orthographic`が`true`なら`Orthographic`、`false`なら`Perspective`となる。
+      - `Vector3` `transparencySortAxis`: `CustomAxis`の時のオブジェクト(`Renderer`)の**描画順をソート**する時に使用する軸(`Axis`)。(`SortingSettings.customAxis`)
+        (デフォルトは、`GraphicsSettings.transparencySortAxis`で設定される)
   - **Built-In,レガシー機能**
     - RenderingPath
       - `RenderingPath actualRenderingPath`: 現在使われているレンダリングパス(Read-Only)。
@@ -164,7 +163,7 @@
 - **Copy, Culling, Frustum**
   - `CopyFrom(Camera other)`: `other`の設定パラメータをこの`Camera`に**コピー**する(`Transform`と`Layer`もコピーされる)
   - `bool` **TryGetCullingParameters**`(＠❰bool stereoAware,❱ out ScriptableCullingParameters cullingParameters)`:
-    - `Camera`の`ScriptableCullingParameters`を取得する。(`ctx.Cull(ref cullParams)`のようなもの?)
+    - `Camera`の`ScriptableCullingParameters`を取得する。(`ctx.Cull(ref cullParams)`するやつ)
   - `CalculateFrustumCorners(Rect viewport, float z, Camera.MonoOrStereoscopicEye eye, Vector3[] outCorners)`:
     - `viewport`座標と`Camera`の深度(`z`)が与えられると、`View`空間の`Frustum`の4つの`Corner`(クラスタの面のようなもの)を計算して`outCorners`に入れる。(Forward+のクラスタ?)
 

@@ -631,8 +631,10 @@ real4 unity_ShadowColor;
   - **これだけ気をつけてコード書く**: `UNITY_REVERSED_Z`, `UNITY_UV_STARTS_AT_TOP`, `UNITY⟪_NEAR¦_RAW_FAR⟫_CLIP_VALUE`
 
 - **#defineKeywordの種類**
-  - **Unity側**: `Unity defined keywords`,`GPU Instancing`,`BuiltinShaderDefine(UNITY_～)`,その他(`SHADER_API_D3D11など`)
-  - **Renderer,Material**: **ShaderKeyword分岐制御系**(`Material Keywords`,`Universal Pipeline keywords`)
+  - **Unity直接#define**: `BuiltinShaderDefine(UNITY_～)`,その他(`SHADER_API_D3D11など`)
+  - #pragma `Shader_feature`,`multi_compile`
+    - **Renderer,Material**: **ShaderKeyword分岐制御系**(`Material Keywords`,`Universal Pipeline keywords`)
+    - **シーン構成,ProjectSettings**: `Unity defined keywords`,`GPU Instancing`
   - **.hlsl内**: .hlsl内部の設定Keyword(品質など), Keywordが別のKeywordを定義
 
 ```C

@@ -95,7 +95,7 @@
       - `void SetPixelData<T>(NativeArray<T> data, int mipLevel, int sourceDataStartIndex = 0)`
         - `CPUテクスチャ`の`mipLevel`のバッファを`data`配列の`sourceDataStartIndex`～`sourceDataStartIndex`+`mipLevel`のバッファサイズ の要素で**コピー**する
       - `⟪『Load』void¦『Get』NativeArray<T>⟫ ⟪Get¦Load⟫RawTextureData<T>(＠❰『Load』NativeArray<T> data❱)`:
-        - `⟪Get¦Set⟫GetPixelData<T>(..)`の全ての`mipLevel`含んでいる版
+        - `⟪Get¦Set⟫PixelData<T>(..)`の全ての`mipLevel`含んでいる版
 - **MipMapストリーミング**
   - `ClearMinimumMipmapLevel()`: >`minimumMipmapLevel`フィールドをリセットする。
   - `ClearRequestedMipmapLevel()`: >`requestedMipmapLevel`フィールドをリセットする。

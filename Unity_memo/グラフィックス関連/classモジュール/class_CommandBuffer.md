@@ -6,9 +6,9 @@
   `camera.AddCommandBuffer(CameraEvent evt, CommandBuffer cmd)`,
   `light.AddCommandBuffer(LightEvent evt, CommandBuffer cmd ＠❰, ShadowMapPass shadowPassMask❱)`
 - `ctx.ExecuteCommandBuffer(cmd)`: `cmd`を積むだけ。(`ctx.ExecuteCB(cmd)`は`cmd`を**キャッシュして使い回す**ことができる。`⟪Begin¦End⟫Event(｢cmdName｣)`が自動的に挿入される)
-- `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`LocalProperty`(`⟪material¦compute⟫.Set～(..)系`)が**反映される単位**)
+- `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`ShaderProperty`が**反映される単位**)
+  - `Properties{..}`に**含める**と`LocalProperty`となる(`⟪material¦compute⟫.Set～(..)`,`MaterialPropertyBlock`)
   - `Properties{..}`に**含めない**と`GlobalProperty`となる(`cmd.SetGlobal～(..)`)
-  - `Properties{..}`に**含める**と`Local(Material)Property`となる(`mat.Set～(..)`,`MaterialPropertyBlock`)
 - [cmdは、各Action後に設定などを自動で元に戻すことはない。設定は次のActionにも引き継がれる。必要に応じて手動で元に戻す必要がある。](https://chatgpt.com/c/68819d44-de38-8329-a5ee-e4a7fdf831d6)
 
 - CommandBuffer系
@@ -26,15 +26,14 @@
     - `BuildRayTracingAccelerationStructure(RayTracingAccelerationStructure accelerationStructure, Vector3 relativeOrigin)`
       :加速構造(`accelerationStructure`)を構築
 - **SetPass系**
-  :設定は基本的に**Actionを実行**したら**元に戻す**。(`cmd.SetGlobal～(..)系`と同様で**エディター再起動まで設定がGPUにキャッシュ**される)
+  :設定は基本的に**Actionを実行**したら**元に戻す**
   (個別で設定する場合は、`ShaderLab/∮RenderingState∮`, `RenderStateBlock` を使う)
   - RenderingState系
     - カリング
-      - `SetInvertCulling(bool invertCulling)`*ok*: **カリング反転**(`％false`)。しかし実際は、
-        *DirectX12*の**Front CCW**を操作する:
-          `BRTT.CameraTarget`への描画時:`true`:**オン**
-          `RenderTexture`への描画時:`true`:**オフ**
-        (`cmd.SetGlobal～(..)系`と同様で**エディター再起動まで設定がGPUにキャッシュ**される) (`GUITexture.Draw`は`Cull Mode:None`(両面描画))
+      - `SetInvertCulling(bool invertCulling)`*ok*: **カリング反転**(`％false`)。しかし実際は*DirectX12*の**Front CCW**を操作する:
+          `BRTT.CameraTarget`への描画時:*Front CCW* <= `invertCulling`
+          `RenderTexture`への描画時:*Front CCW* <= `!invertCulling`
+          (`GUITexture.Draw`は`Cull Mode:None`(両面描画))
     - ビューポート、シザー
       :**原点は左下**。(でも*DirectX12*では左上に原点が変換されている) [](images\Viewport_ScissorRect.png)
       - `SetViewport(Rect pixelRect)`*ok*: **ビューポート設定**。`pixelRect`(スクリーン空間)に**ストレッチ**する。(1つのみ, depthの範囲指定は無し)
@@ -48,13 +47,13 @@
         DirectX12に対して`bias`は`DepthBias(符号反転)`、`slopeBias`は`SlopeScaledDepthBias(符号反転)`と同じ。(`DepthBiasClamp`は無い)
       - `SetShadowSamplingMode(RTI shadowmap, ShadowSamplingMode mode)`: `Texture`の**シャドウサンプリングモード**を設定。(**シャドウマップ**を**サンプリング**したい場合に設定(`RawDepth`))
         :`class Texture`が**シャドウマップ**か**通常のテクスチャ**かは、Unity内部で設定される。(`シャドウマップ`になるパターン: `Light`による影の生成, `LightEvent.AfterShadowMap`)
-        - `enum ShadowSamplingMode`: DirectX12では`D_SAMPLER_DESC/D_COMPARISON_fUNC`に対応する。
+        - `enum ShadowSamplingMode`: DirectX12では`D_SAMPLER_DESC/D_COMPARISON_fUNC`に対応する。  ↑(`RenderTexture.shadowSamplingMode`でも設定できるみたい。(drawio/ページ31))
           - `CompareDepths`: **シャドウマップ**のデフォルト。HLSLで`SamplerComparisonState`,`shadowMap.SampleCmp(..)`を使う。
           - `RawDepth`: **シャドウマップ**を**サンプリング**したい場合の設定。HLSLで`SamplerState`,`shadowMap.Sample～(..)`を使う。
           - `None`: **通常のテクスチャ**のデフォルト。
     - ワイヤーフレーム
       - `SetWireframe(bool enable)`*ok*: **ワイヤーフレーム描画**を設定。[](images\SetWireframe.png)
-        :(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`) (`GUITexture.Draw`は`true`に明示的に指定されてると思われる(`false`にならない))←逆?
+        :(`D_FILL_MODE⟪_WIREFRAME¦_SOLID⟫`) (`GUITexture.Draw`は`false`に明示的に指定されてると思われる(`true`にならない))
         `Wireframe`は、線の太さは1px固定であり、CGでよく見る*ワイヤーフレーム表現*は、実際には`Wireframe`描画機能を使わず、**ジオメトリシェーダー**などで描画されている。
     - XR関係
       - `SetSinglePassStereo(SinglePassStereoMode mode)`: シングルパスステレオを設定
@@ -72,9 +71,7 @@
         `＠○⟦, RenderBuffer○¦⟪Load¦Store⟫Action ＠⟪color¦depth⟫○¦⟪Load¦Store⟫Action⟧,`『⟪Load¦Store⟫Action
         `＠❰int mipLevel＠❰, CubemapFace cubemapFace＠❰, int depthSlice❱❱❱)`『**サブリソース**(無い場合は、RTI(rIt, mipLevel, cubeFace, depthSlice)を使う): >描画先**RTを設定**。
         :`color`バッファと`depth`バッファは**同じ解像度**である必要があるので、`mipLevel != 0`の場合はそれと同じ解像度の`depth`バッファを用意する必要がある。(ミップマップ生成はカラーバッファのみ)
-        ✖❰`cmd`実行中のみ**RT**が切り替わり、`ctx.ExecuteCommandBuffer(cmd)`で`cmd`の実行が終わると**元のRT**に戻る。❱
-          **戻らない**。**Unity公式**が、>コマンドバッファーの実行中にアクティブなレンダーターゲットを明示的に保持する必要はありません(現在のレンダーターゲットが保存とリストアをあとでします)。
-          という事から勘違いしたと思われ、実験したところ`ctx.Submit()`を超えても**戻らなかった**。恐らく**Unity公式**は、Unity内部の`RenderPipeline`内部で**元に戻している**という意味だと思う。
+        恐らく**Unity公式**は、Unity内部の`RenderPipeline`内部では`RT`を**元に戻している**という意味だと思われる。
     - NativeRenderPass系 (Unity.Drawio/ページ44 参照) (MetalやVulkanでは前提機能)
       - `BeginRenderPass(int width, int height ＠❰, int volumeDepth❱, int samples,`
         `NativeArray<AttachmentDescriptor> attachments, int depthAttachmentIndex, NativeArray<SubPassDescriptor> subPasses ＠❰, ReadOnlySpan<byte> debugNameUtf8❱)`
@@ -137,7 +134,7 @@
           設定例: `camera.projectionMatrix`, `Matrix4x4.Perspective(60, 1.777f, 0.1f, 100f)`
         - `SetViewProjectionMatrices(Matrix4x4 view, Matrix4x4 proj)`: ビュープロジェクションMatrixを設定(**Build-inのみ**) (`unity_MatrixVP`)
       - その他
-        - `SetComputeParamsFromMaterial(ComputeShader computeShader, int kernelIndex, Material material)`: `material`から**ShaderProperty**を設定 (ShaderKeywordは無理)
+        - `SetComputeParamsFromMaterial(ComputeShader computeShader, int kernelIndex, Material material)`: `material`から**ShaderProperty**を設定 (ShaderKeywordはできない)
       - 一時RT
         - `GetTemporaryRT(int nameID, RenderTextureDescriptor desc ＠❰, FilterMode filter❱)`:
           **一時RT**を`nameID`に**C#＆Shaderバインド**する。
@@ -156,12 +153,12 @@
   - DrawCall＆Dispatch＠❰Rays❱系: 別ファイル
   - MipMap生成、リゾルブ
     - `GenerateMips(RTI rt)`: `rt`の**MipMap生成**
-      :条件: `rt.useMipMap = true;`, `rt.autoGenerateMips = false;`, 解像度が`2^n正方`, MipMap可能な`GraphicsFormat` (アクティブRTで無くて良い(`cmd.SetRenderTarget(..)`不要))
+      :条件: `rt.useMipMap = true;`, `mipCount > 1`, `rt.autoGenerateMips = false;`, MipMap可能な`GraphicsFormat` (アクティブRTで無くて良い(`cmd.SetRenderTarget(..)`不要))
     - `ResolveAntiAliasedSurface(RenderTexture rt ＠❰, RenderTexture target ❱)`: **リゾルブ**(MSAA解決)。`target`を省略した場合は、`rt`自身にリゾルブ
       :条件: `rt.antiAliasing > 1`, `bindTextureMS = true;`, `rt`と`target`の解像度と`GraphicsFormat`が同じ (アクティブRTで無くて良い)
   - Copy系
     - テクスチャ系
-      - `CopyTexture(RTI src ＠○⟦, int src⟪Element＃⟪Mip＃⟪X¦Y¦Width¦Height⟫⟫⟫⟧, RTI dst ＠○⟦, int dst⟪Element＃⟪Mip＃⟪X¦Y⟫⟫⟫⟧)`
+      - `CopyTexture(RTI src ＠○⟦, int src┃⟪Element＃⟪Mip＃⟪X¦Y¦Width¦Height⟫⟫⟫⟧, RTI dst ＠○⟦, int dst┃⟪Element＃⟪Mip＃⟪X¦Y⟫⟫⟫⟧)`
         :テクスチャのコピー。`src`と`dst`は**サイズ**と**フォーマット**が一致していること。DirectX12API:`R_GraphicsCommandList->CopyTextureRegion(..)`
         (`src`と`dst`が両方とも`texture.isReadable`が`true`ならば、CPU上でもコピーする可能性がある)
       - `ConvertTexture(RTI src ＠❰, int srcElement❱, RTI dst ＠❰, int dstElement❱)`*ok*

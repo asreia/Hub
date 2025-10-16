@@ -230,14 +230,13 @@ public class RenderGraphTestAsset : RenderPipelineAsset<RenderGraphTestAsset.Ren
                 constantBuffer =            new GraphicsBuffer(GraphicsBuffer.Target.Constant, allDataCount, 192){name = "n_Constant"};//Constant は stride:256 推奨
                 rawBuffer =                 new GraphicsBuffer(GraphicsBuffer.Target.Raw, allDataCount , 192){name = "n_Raw"};
                 rWRawBuffer =               new GraphicsBuffer(GraphicsBuffer.Target.Raw, allDataCount , 192){name = "n_RWRaw"};
-                // tempCSharpData = new CSharpData[allDataCount];
-                // cSharpData = new CSharpData[allDataCount];
+
                 for(int i = 0; i < cSharpData.Length; i++)
                 {
                     FillStructuredData(ref cSharpData[i]);
                 }
                 Debug.Log($"Shader.globalRenderPipeline: {Shader.globalRenderPipeline}");//=>RenderGraphTestPipeline
-                // struct NumthreadsValues{uint x, uint y, uint z}; NumthreadsValues numthreadsValues;
+                
                 structuredBufferTest.GetKernelThreadGroupSizes(structuredBufferTest.FindKernel("CSMain"), out uint x, out uint y, out uint z);
                 Debug.Log($"[numthreads({x}, {y}, {z})]");
                 //Consume
