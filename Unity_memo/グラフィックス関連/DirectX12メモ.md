@@ -28,7 +28,7 @@
     3. _cmdQueue->ExecuteCommandLists
   - `SetGraphicsRoot⟪CB¦SR¦UA⟫View`でセットする場合は、`R_Resource`のある範囲(View)ではなく、`R_Resource`の**全範囲がバインド**される
   - **Buffer**は**シェーダー側**で**型を定義**するが、**Texture**は**DXGI_FORMAT**で**型を定義**
-  - `Texture2D<float4>`は`DXGI_FORMAT`の型が`float4`にキャストされると考えて良い？  (変換順:`R8G8B8A8` => `UNORM` => `<float4>`かな。代入(`float4 = Texture2D`)と何が違う?)
+  - `Texture2D<float4>`は`DXGI_FORMAT`の型が`float4`にキャストされると考えて良い。(`class Texture2D<T> { T Load(...); T Sample(...);}`)(`Texture2D`は`Texture2D<float4>`と同じ)
     GPT:シェーダー側で `float4` にキャストされるのは正しい認識ですが、その際に `DXGI_FORMAT` に応じた適切な変換が行われる
     - 例 1: `DXGI_FORMAT_R8G8B8A8_UNORM`
       - フォーマット: `8 ビット`の `RGBA 値`（各チャネルは `0～255 の整数値`）を格納します。

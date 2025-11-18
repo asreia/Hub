@@ -70,7 +70,7 @@
     - `SetRenderTarget(⟪RTI rt¦RTI＠❰[]❱ color＠❰s❱, RTI depth¦RTB binding⟫,`『**レンダーターゲット**
         `＠○⟦, RenderBuffer○¦⟪Load¦Store⟫Action ＠⟪color¦depth⟫○¦⟪Load¦Store⟫Action⟧,`『⟪Load¦Store⟫Action
         `＠❰int mipLevel＠❰, CubemapFace cubemapFace＠❰, int depthSlice❱❱❱)`『**サブリソース**(無い場合は、RTI(rIt, mipLevel, cubeFace, depthSlice)を使う): >描画先**RTを設定**。
-        :`color`バッファと`depth`バッファは**同じ解像度**である必要があるので、`mipLevel != 0`の場合はそれと同じ解像度の`depth`バッファを用意する必要がある。(ミップマップ生成はカラーバッファのみ)
+        :`color＠❰s❱`バッファと`depth`バッファは**同じ解像度**である必要がある。ミップマップ生成はカラーバッファのみ。
         恐らく**Unity公式**は、Unity内部の`RenderPipeline`内部では`RT`を**元に戻している**という意味だと思われる。
     - NativeRenderPass系 (Unity.Drawio/ページ44 参照) (MetalやVulkanでは前提機能)
       - `BeginRenderPass(int width, int height ＠❰, int volumeDepth❱, int samples,`
@@ -108,13 +108,14 @@
       - 基本ShaderProperty_Set
         - `SetGlobal⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫`
           `(int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: `Global`ShaderPropertyを設定
-          - `SetGlobalTexture(int nameID, RTI rt ＠❰, RenderTextureSubElement element❱)`
+          - `SetGlobalTexture(int nameID, RTI rt ＠❰, RenderTextureSubElement element❱)`: (`rt`に`RenderBuffer`を設定しても効果なし)
             - `RenderTextureSubElement element`:`enum RenderTextureSubElement`: >`RenderTexture`が内包するさまざまな種類のデータにアクセスするために使います。
-              - `Color`: `RenderBuffer rt.colorBuffer`
-              - `Depth`: `RenderBuffer rt.depthBuffer` (`rt`生成時に`GraphicsFormat`を`R～_TYPELESS`にする必要があると思われる(Unity.drawio/ページ41参照))
-              - `Stencil`: 基本的に**サンプリング出来ない**
-              - `Default`: 基本的に`Color`、無い場合は`Depth`
-              - `ShadingRate`: 知らない
+              (`.ShadingRate`以外、`Tex2D`,`Tex2DArray`*ok*)
+              - `Color`: カラーバッファ
+              - `Depth`: デプスバッファ [`Texture2D<float>`で普通に取得できる](images\デプス入力.png)
+              - `Stencil`: `rt.stencilFormat = GraphicsFormat.R8_UInt;`,`Texture2D<uint> _rt`,`_rt.Load(..)`*ok*(公式リファレンス参照(`rt.stencilFormat`と`.Stencil`で))
+              - `Default`: `rt`にカラーバッファがある場合は`Color`、無い場合は`Depth`
+              - `ShadingRate`: 知らない (Unity未対応らしい)
           - `SetGlobalConstantBuffer(..)`: `class_GraphicsBuffer.md/- **.Constant**: CBV`を参照
           - `SetRandomWriteTarget(int ❰index❱, ⟪GraphicsBuffer buffer, ＠❰bool preserveCounterValue❱¦RTI rt『enableRandomWrite=true』⟫)`:
               :SM4.5**Pixelシェーダー**で**UAV書き込み**をしたい用。(Computeシェーダーは`SetComputeBufferParam(..)`)
@@ -149,7 +150,8 @@
 - **Action系**
   - Clear系
     - `ClearRenderTarget(RTClearFlags clearFlags, Color＠❰[]❱ backgroundColor＠❰s❱, float depth = 1.0, uint stencil = 0)`: RTを**クリア**
-      - `enum RTClearFlags`: `⟪None¦Color¦Depth¦Stencil¦All¦DepthStencil¦ColorDepth¦ColorStencil¦Color⟪0～7⟫⟫` (`Color`は`Color⟪0～7⟫`全てクリア)
+      [`cmd.SetRenderTarget(rt[])`されたrt分のrtを生成し`cmd.ClearRenderTarget(..)`が呼ばれる](images\ClearRT.png)
+      - `enum RTClearFlags`: `⟪None¦Color¦Depth¦Stencil¦All¦DepthStencil¦ColorDepth¦ColorStencil¦Color⟪0～7⟫⟫` (`Color`は`Color⟪0～7⟫`全てクリア(*Unity 6.2*から))
   - DrawCall＆Dispatch＠❰Rays❱系: 別ファイル
   - MipMap生成、リゾルブ
     - `GenerateMips(RTI rt)`: `rt`の**MipMap生成**

@@ -481,7 +481,7 @@ float2 _GlobalMipBias; // Mipmapのバイアスを指定するパラメータ (#
 // スクリーン座標の編集系? //以下の上２つは ScreenCoordOverride.hlsl で使われていた
 float4 _ScreenCoordScaleBias; // ((positionCS.xy*0.5+0.5) * _ScreenCoordScaleBias.xy) + _ScreenCoordScaleBias.zw するもの?
 float4 _ScreenSizeOverride; // 「スクリーン座標オーバーライド」がアクティブな場合に使用されるスクリーンサイズを指定するためのパラメータ
-float4 _ScaledScreenParams; // スクリーンパラメータ（スケーリングされたスクリーンの解像度やアスペクト比に関する情報）
+float4 _ScaledScreenParams; // スクリーンパラメータ（スケーリングされたスクリーンの解像度やアスペクト比に関する情報）//`_ScreenParams`のRTHandle版らしい?
 
 float _AlphaToMaskAvailable; // Alpha-to-coverageモード: Pass{AlphaToMask On 『MSAAで使用することを目的』} の時、1.0になる?
   //AlphaToCoverageEnable(DirectX12メモ.md/G:421)と、SharpenAlpha(..)(Common.hlsl/G:1773)を使っている?<https://youtu.be/htzYbOZ-an0?t=321>
@@ -527,7 +527,7 @@ float4 _LastTimeParameters; // t, sin(t), cos(t)
 float3 _WorldSpaceCameraPos;
 #endif
 
-// x = 1 or -1 (投影がY軸で反転(している場合は-1)
+// x = 1 or -1 (投影がY軸で反転(している場合は-1) (`new RT()`は`-1`、`BRTT.Cam`は`1`)
 // y = near plane
 // z = far plane
 // w = 1/far plane
@@ -543,7 +543,7 @@ float4 unity_OrthoParams;
 // y = height
 // z = 1 + 1.0/width //1倍 + テクセル ?
 // w = 1 + 1.0/height
-float4 _ScreenParams;
+float4 _ScreenParams; //`cmd.SetupCameraProperties(camera)`で設定される事を確認した(`camera`が描画する`rt`のサイズ) (`cmd.SetRednerTarget(..)`では設定されない)
 
 // Zバッファーのリニアライズに使用される値 (http://www.humus.name/temp/Linearize%20depth.txt)
   //グラフィックス関連/images/_ZBufferParams_Zバッファーのリニアライズに使用される値.png を参照
