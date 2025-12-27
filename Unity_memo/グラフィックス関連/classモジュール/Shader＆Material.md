@@ -96,6 +96,7 @@
 
 - 違う`Material`が同じ`Shader`を**共有**することができる。
   - 違う`Shader`を同じ`Material`から`material.shader`を切り替えて使用することはできる (`.mat`にそれぞれの`Shader`の`Local⟪Property¦Keyword⟫`を保存することが可能)
+  - つまり、`Material`は`Shader`のバリアント(派生(スイッチ多重継承))のようなもの
 
 - SRP Batcherメモ
   - スクリプトからのプロパティ操作について (ナレッジ 32:44) (DOTS InstanceShader でも同じ?)

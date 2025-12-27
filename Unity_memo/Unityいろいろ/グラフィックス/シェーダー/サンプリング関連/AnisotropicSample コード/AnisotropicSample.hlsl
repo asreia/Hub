@@ -33,7 +33,7 @@ float4 TrilinearSample(Texture2D tex, float2 texel, float lod, uint levels)
 }
 
 //アニソトロピック(長軸方向に`N`個並べて平均をとる)
-float4 AnisotropicSample(Texture2D tex, float2 uv, uint maxAniso/*2^nの単位*/)
+float4 AnisotropicSample(Texture2D tex, float2 uv, uint maxAniso, SamplerState samplerState)
 {
     uint W, H, levels;
     tex.GetDimensions(0, W, H, levels);
@@ -62,7 +62,7 @@ float4 AnisotropicSample(Texture2D tex, float2 uv, uint maxAniso/*2^nの単位*/
         //λ_a/N = log2(a/N) = log2(a) - log2(N)
     
     //長軸側(a)に隙間ができる場合は`lod_aN`を使用する(NがmaxAnisoで制限される時)
-    float lod    = max(lod_b, lod_aN);
+    float lod    = max(max(lod_b, lod_aN), 0.0);
     
     //長軸方向ベクトル(dir)====================================================
     float2 dir = (Lx >= Ly ? ddx_texel : ddy_texel);
@@ -79,6 +79,7 @@ float4 AnisotropicSample(Texture2D tex, float2 uv, uint maxAniso/*2^nの単位*/
             //長軸の、`正規化特異ベクトル(dir)`を`特異値(a)`でスケールし、
             //`t`を変えながら長軸方向に等間隔で↓サンプリングしている。
         acc += TrilinearSample(tex, texel, lod, levels);
+        // acc += tex.Sample(samplerState, texel / float2(W, H));
     }
     return acc / N; //サンプリングの平均を取る
 }

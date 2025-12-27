@@ -128,7 +128,7 @@
           後は大体`SetGlobal`と同じ。
       - VP_Matrix,クリッププレーン (**Draw～(..)系**の描画前に設定する)
         - `SetupCameraProperties(Camera camera)`: `camera`から*VP_Matrix*と*クリッププレーン*を設定
-          :↓,↓↓の **ビューMatrix**,**プロジェクションMatrix** と **クリッププレーン**(`float4 unity_CameraWorldClipPlanes[6]`) を設定
+          :↓,↓↓の **ビューMatrix**,**プロジェクションMatrix** と **クリッププレーン**(`float4 unity_CameraWorldClipPlanes[6]`) と `float4 _ScreenParams` を設定
         - `SetViewMatrix(Matrix4x4 view)`: ビューMatrix を設定 (`unity_MatrixV`)
           >Unityの`View`空間はOpenGLの規約と一致していて、カメラの前方方向が **-Z方向** なのです。
         - `SetProjectionMatrix(Matrix4x4 proj)`: プロジェクションMatrix を設定 (`glstate_matrix_projection`)

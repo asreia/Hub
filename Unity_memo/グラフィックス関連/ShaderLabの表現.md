@@ -17,16 +17,16 @@ Shader "｢ShaderName｣"『"Legacy Shaders/VertexLit"のように"/"で階層�
                 ＃TEXTURE＝≪"⟪white¦black¦gray¦bump⟫" {}≫
             ＃PROPERTY_ATTRIBUTE＝≪○¦PT⟪∮Int_ATT∮¦∮Float_ATT∮¦∮Range_ATT∮¦∮Color_ATT∮¦∮Vector_ATT∮¦∮2D_ATT∮¦∮Cube_ATT∮¦∮3D_ATT∮⟫≫
                 ＃Int_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮≫
-                ＃Float_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮＠❰\[Gamma]❱≫
+                ＃Float_ATT＝≪∮ALL_ATT∮∮Int_Float_ATT∮＠❰\[Gamma]『`Color Space:Linear`のときリニア変換される』❱≫
                     ＃Int_Float_ATT＝≪＠❰[｡Toggle＠❰(｢define ShaderKeyword｣)❱｡]❱⏎
-                                    ＠❰\[Enum＠❰(｡｡⟪｢C#列挙型｣¦｡⟦,┃1～7⟧❰｢ShowEnum｣,⟪～⟫❱｡⟫｡｡)❱]❱⏎『EnumでもShaderKeywordが設定されるっぽい
-                                    ＠❰[KeywordEnum(⟦, ┃1～⟧❰｢Keyword｣❱)]『｢PropertyName｣_｢Keyword｣というShaderKeywordがdefineされる』❱≫
+                                    ＠❰\[Enum＠❰(｡｡⟪｢C#列挙型｣¦｡⟦,┃1～7⟧❰｢ShowEnum｣,⟪～⟫❱｡⟫｡｡)❱]❱⏎
+                                    ＠❰[KeywordEnum(⟦, ┃1～⟧❰｢Keyword｣❱)]『｢PropertyName｣_｢Keyword｣(を大文字化)というShaderKeywordがdefineされる』❱≫
                 ＃Range_ATT＝≪∮ALL_ATT∮＠❰[PowerSlider(⟪unsigned float┃～⟫)]『Range^PowerSlider ?』❱≫
-                ＃Color_ATT＝≪∮ALL_ATT∮≫
+                ＃Color_ATT＝≪∮ALL_ATT∮＠❰\[HDR]❱≫『✖❰\[HDR]❱の時、常にリニア変換される
                 ＃Vector_ATT＝≪∮ALL_ATT∮＠❰\[Gamma]❱≫
                 ＃2D_ATT＝＃3D_ATT＝＃Cube_ATT＝≪∮ALL_ATT∮∮2D_3D_Cube_ATT∮≫
-                    ＃2D_3D_Cube_ATT＝≪＠❰\[NoScaleOffset]❱＠❰\[Normal]❱＠❰\[HDR]❱＠❰\[PerRendererData]『MaterialPropertyBlock』❱≫
-                    ＃ALL_ATT＝≪＠❰\[HideInspector]❱＠❰\[Header(｢ShowString｣)]❱＠❰\[｡Space＠❰(⟪～⟫)❱｡]❱≫
+                    ＃2D_3D_Cube_ATT＝≪＠❰\[NoScaleOffset]❱＠❰\[Normal]❱＠❰\[PerRendererData]『MaterialPropertyBlock』❱≫
+                    ＃ALL_ATT＝≪＠❰\[HideInInspector]❱＠❰\[Header(｢ShowString｣)]❱＠❰\[｡Space＠❰(⟪～⟫)❱｡]❱≫
     }
 
     『`int shader.subshaderCount`: >このシェーダーの**SubShader数**を返します。

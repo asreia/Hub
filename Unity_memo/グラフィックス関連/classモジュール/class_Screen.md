@@ -51,7 +51,7 @@
 - `SetResolution(int width, int height, FullScreenMode fullscreenMode, RefreshRate preferredRefreshRate)`:
   - 主に**解像度**(`Screen.⟪width¦height⟫`)の**切り替え**だが、`Screen.⟪fullScreen¦fullScreenMode⟫`と`Screen.mainWindowDisplayInfo?.refreshRate`も切り替えれる
 - `SetMSAASamples(int numSamples)`: >Unity **SwapChain**のMSAAサンプル数を切り替えます。(>0はQuality設定の値を使用)
-  - `SwapChain`という記述があるので`Screen` == `BRTT.CameraTarget`,`BRTT.Depth` == `SwapChain`
+  - `SwapChain`という記述があるので`Screen` == `BRTT.CameraTarget` == `SwapChain`
 - `GetDisplayLayout(List<DisplayInfo> displayLayout)`: >**接続されているディスプレイ**の`DisplayInfo`情報を取得します。
 - `AsyncOperation MoveMainWindowTo(ref DisplayInfo display, Vector2Int position)`:
   - >指定された`display`の左上隅を基準として、指定された`position`にメインウィンドウを**移動**する。(`mainWindowPosition`の移動?)

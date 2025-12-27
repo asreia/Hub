@@ -572,7 +572,7 @@ uniform float4 _RTHandleScale;
 //平面の方程式: Ax + By + Cz + D = 0 (float4には(A,B,C,D)が格納されている)
   //法線(N) = (A,B,C) (多分、正規化されてる), 原点から3次元平面までの距離(d) = -D
   //N * d = 平面の中心位置 (または、原点から平面が法線方向にどのくらいオフセットされているか)
-  //(A,B,C,D)・(Position, 1) = 平面との距離(正は法線(N)側) (N(A,B,C)は正規化されていること)
+  //(A,B,C,D)・(Position, 1) = 平面との距離(正は法線(N)側) (N(A,B,C)は正規化されていること) (ABCへのPositionの射影 から Dを足す(引く))
 float4 unity_CameraWorldClipPlanes[6];
 ```
 Lightingウインドウの項目?

@@ -67,12 +67,13 @@
   - `anisoLevel`: >**異方性フィルタリングレベル**を設定します。(鋭角な`視線の方向`の**解像度が上がる**)
     - (`Texture`との`視線の角度`によって、サンプリングする範囲を変える(鋭角ほど広い)(`Level`は範囲中のサンプリング数))
     - (>`Direct3D 11 API`には、異方性フィルタリングを使用すると`Trilinear`が**有効**になってしまうという**制限**があります。)
-    - (anisoLevel 値が `1` から `9` の間で、**Quality Settings** の `Anisotropic Filtering` が `Forced On` に設定されている場合、Unity は anisoLevel を **9** に設定します。(`0`は無効))
-    - (考察: `Trilinear`＆`anisoLevel`の場合、**サンプリング数** = 2(`Bilinear`) x 2(`MipMap補間`) x anisoLevel数 ?)
+      - ([DirectX12](https://learn.microsoft.com/ja-jp/windows/win32/api/d3d12/ne-d3d12-d3d12_filter))
+    - (`anisoLevel` 値が `1` から `9` の間で、**Quality Settings** の `Anisotropic Filtering` が `Forced On` に設定されている場合、Unity は `anisoLevel` を **9** に設定します。(`0`は無効))
+    - (`Trilinear`＆`anisoLevel`の場合、**サンプリング数** = 4(`Bilinear`(1fetch)) x 2(`MipMap補間`) x `anisoLevel`数)
 - **GraphicsTexture** (Unity 2022.1 以降に導入された**新しい機能**)
   - `class GraphicsTexture` `graphicsTexture`: >**GPUにアップロード**された**R_Resource**の**ビュー**を表す。(Read-Only).
     - `static GraphicsTexture active`: **現在アクティブ**な`GraphicsTexture`。`static RenderTexture active`のようなもの
-      - (**Set**するにはテクスチャ作成時に`GraphicsTexture.descriptor.flags`で`GraphicsTextureDescFlags.RenderTarget`を有効にする)
+      - (**Set**するにはテクスチャ作成時に`GraphicsTexture.descriptor.flags`で`GraphicsTextureDescriptorFlags.RenderTarget`を有効にする)
     - `GraphicsTextureDescriptor descriptor`: UnityがGraphicsTextureを作成するために使用するすべての情報が含まれています。(`D3D12_RESOURCE_DESC`。RTDescにも似ている)
       - Resource Desc (↑↑参照)
         - `TextureDimension dimension`: >Textureの**次元数** (Read-Only)
