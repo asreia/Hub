@@ -567,7 +567,7 @@ uniform float4 _ScaleBiasRt;
 
 // { w / RTHandle.maxWidth, h / RTHandle.maxHeight } : xy = currFrame, zw = prevFrame
 // V / RT (サンプリング時にUVをScaleする値) (uvは、(RT.w,RT.h)を(1.0,1.0)とする)
-uniform float4 _RTHandleScale;
+uniform float4 _RTHandleScale; //恐らく、`RTHandles`
 
 //平面の方程式: Ax + By + Cz + D = 0 (float4には(A,B,C,D)が格納されている)
   //法線(N) = (A,B,C) (多分、正規化されてる), 原点から3次元平面までの距離(d) = -D

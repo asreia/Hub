@@ -1,0 +1,68 @@
+// #pragma target 5.0
+#pragma kernel CSMain
+
+struct StructuredData //42変数
+{
+    float data0; //4 (4)
+    float2 data1; //12 (8)
+    int data2; //16 (4)
+    float4x4 data3; //80 (64)
+    double data4[2]; //96 (16)
+    // double data4_0; //88 (8)
+    // double data4_1; //96 (8)
+    double4 data5; //128 (32)
+    int4x4 data6; //192 (64)
+};
+
+// ConstantBuffer<StructuredData> p_constantBuffer //まだ ConstantBuffer<～> は使えない
+cbuffer _constantBuffer
+{
+    // StructuredData p_constantBuffer; //コンピュートシェーダではstructを含められない
+
+    float data0; //4 (4)
+    float2 data1; //12 (8)
+    int data2; //16 (4)
+    float4x4 data3; //80 (64)
+    double data4[2]; //96 (16)
+    // double data4_0; //88 (8)
+    // double data4_1; //96 (8)
+    double4 data5; //128 (32)
+    int4x4 data6; //192 (64)
+};
+
+// RWStructuredBuffer<StructuredData> p_structuredBuffer;
+StructuredBuffer<StructuredData> p_structuredBuffer; //(SRV) //✖❰RW❱で書き込むとエラー
+
+#define RW
+#if(defined(RW))//全て、UAV + Counter(.Append)。 Counter が無い場合は SetCounterValue(0) と同じ挙動
+    RWStructuredBuffer<StructuredData> p_append_structuredBuffer;
+    RWStructuredBuffer<StructuredData> p_consume_structuredBuffer;
+#else
+    AppendStructuredBuffer<StructuredData> p_append_structuredBuffer;
+    ConsumeStructuredBuffer<StructuredData> p_consume_structuredBuffer;
+#endif
+
+ByteAddressBuffer p_rawBuffer;
+RWByteAddressBuffer p_rWRawBuffer;
+
+[numthreads(2,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    #if(defined(RW))
+        int appendIndex = p_append_structuredBuffer.IncrementCounter(); //後置インクリメント(return counterValue++) (Pixel, Compute)
+        int consumeIndex = p_consume_structuredBuffer.DecrementCounter(); //前置デクリメント(return --counterValue) (Pixel, Compute)
+        p_append_structuredBuffer[appendIndex] = p_consume_structuredBuffer[consumeIndex];
+        // StructuredData sd = (StructuredData)0; p_append_structuredBuffer.Append(sd); //.Append(..)は不可
+        p_append_structuredBuffer[appendIndex].data1.x = p_structuredBuffer[1].data1.x;
+        p_append_structuredBuffer[appendIndex].data1.y = data1.y;
+    #else
+        p_append_structuredBuffer.Append(p_consume_structuredBuffer.Consume());
+        // p_append_structuredBuffer[id.x].data2 = 4; //インデックスアクセスは不可
+    #endif
+
+    for(int i = 0; i < 48; i++) p_rWRawBuffer.Store(id.x * 192 + 4 * i, /*asuint*/(p_rawBuffer.Load(id.x * 192 + 4 * i)));
+    // uint Load(in int address); void Store(in uint address, in uint value); //uint として Load し、 uint として Store する
+        //なので、 Store 時は、 asuint(..) し、 Load 時は、目的の｢Type｣に as｢Type｣(..) する?
+
+    //GetDimensions(..), InterlockedAdd(..)
+}

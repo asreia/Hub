@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4752bc0ea4a95a4da27b65da7c1de3a, type: 3}
+  m_Name: RenderGraphTest_PipelineAsset
+  m_EditorClassIdentifier: 
+  cat: {fileID: 2800000, guid: 8ce098e4b132e3948acbe0408844440a, type: 3}
+  beluga: {fileID: 2800000, guid: cac17334e6305664f98160be8697b0e8, type: 3}
+  face: {fileID: 2800000, guid: 275ca773c1e641f4b98f618c71eb38a2, type: 3}
+  cmdTest: {fileID: 4800000, guid: 8f1bd6e0c54c49741b4c7014d59d4d72, type: 3}
+  moveOffset: 0
+  instancingMaterial: {fileID: 2100000, guid: 2f84ef3e5c95d5d468f94638e13eaf76, type: 2}
+  viewportRect:
+    serializedVersion: 2
+    x: 0.2
+    y: 0.1
+    width: 0.6
+    height: 0.7
+  scissorRect:
+    serializedVersion: 2
+    x: 0.3
+    y: 0.3
+    width: 0.6
+    height: 0.6
+  wireframe: 1
+  invertCullingFlag: 0
+  globalDepthBias: {x: 1000, y: 1}
+  middleSubmit: 1
+  faceCount: 4
+  global_keyword_enable: 1
+  strip_keyword_enable: 0
+  svc_keyword_enable: 1
+  vertex_keyword_enable: 0
+  asset_0_keyword_enable: 1
+  asset_1_keyword_enable: 1
+  instancingCount: 4
+  matNullSwitch: 0
+  sortingLayer: 0
+  canvasOrder: 0
+  renderQueue: 0
+  rendererPriority: 0
+  backToFront: 0
+  optimizeStateChanges: 0
+  cameraPositionZ: -10
+  stopMotion: 0
+  excludeMotionVectorObjects: 0
+  forceAllMotionVectorObjects: 0
+  fallbackMaterial: 0
+  overrideMaterial: 0
+  depthTest: 0

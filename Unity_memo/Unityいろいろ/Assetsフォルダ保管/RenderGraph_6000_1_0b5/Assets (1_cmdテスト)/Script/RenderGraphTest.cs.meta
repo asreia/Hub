@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d4752bc0ea4a95a4da27b65da7c1de3a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - cat: {fileID: 2800000, guid: 8ce098e4b132e3948acbe0408844440a, type: 3}
+  - beluga: {fileID: 2800000, guid: cac17334e6305664f98160be8697b0e8, type: 3}
+  - face: {fileID: 2800000, guid: 275ca773c1e641f4b98f618c71eb38a2, type: 3}
+  - cmdTest: {fileID: 4800000, guid: 8f1bd6e0c54c49741b4c7014d59d4d72, type: 3}
+  - instancingMaterial: {fileID: 2100000, guid: 2f84ef3e5c95d5d468f94638e13eaf76, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

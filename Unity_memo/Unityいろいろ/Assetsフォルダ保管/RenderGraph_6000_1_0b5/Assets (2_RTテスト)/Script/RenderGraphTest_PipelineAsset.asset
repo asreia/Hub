@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4752bc0ea4a95a4da27b65da7c1de3a, type: 3}
+  m_Name: RenderGraphTest_PipelineAsset
+  m_EditorClassIdentifier: 
+  dimension: 5
+  colorFormat: 4
+  depthStencilFormat: 92
+  msaaSamples: 1
+  bindMS: 0
+  useMipMap: 1
+  mipCount: 4
+  autoGenerateMips: 0
+  volumeDepth: 10
+  mipLevel: 0
+  cubemapFace: -1
+  depthSlice: 0
+  clearFlags: -1
+  backgroundColors:
+  - {r: 1, g: 0.8941177, b: 0.7686275, a: 1}
+  - {r: 0.019579919, g: 0.8301887, b: 0.050850257, a: 1}
+  - {r: 0.990566, g: 0.1728818, b: 0.8986567, a: 1}
+  depth: 1
+  stencil: 99
+  sourceTex: {fileID: 2800000, guid: da328bfc3fdf1374cba58955ae61d687, type: 3}
+  dimension_ma: 5
+  useMipMap_ma: 1
+  mipCount_ma: 4
+  autoGenerateMips_ma: 1
+  volumeDepth_ma: 10
+  mipLevel_ma: 0
+  depthSlice_ma: 5
+  overrideDepth_d: 0
+  colorFormat_d: 0
+  depthStencilFormat_d: 92
+  dimension_d: 5
+  width_d: 256
+  height_d: 256
+  useMipMap_d: 0
+  mipCount_d: 5
+  autoGenerateMips_d: 0
+  volumeDepth_d: 20
+  gomi: 1
+  drawAnisotropicTest: 1
+  drawMsaaTest: 1
+  msaaKeyword: 0
+  msaaSamples1: 4
+  rtSize: {x: 16, y: 16}
+  position_0: {x: -0.45, y: 0, z: 0.4}
+  rotation_0: {x: 0, y: 0, z: 0}
+  scale_0: {x: 0.5, y: 0.5, z: 0.5}
+  position_1: {x: 0.45, y: 0, z: 0.6}
+  rotation_1: {x: 0, y: 0, z: 0}
+  scale_1: {x: 0.5, y: 0.5, z: 0.5}
+  position_2: {x: 0, y: 0, z: 0.5}
+  rotation_2: {x: 0, y: 0, z: 45}
+  scale_2: {x: 0.5, y: 0.5, z: 0.5}
+  drawRTHandleTest: 1
+  initialize: {x: 164, y: 155}
+  scaleFactor_0: {x: 1.7, y: 0.67}
+  useScaling_1: 1
+  scaleFactor_1: {x: 1.58, y: 1.12}
+  rTHandleParameters: {fileID: 11400000, guid: 218ffe618f3853747bb2f6d7bd7ed100, type: 2}
+  blitShader: {fileID: 4800000, guid: 1578738bf850ea74fbd13e47624b8acf, type: 3}
+  layoutBlitShader: {fileID: 4800000, guid: a31fbd8a4513f6f419329cbe60175a11, type: 3}
+  AnisotropicTestMaterial_0: {fileID: 2100000, guid: 124f58c0bc067f845938588d4039d8d1, type: 2}
+  AnisotropicTestMaterial_1: {fileID: 2100000, guid: 4727d6ead3382494cae1053bf5bf9ca6, type: 2}
+  msaaTestMaterial: {fileID: 2100000, guid: ed7ecaa043d014442a12ff4ee9d189a2, type: 2}

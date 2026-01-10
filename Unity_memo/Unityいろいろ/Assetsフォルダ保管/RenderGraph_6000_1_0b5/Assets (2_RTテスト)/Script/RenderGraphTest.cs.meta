@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d4752bc0ea4a95a4da27b65da7c1de3a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - sourceTex: {fileID: 2800000, guid: da328bfc3fdf1374cba58955ae61d687, type: 3}
+  - rTHandleParameters: {fileID: 11400000, guid: 218ffe618f3853747bb2f6d7bd7ed100, type: 2}
+  - blitShader: {fileID: 4800000, guid: 1578738bf850ea74fbd13e47624b8acf, type: 3}
+  - layoutBlitShader: {fileID: 4800000, guid: a31fbd8a4513f6f419329cbe60175a11, type: 3}
+  - AnisotropicTestMaterial_0: {fileID: 2100000, guid: 124f58c0bc067f845938588d4039d8d1, type: 2}
+  - AnisotropicTestMaterial_1: {fileID: 2100000, guid: 4727d6ead3382494cae1053bf5bf9ca6, type: 2}
+  - msaaTestMaterial: {fileID: 2100000, guid: ed7ecaa043d014442a12ff4ee9d189a2, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

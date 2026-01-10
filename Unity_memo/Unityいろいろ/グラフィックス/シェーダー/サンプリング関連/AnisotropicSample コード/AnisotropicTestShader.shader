@@ -58,7 +58,7 @@ Shader "Custom/AnisotropicTestShader"
                 pos.y = _ScreenParams.y - pos.y; //cmd.SetupCameraProperties(camera)で設定される
                 half4 col = half4(0,0,0,0);
                 float2 texDrawEndpoint = _SourceTex_TexelSize.zw * float2(_texDrawScaleX, _texDrawScaleY) + _texDrawPoint;
-                if((_texDrawPoint.x < pos.x && pos.x < texDrawEndpoint.x) && (_texDrawPoint.y < pos.y && pos.y < texDrawEndpoint.y))
+                if((_texDrawPoint.x <= pos.x && pos.x < texDrawEndpoint.x) && (_texDrawPoint.y <= pos.y && pos.y < texDrawEndpoint.y))
                 {
                     float2 sampleUV = float2(Map(float2(0.0, 1.0), float2(_texDrawPoint.x, texDrawEndpoint.x), pos.x),
                                         Map(float2(0.0, 1.0), float2(_texDrawPoint.y, texDrawEndpoint.y), pos.y));
