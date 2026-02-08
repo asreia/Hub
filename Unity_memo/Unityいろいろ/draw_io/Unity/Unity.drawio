@@ -17224,7 +17224,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="qkxb5V11HlmSRNFKXg9V" name="ページ44">
-    <mxGraphModel dx="1426" dy="875" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="570" dy="350" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -17939,6 +17939,9 @@
         </mxCell>
         <mxCell id="DVOnA-zM9IW6tNxOf35g-4" value="&lt;font face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;NativeRenderPassが終了(.EndSubPass())するまで、&lt;br&gt;Attachmentをテクスチャとして参照することはできない&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=#f5f5f5;fontColor=#333333;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="695" y="730" width="330" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="CUD9Sq9g8xxKZWsZ0k6s-1" value="&lt;font style=&quot;color: rgb(108, 142, 191);&quot; face=&quot;UD デジタル 教科書体 NK-B&quot;&gt;https://blog.sge-coretech.com/entry/2025/01/27/145242&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="695" y="778" width="400" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
