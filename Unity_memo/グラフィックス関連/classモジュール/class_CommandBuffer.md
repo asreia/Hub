@@ -157,7 +157,7 @@
     - `GenerateMips(RTI rt)`: `rt`の**MipMap生成**
       :条件: `rt.useMipMap = true;`, `mipCount > 1`, `rt.autoGenerateMips = false;`, MipMap可能な`GraphicsFormat` (アクティブRTで無くて良い(`cmd.SetRenderTarget(..)`不要))
     - `ResolveAntiAliasedSurface(RenderTexture rt ＠❰, RenderTexture target ❱)`: **リゾルブ**(MSAA解決)。`target`を省略した場合は、`rt`自身にリゾルブ
-      :条件: `rt.antiAliasing > 1`, `bindTextureMS = true;`, `rt`と`target`の解像度と`GraphicsFormat`が同じ (アクティブRTで無くて良い)
+      :条件: `rt.antiAliasing > 1`, `bindTextureMS = false;`, `rt`と`target`の解像度と`GraphicsFormat`が同じ (アクティブRTで無くて良い)
   - Copy系
     - テクスチャ系
       - `CopyTexture(RTI src ＠○⟦, int src┃⟪Element＃⟪Mip＃⟪X¦Y¦Width¦Height⟫⟫⟫⟧, RTI dst ＠○⟦, int dst┃⟪Element＃⟪Mip＃⟪X¦Y⟫⟫⟫⟧)`

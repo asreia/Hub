@@ -7,34 +7,33 @@
   最終的に最初に`RenderGraph`にセットした`cmd`に必要な全ての**RenderPass**のみを記述され、最後にその`cmd`を`ctx.Submit(cmd)`する。
   (drawioで表現する)
 - リソースは、最初Writeで確保、最後Readで解放
-- NRPは、パスカル後にNRP条件から外れるまで複数のSubPassを1つのNRPに含め続ける
+- NRPは、パスカル後にNRP条件から外れるまで複数のSubPassを1つのNRPに含め続ける(RasterPassのみパスマージされる)
 - Computeととの同期ポイントも作られる
-- RasterPassのみパスマージされる
 
 - まずは極力中身を見ない
 
 - RenderGraph
   - **リソース準備**
-    - Desc系
-      - `TextureDesc GetTextureDesc(TextureHandle texture)`
-      - `BufferDesc GetBufferDesc(BufferHandle buffer)`
-    - Create系
+    - **Create系**
       - `TextureHandle CreateTexture(⟪TextureDesc desc¦TextureHandle texture ＠❰, string name, bool clear = false❱⟫)`
-    - Import系
+      - Desc
+        - `TextureDesc GetTextureDesc(TextureHandle texture)`
+        - `BufferDesc GetBufferDesc(BufferHandle buffer)`
+    - **Import系**
       - `TextureHandle ImportBackbuffer(RenderTargetIdentifier rt, RenderTargetInfo info, ImportResourceParams importParams = default)`
         >`RenderTargetIdentifier`は不透明なハンドルであるため、レンダリンググラフはプロパティを導出できません。そのため、ユーザーは`info`引数を介してプロパティを渡す必要があります。
       - `BufferHandle ImportBuffer(GraphicsBuffer graphicsBuffer)`
       - `TextureHandle ImportTexture(RTHandle rt ＠❰｡＠❰, RenderTargetInfo info❱, ImportResourceParams importParams = default｡❱)`
         - `RenderTargetInfo info`: `RTHandle rt`の中身が`RTI`の時に必要
-  - RenderPass構築
-    - RenderPass生成
-      - AddRasterRenderPass()
-      - AddRenderPass()
-      - AddComputePass()
-      - AddUnsafePass()
-    - **Builder**
-      - Graph入出力
-        - Use系
-        - Attachment系
-      - SetRenderFunc(..)
-        - CommandBuffer
+  - **Builder**
+    - **Graph入出力**
+      - Use系
+      - Attachment系
+    - **SetRenderFunc(..)**
+      - CommandBuffer
+
+  - RenderPass生成
+    - AddRasterRenderPass()
+    - AddRenderPass()
+    - AddComputePass()
+    - AddUnsafePass()

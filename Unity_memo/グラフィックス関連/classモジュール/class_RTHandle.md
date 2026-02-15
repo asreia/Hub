@@ -237,7 +237,7 @@ Vector2Int GetScaledSize(Vector2Int refSize)
 //DynamicScalingClamping.hlsl ==================================================================================================================
 float2 ClampAndScaleUV(float2 UV, float2 texelSize, float numberOfTexels, float2 scale) //☆ //`scale`は`rtHandle.rtHP.rtHandleScale`を入れる
 {
-    float2 maxCoord = 1.0f - numberOfTexels * texelSize; //`_viewportSize`なら正しいが..
+    float2 maxCoord = 1.0f - numberOfTexels * texelSize; //`_viewportSize`なら正しいが..(多分`1/_viewportSize`)
     return min(UV, maxCoord) * scale; // 1/RT❰`texelSize`❱ * V/RT❰`scale`❱ = V/RT^2 を引くのは間違っていないか?..
     // return min(UV * scale, scale - (numberOfTexels * texelSize)); //●`～_TexelSize`ならこっちで正しいはず..
 }
