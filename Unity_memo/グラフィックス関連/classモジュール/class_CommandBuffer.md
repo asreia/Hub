@@ -58,14 +58,14 @@
     - XR関係
       - `SetSinglePassStereo(SinglePassStereoMode mode)`: シングルパスステレオを設定
       - `SetInstanceMultiplier(uint multiplier)`: インスタンス数に乗算する値を設定
-    - FoveatedRendering系
-      - `ConfigureFoveatedRendering`: フォービエイテッドレンダリングの構成コマンド
-      - `SetFoveatedRenderingMode`: フォービエイテッドレンダリングのモードを設定
-      - シェーディングレート
-        - `SetShadingRateCombiner`: シェーディングレートコンバイナを設定
-        - `SetShadingRateFragmentSize`: 基本のシェーディングレートを設定
-        - `SetShadingRateImage`: シェーディングレートイメージを設定
-        - `ResetShadingRate`: シェーディングレート状態をデフォルトにリセット
+      - FoveatedRendering系
+        - `ConfigureFoveatedRendering`: フォービエイテッドレンダリングの構成コマンド
+        - `SetFoveatedRenderingMode`: フォービエイテッドレンダリングのモードを設定
+        - シェーディングレート
+          - `SetShadingRateCombiner`: シェーディングレートコンバイナを設定
+          - `SetShadingRateFragmentSize`: 基本のシェーディングレートを設定
+          - `SetShadingRateImage`: シェーディングレートイメージを設定
+          - `ResetShadingRate`: シェーディングレート状態をデフォルトにリセット
   - RenderTarget系
     - `SetRenderTarget(⟪RTI rt¦RTI＠❰[]❱ color＠❰s❱, RTI depth¦RTB binding⟫,`『**レンダーターゲット**
         `＠○⟦, RenderBuffer○¦⟪Load¦Store⟫Action ＠⟪color¦depth⟫○¦⟪Load¦Store⟫Action⟧,`『⟪Load¦Store⟫Action
@@ -106,7 +106,7 @@
   - Property系
     - ShaderProperty系 (設定は**C#コンパイルも跨ぐ**(GPUバッファだから?)) (**Global**Property(↓多分全て)は`Properties{..}`に含まれて**いない**`ShaderProperty`を**設定**する)
       - 基本ShaderProperty_Set
-        - `SetGlobal⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫`
+        - `SetGlobal｡⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫`
           `(int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: `Global`ShaderPropertyを設定
           - `SetGlobalTexture(int nameID, RTI rt ＠❰, RenderTextureSubElement element❱)`: (`rt`に`RenderBuffer`を設定しても効果なし)
             - `RenderTextureSubElement element`:`enum RenderTextureSubElement`: >`RenderTexture`が内包するさまざまな種類のデータにアクセスするために使います。
@@ -122,7 +122,7 @@
               Pixelシェーダー側: `RW～<T> ⟪_buffer¦_rt⟫ : register(u❰index❱)`
               **使用後**は`cmd.ClearRandomWriteTargets()`を呼ぶ必要がある
             - `bool preserveCounterValue`:カウンター値を⟪％`false`:リセット(0)¦`true`:保持⟫
-        - `Set⟪Compute¦RayTracing⟫｡⟪⟪Float¦Int⟫Param＠❰s❱¦⟪⟪Vector¦Matrix⟫＠❰Array❱¦＠❰Constant❱Buffer¦Texture⟫Param⟫`
+        - `Set⟪Compute¦RayTracing⟫｡⟪⟪Float¦Int⟫Param＠❰s❱¦⟪｡⟪Vector¦Matrix⟫＠❰Array❱¦＠❰Constant❱Buffer¦Texture｡⟫Param⟫`
           `(⟪Compute¦RayTracing⟫Shader shader ＠❰, int kernelIndex ❱, int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: ⟪`Compute`¦`RayTracing`⟫ShaderPropertyを設定
           :`Compute`Shaderで`⟪Buffer¦Texture⟫`を設定する場合は`int kernelIndex`が必要。
           後は大体`SetGlobal`と同じ。

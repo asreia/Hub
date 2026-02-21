@@ -1,0 +1,79 @@
+
+SetInvertCulling(bool invertCulling) ;
+SetViewport(Rect pixelRect) ;
+EnableScissorRect(Rect scissor) ;
+DisableScissorRect() ;
+SetShadowSamplingMode(RenderTargetIdentifier shadowmap, ShadowSamplingMode mode) ;
+
+SetGlobalFloat(int nameID, float value) ;
+SetGlobalInt(int nameID, int value) ;
+SetGlobalInteger(int nameID, int value) ;
+SetGlobalVector(int nameID, Vector4 value) ;
+SetGlobalColor(int nameID, Color value) ;
+SetGlobalMatrix(int nameID, Matrix4x4 value) ;
+SetGlobalDepthBias(float bias, float slopeBias) ;
+SetGlobalFloatArray(int nameID, float[] values) ;
+SetGlobalVectorArray(int nameID, Vector4[] values) ;
+SetGlobalMatrixArray(int nameID, Matrix4x4[] values) ;
+SetGlobalFloat(string name, float value) ;
+SetGlobalInt(string name, int value) ;
+SetGlobalInteger(string name, int value) ;
+SetGlobalVector(string name, Vector4 value) ;
+SetGlobalColor(string name, Color value) ;
+SetGlobalMatrix(string name, Matrix4x4 value) ;
+SetGlobalFloatArray(string propertyName, List<float> values) ;
+SetGlobalFloatArray(int nameID, List<float> values) ;
+SetGlobalFloatArray(string propertyName, float[] values) ;
+SetGlobalVectorArray(string propertyName, List<Vector4> values) ;
+SetGlobalVectorArray(int nameID, List<Vector4> values) ;
+SetGlobalVectorArray(string propertyName, Vector4[] values) ;
+SetGlobalMatrixArray(string propertyName, List<Matrix4x4> values) ;
+SetGlobalMatrixArray(int nameID, List<Matrix4x4> values) ;
+SetGlobalMatrixArray(string propertyName, Matrix4x4[] values) ;
+SetGlobalTexture(string name, TextureHandle value) ;
+SetGlobalTexture(int nameID, TextureHandle value) ;
+SetGlobalTexture(string name, TextureHandle value, RenderTextureSubElement element) ;
+SetGlobalTexture(int nameID, TextureHandle value, RenderTextureSubElement element) ;
+SetGlobalBuffer(string name, ComputeBuffer value) ;
+SetGlobalBuffer(int nameID, ComputeBuffer value) ;
+SetGlobalBuffer(string name, GraphicsBuffer value) ;
+SetGlobalBuffer(int nameID, GraphicsBuffer value) ;
+SetGlobalConstantBuffer(ComputeBuffer buffer, int nameID, int offset, int size) ;
+SetGlobalConstantBuffer(ComputeBuffer buffer, string name, int offset, int size) ;
+SetGlobalConstantBuffer(GraphicsBuffer buffer, int nameID, int offset, int size) ;
+SetGlobalConstantBuffer(GraphicsBuffer buffer, string name, int offset, int size) ;
+
+EnableShaderKeyword(string keyword) ;
+EnableKeyword(in GlobalKeyword keyword) ;
+EnableKeyword(Material material, in LocalKeyword keyword) ;
+EnableKeyword(ComputeShader computeShader, in LocalKeyword keyword) ;
+DisableShaderKeyword(string keyword) ;
+DisableKeyword(in GlobalKeyword keyword) ;
+DisableKeyword(Material material, in LocalKeyword keyword) ;
+DisableKeyword(ComputeShader computeShader, in LocalKeyword keyword) ;
+SetKeyword(in GlobalKeyword keyword, bool value) ;
+SetKeyword(Material material, in LocalKeyword keyword, bool value) ;
+SetKeyword(ComputeShader computeShader, in LocalKeyword keyword, bool value) ;
+
+SetupCameraProperties(Camera camera) ;
+SetViewProjectionMatrices(Matrix4x4 view, Matrix4x4 proj) ;
+
+MarkLateLatchMatrixShaderPropertyID(CameraLateLatchMatrixType matrixPropertyType, int shaderPropertyID) ;
+UnmarkLateLatchMatrix(CameraLateLatchMatrixType matrixPropertyType) ;
+SetLateLatchProjectionMatrices(Matrix4x4[] projectionMat) ;
+
+BeginSample(string name) ;
+BeginSample(CustomSampler sampler) ;
+BeginSample(ProfilerMarker marker) ;
+EndSample(string name) ;
+EndSample(CustomSampler sampler) ;
+EndSample(ProfilerMarker marker) ;
+
+IncrementUpdateCount(RenderTargetIdentifier dest) ;
+InvokeOnRenderObjectCallbacks() ;
+SetSinglePassStereo(SinglePassStereoMode mode) ;
+
+IssuePluginEvent(IntPtr callback, int eventID) ;
+IssuePluginEventAndData(IntPtr callback, int eventID, IntPtr data) ;
+IssuePluginCustomBlit(IntPtr callback, uint command, RenderTargetIdentifier source, RenderTargetIdentifier dest, uint commandParam, uint commandFlags) ;
+IssuePluginCustomTextureUpdateV2(IntPtr callback, Texture targetTexture, uint userData) ;
