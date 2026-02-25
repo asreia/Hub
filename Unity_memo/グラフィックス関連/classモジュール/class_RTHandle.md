@@ -237,7 +237,7 @@ Vector2Int GetScaledSize(Vector2Int refSize)
 //DynamicScalingClamping.hlsl ==================================================================================================================
 float2 ClampAndScaleUV(float2 UV, float2 texelSize, float numberOfTexels, float2 scale) //☆ //`scale`は`rtHandle.rtHP.rtHandleScale`を入れる
 {
-    float2 maxCoord = 1.0f - numberOfTexels * texelSize; //`_viewportSize`なら正しいが..(多分`1/_viewportSize`)
+    float2 maxCoord = 1.0f - numberOfTexels * texelSize; //`texelSize`が`1/_viewportSize`なら正しいが..
     return min(UV, maxCoord) * scale; // 1/RT❰`texelSize`❱ * V/RT❰`scale`❱ = V/RT^2 を引くのは間違っていないか?..
     // return min(UV * scale, scale - (numberOfTexels * texelSize)); //●`～_TexelSize`ならこっちで正しいはず..
 }
@@ -260,7 +260,7 @@ float2 ClampUV(float2 UV, float2 texelSize, float numberOfTexels, float2 scale)
     return min(UV, maxCoord);
 }
 
-//LayoutBlitShader.shader ======================================================================================================================
+//LayoutBlitShader.shader(自作) ======================================================================================================================
 #if defined(_RTHandle_ClampAndScaleUV)  //`_viewportSize`⇔`rtHand.rtHandleProperties.currentViewportSize`
     float2 texelSize = 1 / float2(_viewportSize.x, _viewportSize.y); // 1/V  * V/RT = 1/RT (こっちかなと思ったけど、Unity公式は`～_TexelSize`を使っている..)
     // texelSize = _SourceTex_TexelSize.xy;                          // 1/RT * V/RT = V/RT^2
@@ -274,7 +274,7 @@ SAMPLER(sampler_CameraOpaqueTexture);  //>注記: 実行時にコピーカラー
 float4 _CameraOpaqueTexture_TexelSize;
 float3 SampleSceneColor(float2 uv)
 {
-    uv = ClampAndScaleUVForBilinear(UnityStereoTransformScreenSpaceTex(uv), _CameraOpaqueTexture_TexelSize.xy); //`_viewportSize`ではなく`～_TexelSize`になっている..
+    uv = ClampAndScaleUVForBilinear(UnityStereoTransformScreenSpaceTex(uv), _CameraOpaqueTexture_TexelSize.xy); //`1/_viewportSize`ではなく`～_TexelSize`になっている..
     return SAMPLE_TEXTURE2D_X(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, uv).rgb;
 }
 float3 LoadSceneColor(uint2 uv)

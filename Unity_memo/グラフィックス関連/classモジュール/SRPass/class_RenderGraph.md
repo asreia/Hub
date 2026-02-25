@@ -11,11 +11,74 @@
 - Computeととの同期ポイントも作られる
 - `～Handle`は`RenderGraph`内のみ使用可能
 
+- `BRTT.⟪CameraTarget¦Depth⟫`の`Import⟪Backbuffer¦Texture⟫`
+```csharp
+    var backbufferInfo = new RenderTargetInfo
+    {
+        width       = cameras[0].pixelWidth,  //Screen.width, //どちらでも動くが`Camera`の方が正確らしい
+        height      = cameras[0].pixelHeight, //Screen.height,
+        volumeDepth = 1,
+        msaaSamples = 1,
+        bindMS      = false,
+        format      = SystemInfo.GetGraphicsFormat(DefaultFormat.LDR),
+    };
+    var CameraDepthInfo = backbufferInfo;
+    CameraDepthInfo.format = SystemInfo.GetGraphicsFormat(DefaultFormat.DepthStencil);
+
+    //このメソッドを使うと`Backbuffer`になるぽい
+    TextureHandle backbufferDayo = renderGraph.ImportBackbuffer(BuiltinRenderTextureType.CameraTarget, backbufferInfo); 
+    TextureHandle cameraDepth = renderGraph.ImportTexture(RTHandles.Alloc(BuiltinRenderTextureType.Depth, "Camera Depth"), CameraDepthInfo);
+
+    using (var builder = renderGraph.AddRasterRenderPass<ClearPassData>("Clear Backbuffer", out var passData))
+    {
+        builder.SetRenderAttachment(backbufferDayo, 0);
+        builder.SetRenderAttachmentDepth(cameraDepth);
+        /*..*/
+    }
+```
+
 - `＠⟪Create¦Import¦Use⟫⟪Texture¦Buffer¦RendererList⟫＠⟪Desc¦Handle⟫`
   - `Set⟪Input¦Render⟫Attachment＠❰Depth❱`
 - `＠❰Add❱⟪Raster＠❰Render❱¦Compute¦Unsafe⟫⟪Pass¦GraphContext⟫`
+- 区間: `Pass`,`Recording`,`RenderGraph`
 
 - 謎: `void AllowGlobalStateModification(bool value)`、`void EnableAsyncCompute(bool value)`、`TextureUVOrigin`、`bool disableFallBackToImportedTexture`
+
+- `Mesh CreatePlaneMesh(Rect scaleRect)`、`Shader "Custom/RendererListShader"`、`Shader "Custom/LayoutBlitShader"`、`GraphicsBufferTest.compute`
+```csharp
+    void OnEnable()
+    {
+        // 既存のアセットをロードするか、新しく作成する
+        string assetPath = "Assets/Script/RTHandleParameters.asset";
+        rTHandleParameters = UnityEditor.AssetDatabase.LoadAssetAtPath<RTHandleParameters>(assetPath);
+        
+        if (rTHandleParameters == null)
+        {
+            // アセットが存在しない場合は新しく作成
+            rTHandleParameters = CreateInstance<RTHandleParameters>();
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.CreateAsset(rTHandleParameters, assetPath);
+            UnityEditor.AssetDatabase.SaveAssets();
+#endif
+        }
+    }
+using UnityEngine;
+
+public class RTHandleParameters : ScriptableObject
+{
+    public Vector2Int setReferenceSize = new Vector2Int(128,128);
+    public bool resetReferrenceSize = false;
+}
+```
+
+- 計画
+  - まずは、1つの`BeginRecording(.)`～`EndRecordingAndExecute()`内、**RasterPass**のみでテストする。
+    - **Create系**、**Import系**
+    - `AccessFlags`テスト、**GlobalTexture系**、**Use系**、**Attachment/NRP系**、**AllowPassCulling**
+    - cmd: *基本ShaderProperty_Set*:`SetGlobal`⟪`Texture(.,`**TextureHandle**`,.)`¦`Float`⟫、**Clear系**:`ClearRenderTarget`、**DrawCall系**:`DrawRendererList`,`DrawMesh`
+  - その次に、**ComputePass**、複数の`BeginRecording(.)`～`EndRecordingAndExecute()`でテスト(`～Handle`を複数の`Recording`間を超えて渡せるか)
+    - `EnableAsyncCompute(bool value)`
+  - その次に、**UnsafePass**
 
 - まずは極力中身を見ない
 
