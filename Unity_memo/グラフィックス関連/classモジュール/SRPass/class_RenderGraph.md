@@ -33,7 +33,12 @@
     {
         builder.SetRenderAttachment(backbufferDayo, 0);
         builder.SetRenderAttachmentDepth(cameraDepth);
-        /*..*/
+
+        builder.SetRenderFunc(static (ClearPassData data, RasterGraphContext RasterCtx) =>
+        {
+            //DX12: ClearRenderTargetView(..)ではなくDrawIndexedInstanced(6,1)で描画されている..
+            RasterCtx.cmd.ClearRenderTarget(RTClearFlags.Color, Color.aquamarine, 1.0f, 0);
+        });
     }
 ```
 
@@ -153,10 +158,10 @@ public class RTHandleParameters : ScriptableObject
             >戻り値:'input'に渡された値。返された値は将来削除されるため、使用しないでください。?
           - RendererListHandle:   `void` **UseRendererList**`(RendererListHandle input)`: Readのみ
         - `IRenderAttachment`, `cmd.SetRandomWriteTarget(..)`と対応してるぽい。戻り値は謎
-          - `TextureHandle SetRandomAccessAttachment(TextureHandle tex, int index,                                 AccessFlags flags = AccessFlags.ReadWrite)`
           - `BufferHandle  UseBufferRandomAccess    (BufferHandle tex,  int index ＠❰, bool preserveCounterValue ❱, AccessFlags flags = AccessFlags.Read)`
       - **Attachment系** (`SetRenderTarget(..)`,*NRP*)
         - `IRenderAttachment`
+          - `TextureHandle SetRandomAccessAttachment(TextureHandle tex, int index,                                 AccessFlags flags = AccessFlags.ReadWrite)`
           - `void` **SetRenderAttachment**     `(TextureHandle tex, int index, AccessFlags flags = AccessFlags.Write     ＠❰, int mipLevel, int depthSlice ❱)`:
             >ブレンディングなど読み取る場合は`AccessFlags.ReadWrite`にする必要がある。フルスクリーンパスなどで完全に上書きする場合`AccessFlags.WriteAll`にするとパフォーマンスが良くなる
             - `int index`: MRTスロット(`SV_Target++index`), `int depthSlice`: >`-1`は全てのスライスをバインド(Layered Rendering?)
@@ -297,12 +302,12 @@ public class RTHandleParameters : ScriptableObject
         - `SetComputeParamsFromMaterial`,`SetRayTracingAccelerationStructure`
       - ResourceModified系:`SetBufferData`,`⟪SetBuffer¦Copy⟫CounterValue`,`BuildRayTracingAccelerationStructure`
     - **IUnsafe** : `IBase`, `IRaster`, `ICompute`===============================================
-      - **RenderTarget系**:`SetRenderTarget`,`SetRandomWriteTarget`
+      - **RenderTarget系**:`SetRenderTarget`,`⟪Set¦Clear⟫RandomWriteTarget`
       - **Copy系**:`CopyTexture`
       - *基本ShaderProperty_Set*:`SetGlobalTexture(.,`**RTI**`,.)`,`Set⟪Compute¦RayTracing⟫TextureParam(..,`**RTI**`,..)`
       - MipMap生成:`GenerateMips`
       - **AsyncReadback系**:`RequestAsyncReadback＠❰IntoNativeArray❱`
-      - Clear:`Clear`,`ClearRandomWriteTargets`
+      - Clear:`Clear`
   - 情報系
     - `string name {get;}`: `renderGraph`の名前
     - `bool nativeRenderPassesEnabled {get; set;}`: >`AddRasterRenderPass()`の従来の`SetRenderTarget(..)`の代わりに、**NRPの使用を有効**にします(6000.3以降デフォルトで有効)。

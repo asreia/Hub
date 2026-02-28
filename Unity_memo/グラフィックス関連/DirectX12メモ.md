@@ -347,7 +347,7 @@
 
 ### D_RESOURCE_BARRIER
 
-`R_Resource`への適切な**アクセス権限の管理**を行い、最適化する
+`R_Resource`への適切な**アクセス権限の管理**を行い、最適化する [リソースバリア](images\リソースバリア.png)
 
 - ☆`R_GraphicsCommandList->`**ResourceBarrier**`(D_RESOURCE_BARRIER[] pBarriers)`
   - **struct D_RESOURCE_BARRIER**[] `pBarriers`:
@@ -356,7 +356,7 @@
       - `_ALIASING`: >異なるリソースが同じ物理メモリ領域を使用する場合、メモリの競合を防ぐために使われるバリアです。
       - `_UAV`: >UAVの操作を完了させるためのバリアで、特定のリソースの状態に依存しないバリアです。
     - **enum D_RESOURCE_BARRIER_FLAGS** `Flags`: `D_RESOURCE_BARRIER_FLAG⟪％_NONE¦⟪_BEGIN¦_END⟫_ONLY⟫`:
-      `R_Resource`の最初と最後に`⟪_BEGIN¦_END⟫_ONLY`を使うことで**最適化**するらしい
+      `R_Resource`の**バリア遷移**の最初と最後に`⟪_BEGIN¦_END⟫_ONLY`を使うことで**最適化**するらしい
     - union{D_RESOURCE_BARRIER_TYPE}: `Transition`のみメモしている
       - **D_RESOURCE_TRANSITION_BARRIER** `Transition`:
         - `R_Resource Resource`: バリアを遷移させる`R_Resource`
@@ -457,7 +457,7 @@
           - `UINT8 StencilWriteMask`: `Stencil`**書き込み**時のマスク。(`Stencil = (Stencil & ~StencilWriteMask) | (NewStencil & StencilWriteMask)`)
         - **struct D_DEPTH_STENCILOP_DESC** `⟪Front¦Back⟫Face`: ポリゴンの`⟪Front¦Back⟫Face`に**ステンシルテスト**を設定する
           - **enum D_COMPARISON_FUNC** `StencilFunc`: `DepthFunc`と同じ型: Stencil `⟪True¦False¦<¦>¦<=¦>=¦!=¦==⟫` Ref。`Stencil`と`Ref`との**ステンシルテスト**
-          - **enum D_STENCIL_OP** `Stencil⟪＠❰Depth❱Fail¦Pass⟫Op`: `_STENCIL_OP～`: ⟪ステンシル⟪成功¦失敗⟫¦デプスのみ失敗⟫の時の、`Stencil`**更新**方法
+          - **enum D_STENCIL_OP** `Stencil⟪＠❰Depth❱Fail¦Pass⟫Op`: `D_STENCIL_OP～`: ⟪ステンシル⟪成功¦失敗⟫¦デプスのみ失敗⟫の時の、`Stencil`**更新**方法
             - `_KEEP`: `Stencil = Stencil`
             - `_ZERO`: `Stencil = 0`
             - `_REPLACE`: `Stencil = Ref`
@@ -559,6 +559,61 @@
   - **struct D_CPU_DESCRIPTOR_HANDLE**[] `pRenderTargetDescriptors`: `RTV[]`を設定。`0`だと**デプス**のみ(*PS*は動く)。`2`以上だと**MRT**
   - `BOOL RTsSingleHandleToDescriptorRange`: `TRUE`:`pRenderTargetDescriptors`に**要素が一つ**の配列を設定して、`R_DescriptorHeap`の範囲を設定する。(`D_DESCRIPTOR_RANGE`とは関係ない)
   - **struct D_CPU_DESCRIPTOR_HANDLE** `pDepthStencilDescriptor`: `DSV`を設定
+
+- ☆**RenderPass**
+  - メモ
+    - `SV_TargetN`と`LOAD_FRAMEBUFFER_INPUT(N)`の`N`は、`RENDER_TARGET_DESC[]`の`index`と`RTVFormats[8]`の各要素が`_UNKNOWN`かどうかで決まると思われる
+      - `FBF(_UNKNOWN)`は*ディスクリプタ*をセットする必要はない?`index`のみでいいのかな?
+      - `PSO`の切り替えがサブパスの切り替えと言うのは**怪しい**
+      - [BeginRenderPassとindex対応](images\BeginRenderPassとindex対応.png)
+    - *RenderPass内*で**禁止されている命令**: `OMSetRenderTargets(..)`,`ResourceBarrier(..)`,`Clear⟪RenderTarget¦DepthStencil⟫View(..)`(Blitに変換)
+    - **非モバイル**では`OMSetRenderTargets(..)`と`ResourceBarrier(..)`相当に**変換**されると思われる
+  - `R_GraphicsCommandList->`**BeginRenderPass**`(..)`: `OMSetRenderTargets(..)`＆`Access(バリア含む)`**相当**
+    - `UINT NumRenderTargets`:  バインドする↓の**RTVの数**
+    - `D_RENDER_PASS_RENDER_TARGET_DESC[] pRenderTargets`
+      - `D_CPU_DESCRIPTOR_HANDLE            cpuDescriptor`: **RTV**
+      - `D_RENDER_PASS_BEGINNING_ACCESS     BeginningAccess`
+      - `D_RENDER_PASS_ENDING_ACCESS        EndingAccess`
+    - `D_RENDER_PASS_DEPTH_STENCIL_DESC   pDepthStencil`
+      - `D_CPU_DESCRIPTOR_HANDLE            cpuDescriptor`: **DSV**
+      - `D_RENDER_PASS_BEGINNING_ACCESS     ⟪Depth¦Stencil⟫BeginningAccess`
+      - `D_RENDER_PASS_ENDING_ACCESS        ⟪Depth¦Stencil⟫EndingAccess`
+    - `enum D_RENDER_PASS_FLAGS` **Flags**:`D_RENDER_PASS_FLAG～`: 組合せ可能 [Flags](images\Flags.png)
+      - `_NONE`
+      - `_ALLOW_UAV_WRITES`: `UAV`への**書き込み**を許可 (恐らくこれが無いと`UAV`であっても読み取りのみ)
+      - `⟪_SUSPENDING¦_RESUMING⟫_PASS`: **パス連結**のための**中断**(`_SUSPENDING`(サスペンディング))と**再開**(`_RESUMING`(リジューミング)) (タイルメモリの内容を破棄しない)
+      - `_BIND_READ_ONLY⟪_DEPTH¦_STENCIL⟫`: ⟪デプス¦ステンシル⟫バッファを`READ_ONLY`にする (⟪`ZWrite`¦`STENCIL_OP_KEEP`以外⟫が不可、代わりにテクスチャサンプル可能(`SRV`と`DSV`を**同時**))
+  - `struct D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS` `＠⟪Depth¦Stencil⟫⟪Beginn¦End⟫ing`**Access**: [ACCESS_TYPE](images\ACCESS_TYPE.png)
+    - `enum D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS_TYPE`: `D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS_TYPE～`: 組合せ不能
+      - `_DISCARD`:   `.DontCare`
+      - `_PRESERVE`:  ⟪BEGIN:`.Load`¦END:`.Store`⟫ (プリザーブ)
+      - ⟪`_CLEAR`:    BEGIN:`.Clear`
+      - ¦`_RESOLVE`⟫: END:`.＠❰StoreAnd❱Resolve`
+      - **パス連結**時の**タイルメモリ内**の**軽量バリア**の**遷移** (`ENDING`と**次のパス**の`BEGINNING`で**同じ**`ACCESS_TYPE`である必要がある)
+        - `_NO_ACCESS`: *軽量バリア*を**一切変えない**。そのパスではリソースを触らない
+        - `_PRESERVE_LOCAL⟪_RENDER¦_SRV¦_UAV⟫`: それぞれの*軽量バリア*に**遷移** (`_RENDER`:ほぼ`RTV/DSV`)
+    - ⟪`struct D_RENDER_PASS_`**BEGINNING**`_ACCESS_CLEAR_PARAMETERS` **Clear**
+      - `struct D_CLEAR_VALUE ClearValue`
+        - `union{}`
+          - `FLOAT Color[4]`
+          - `struct D_DEPTH_STENCIL_VALUE DepthStencil`
+            - `FLOAT Depth`
+            - `UINT8 Stencil`
+    - ¦`struct D_RENDER_PASS_`**ENDING**`_ACCESS_RESOLVE_PARAMETERS`  **Resolve**⟫
+      - `BOOL PreserveResolveSource`: >リゾルブ元(Src)を**保持**する場合は`TRUE`
+      - `R_Resource pSrcResource`: **Src** (現在の`cpuDescriptor`の`R_Resource`?)
+      - `R_Resource pDstResource`: **Dst** (この`Dst`がタイルメモリ上(`pRenderTargets`)の`R_Resource`かVRAM上の`R_Resource`かによって`.＠❰StoreAnd❱Resolve`が決まる?)
+      - `DXGI_FORMAT Format`: フォーマット
+      - `UINT SubresourceCount` >サブリソースの数 (この`R_Resource`が持っているサブリソースの総数?)
+      - `struct D_RENDER_PASS_ENDING_ACCESS_RESOLVE_SUBRESOURCE_PARAMETERS pSubresourceParameters`
+        - `UINT ⟪Src¦Dst⟫Subresource`,`D_RECT SrcRect`,`UINT Dst⟪X¦Y⟫`: 恐らく`Srcサブ`の`D_RECT`を`Dstサブ`の`Dst⟪X¦Y⟫`の位置にリゾルブ
+      - `enum D_RESOLVE_MODE ResolveMode`:`D_RESOLVE_MODE～`: >リゾルブ操作を指定
+        - `_DECOMPRESS`: 展開
+        - `_MIN`: >`Src`を最小値にリゾルブ
+        - `_MAX`: >`Src`を最大値にリゾルブ
+        - `_AVERAGE`: >`Src`を平均値にリゾルブ
+        - `_ENCODE_SAMPLER_FEEDBACK`
+        - `_DECODE_SAMPLER_FEEDBACK`
 
 - ☆`R_GraphicsCommandList->`**ClearDepthStencilView**`(..)`:
   - **struct D_CPU_DESCRIPTOR_HANDLE** `DepthStencilView`: クリアする`DSV`
