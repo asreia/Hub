@@ -9,7 +9,17 @@
 - リソースは、最初Writeで確保、最後Readで解放
 - NRPは、パスカル後にNRP条件から外れるまで複数のSubPassを1つのNRPに含め続ける(RasterPassのみパスマージされる)
 - Computeととの同期ポイントも作られる
-- `～Handle`は`RenderGraph`内のみ使用可能
+- `～Handle`は**Recording**内のみ使用可能(`CreateTransientTexture(..)`は`Pass`内のみ)
+  - `RTI`=>`TextureHandle`=>`UseTexture(..)`=>`PassData{..}`とする必要があってめんどくさい
+- **NRPパスマージ**の条件は、`解像度`,`MSAAサンプル数`,`VolumeDepth`が**一致**し`デプスバッファ`を**共有**する。
+  - 1つの`Pass`内で`Set～Attachment～(..)`の↑の**一致**が**崩れる**と**エラー**となる。
+  - `cmd.SetGlobalTexture(..)`しても**NRPパスマージ**は切れない
+  - 基本的に`Set⟪Render¦Input⟫Attachment(., index)`の`index`は、`SV_Target##index`と`＠❰LOAD_❱FRAMEBUFFER_INPUT_X＠❰_FLOAT❱(index, ＠❰.❱)`に**一致**していること
+      (`index`は`Render`と`Input`それぞれ`0`から始まる) (シェーダー側の**使われない**`index`(FB,MRT)が**定義**してあっても問題なく**動く**)
+    - `Set⟪Render¦Input⟫Attachment(..)`を**コメントアウト**しても`index`が`0`から詰められてシェーダーに渡り描画する。(とりあえず**動く**)
+- 当然だが`.SetRenderFunc(..)`は1つの`Pass`につき1つのみ可能(**Pass内2回行動不可**)
+- `Memoryless`は何しても`Fasle`
+- `builder.AllowGlobalStateModification(true)`が必要: `.SetKeyword`, `.SetGlobalTexture` (本当に`GloablKeyword`,`GlobalProperty`系に必要?)(`Set～Attachment～(..)`系は**必要ではない**)
 
 - `BRTT.⟪CameraTarget¦Depth⟫`の`Import⟪Backbuffer¦Texture⟫`
 ```csharp
@@ -43,7 +53,7 @@
 ```
 
 - `＠⟪Create¦Import¦Use⟫⟪Texture¦Buffer¦RendererList⟫＠⟪Desc¦Handle⟫`
-  - `Set⟪Input¦Render⟫Attachment＠❰Depth❱`
+  - `Set⟪Input¦Render¦RandomAccess⟫Attachment＠❰Depth❱`
 - `＠❰Add❱⟪Raster＠❰Render❱¦Compute¦Unsafe⟫⟪Pass¦GraphContext⟫`
 - 区間: `Pass`,`Recording`,`RenderGraph`
 
@@ -74,6 +84,9 @@ public class RTHandleParameters : ScriptableObject
     public Vector2Int setReferenceSize = new Vector2Int(128,128);
     public bool resetReferrenceSize = false;
 }
+
+//MW * (SH / SW) = SH * (MW / SW) //MWはSHに合わせる
+passData.modelMatrix = Matrix4x4.TRS(new Vector3(0, 0, 0), Quaternion.identity, new Vector3((float)Screen.height/Screen.width, 1f, 1f));
 ```
 
 - 計画
@@ -104,6 +117,19 @@ public class RTHandleParameters : ScriptableObject
     - `void` **EndRecordingAndExecute**`()`: >**記録を終了**し、**レンダリンググラフを実行**します。
     - `void` **EndFrame**`()`: >最後のフレーム以降に使用されたリソースを消去し、内部状態をリセットします。
     - `bool ResetGraphAndLogException(Exception e)`: >グラフの記録または実行中に発生する可能性のある例外をキャッチして記録します
+      - これを入れないと不安定になる気がする
+        ```csharp
+        try
+        {
+            renderGraph.BeginRecording(rgParams);
+            /*～Recording～*/
+            renderGraph.EndRecordingAndExecute();
+        }
+        catch (Exception e)
+        {
+            if(renderGraph.ResetGraphAndLogException(e)) throw;
+        }
+        ```
     - `void` **Cleanup**`()`: >`renderGraph`が内部で使用している**全てのリソースを解放**します。
   - **リソース準備**
     - **Create系**
@@ -127,7 +153,7 @@ public class RTHandleParameters : ScriptableObject
             - `int msaaSamples`,`bool bindMS`
             - `○⟦, ┃int ⟪width¦height⟫⟧`
             - `int volumeDepth`
-          - `enum ImportResourceParams importParams`: >`Import`されたテクスチャの動作を記述するヘルパー構造体。
+          - `struct ImportResourceParams importParams`: >`Import`されたテクスチャの動作を記述するヘルパー構造体。
             - `bool clearOnFirstUse`,`Color clearColor`: `clearOnFirstUse=true`の時、グラフの初めて使用されるとき`Import`された**テクスチャをクリア**(`clearColor`)します。
             - `bool discardOnLastUse`: >`true`:グラフの**最後に使用**された時点で**破棄**(`rt.Release()`?)する。*MSAA*の場合はMSAAテクスチャのみが破棄される
               >5.2:最後に使った後に「内容破棄してよい」ヒント
@@ -148,6 +174,7 @@ public class RTHandleParameters : ScriptableObject
         - `Write`: >このパスはリソースへ少なくとも一部を書き込みます。書き込み専用の場合、読み取りはしてはいけません。
         - `Discard`: >リソース内の以前のデータは保持されません。パス開始時、リソースには未定義のデータが入っている状態になります。
           初期化されて無いリソースに書き込むことを表している? >いつ使うか： そのパスの開始時に、リソースの中身がゴミ（未定義データ）であっても構わない時。
+          恐らく、*DirectX12*の`_DISCARD`と同じ (`.DontCare`)
         - `WriteAll`=`Write|Discard`: >このパスがリソースの全データを書き込みます。そのため、リソースの既存データは読み取るべきではありません。
           これ以前に書き込まれて一度も読まれて無かったらそのパスはカリングされる?
         - `ReadWrite`=`Read|Write`: >`Read|Write`のショートカットです。
@@ -159,18 +186,24 @@ public class RTHandleParameters : ScriptableObject
           - RendererListHandle:   `void` **UseRendererList**`(RendererListHandle input)`: Readのみ
         - `IRenderAttachment`, `cmd.SetRandomWriteTarget(..)`と対応してるぽい。戻り値は謎
           - `BufferHandle  UseBufferRandomAccess    (BufferHandle tex,  int index ＠❰, bool preserveCounterValue ❱, AccessFlags flags = AccessFlags.Read)`
-      - **Attachment系** (`SetRenderTarget(..)`,*NRP*)
-        - `IRenderAttachment`
           - `TextureHandle SetRandomAccessAttachment(TextureHandle tex, int index,                                 AccessFlags flags = AccessFlags.ReadWrite)`
+            - **NRP**とは**無関係** (*RenderDoc*で`BeginRenderPass(..)`などには現れなかった)
+            - `builder.AllowGlobalStateModification(true)`は**不要**
+            - `enableRandomWrite = true`にする必要がある。[uav](images\uav.png)
+                `true`:UAV対応テクスチャ(`SRV`,`RTV` + **UAV候補**)
+      - **Attachment系** (`SetRenderTarget(..)`相当,**NRP**)
+        - `IRenderAttachment`
           - `void` **SetRenderAttachment**     `(TextureHandle tex, int index, AccessFlags flags = AccessFlags.Write     ＠❰, int mipLevel, int depthSlice ❱)`:
             >ブレンディングなど読み取る場合は`AccessFlags.ReadWrite`にする必要がある。フルスクリーンパスなどで完全に上書きする場合`AccessFlags.WriteAll`にするとパフォーマンスが良くなる
-            - `int index`: MRTスロット(`SV_Target++index`), `int depthSlice`: >`-1`は全てのスライスをバインド(Layered Rendering?)
+            - `int index`: MRTスロット(`SV_Target##index`), `int depthSlice`: >`-1`は全てのスライスをバインド(Layered Rendering?)
           - `void` **SetRenderAttachment**Depth`(TextureHandle tex,            AccessFlags flags = AccessFlags.ReadWrite ＠❰, int mipLevel, int depthSlice ❱)`
             >`Write`:`ZWrite On`, `Read`:`Ztest`が`Disabled`,`Never`,`Always`以外のとき。デプスバッファにMipMapは作れないはずだが?..
         - `IRaster`
-          - `void` **Set**`Input`**Attachment**`(TextureHandle tex, int index, AccessFlags flags = AccessFlags.Read      ＠❰, int mipLevel, int depthSlice ❱)`
+          - `void` **Set**Input**Attachment**  `(TextureHandle tex, int index, AccessFlags flags = AccessFlags.Read      ＠❰, int mipLevel, int depthSlice ❱)`
             - `int index`: `LOAD_FRAMEBUFFER_INPUT(index)`
-      - CreateTransient系:`IBase`: この**Pass内でのみ使用可能**(Read/Write)
+      - CreateTransient系:`IBase`: この**Pass内でのみ使用可能**(％`.ReadWrite`(`.Use⟪Texture¦Buffer⟫(..)`の宣言省略可能))
+        - メモ: 本質的に↑これだけの機能のようで、`RasterRenderPass`の＠❰*NRP*の❱**中間テクスチャバッファ**としては**使えず**(`Set～Attachment～(..)`できるが**意味ない**)、
+          主に`UAV`か`UnsafePass`(`SetRT(..)`)の用途しかないみたい..
         - TextureHandle: `TextureHandle CreateTransientTexture(⟪TextureDesc desc¦TextureHandle texture⟫)`
         - BufferHandle:   `BufferHandle CreateTransientBuffer (⟪BufferDesc  desc¦BufferHandle  buffer⟫)`
       - **GlobalTexture系**:`IBase`
@@ -180,8 +213,10 @@ public class RTHandleParameters : ScriptableObject
           - その代償として RenderGraph 側は 同期点（sync-point）を入れる
           - このパス以降のパスは、このパスより前にリオーダーしない（最適化が効きにくくなる）
           - さらに パスカリング（AllowPassCulling）が無効化される（副作用がある可能性があるため間引けない）
-        - `void` **SetGlobalTextureAfterPass**`(in TextureHandle input, int propertyId)`: Passの直後に`cmd.SetGlobalTexture(..)`すると思われる
+        - `void` **SetGlobalTextureAfterPass**`(in TextureHandle input, int propertyId)`
+          :現在の`Pass`の直後に`cmd.SetGlobalTexture(propertyId, input)`し、*Render Graph Viewer*に**地球儀のマーク**を表示する
         - `void` **UseGlobalTexture**`(int propertyId, AccessFlags flags = AccessFlags.Read)`
+          :`SetGlobalTextureAfterPass(..)`でセットした`propertyId`を**使用**(`Use`)する。(`SetGlobalTextureAfterPass(..)`と必ず対である必要がある)
         - `void UseAllGlobalTextures(bool enable)`: `SetGlobalTextureAfterPass(..)`された全ての`propertyId`を使用する?(`AccessFlags.Read`?)
     - **Passの実行**
       - SetRenderFunc:`IRaster`,`ICompute`,`IUnsafe`
@@ -235,7 +270,7 @@ public class RTHandleParameters : ScriptableObject
               - `Functor`: `ScaleFunc func`
               - `Scale`: `Vector2 scale`
             - `bool useMipMap`,`bool autoGenerateMips`
-            - `int slices`: >テクスチャ スライスの数。(`volumeDepth`?)
+            - `int slices`: >テクスチャ スライスの数。(`volumeDepth`?) 追記:指定側みたい..
           - `bool isShadowMap`
           - `bool enableRandomWrite`
           - `bool useDynamicScale`,`bool useDynamicScaleExplicit`

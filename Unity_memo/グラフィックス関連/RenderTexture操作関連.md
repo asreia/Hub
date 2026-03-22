@@ -100,6 +100,7 @@ FragOut frag (Varyings input){FragOut output; /*～*/ return output;}
 
 ## メモ
 
+- `cmd.SetRenderTarget(BRTT.CameraTarget)`は**カラー**と**デプス**の両方セットされる。`cmd.SetRenderTarget(BRTT.Depth)`は**デプス**のみ。(`GameView RT`)
 - `cmd.SetGlobalTexture(sourceTex_id, BuiltinRenderTextureType.CameraTarget);`: `UnityDefault2D`になった..**BRTT**は入力に使えない?
 - `cmd.Blit(customRT.depthBuffer, BuiltinRenderTextureType.CameraTarget);`: `customRT.depthBuffer`を渡しても**カラーバッファのみBlit**される
 - `half4 col = half4(0,0,0,0);`: **シェーダーは暗黙的に0初期化しない**。複数スレッド間で使いまわされて何処かで色が入るとそのままになる

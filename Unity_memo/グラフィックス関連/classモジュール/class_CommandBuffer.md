@@ -80,8 +80,8 @@
           :(`volumeDepth`はPixelシェーダで`RT[SV_RenderTargetArrayIndex]`に描画する(Layered Rendering))
         - `NativeArray<AttachmentDescriptor> attachments`: `struct AttachmentDescriptor`: このNativeRenderPassで使用する**全てのアタッチメント**
           - プロパティ
-            - `RTI` **loadStoreTarget**: このNativeRenderPassで使う**アタッチメント**
-            - `GraphicsFormat graphicsFormat`: `loadStoreTarget`の**ビュー用フォーマット**(Unity.drawio/ページ41 参照)
+            - `RTI` **loadStoreTarget**: このNativeRenderPassで使う**アタッチメント** (`RT`の**フォーマットは何でも良い**みたい)
+            - `GraphicsFormat graphicsFormat`: `loadStoreTarget`の**_↑のフォーマット?**(`RTI`は不透明) (ビュー用では無いかも)
             - `RenderBufferLoadAction` **loadAction**: `enum RenderBufferLoadAction`: `⟪Load¦Clear¦DontCare⟫`
             - `○⟦, ┃○¦⟪Color¦float¦uint⟫ clear○¦⟪Color¦Depth¦Stencil⟫⟧`: `loadAction.Clear`時のクリア値
             - `RenderBufferStoreAction` **storeAction**: `enum RenderBufferStoreAction`: `⟪Store¦Resolve¦StoreAndResolve¦DontCare⟫`
@@ -97,7 +97,7 @@
             - `struct AttachmentIndexArray`: 単なる`⟪int[]¦NativeArray<int>⟫ attachments`を持っているだけ(`implicit`がある)(最大`8つ`まで(`MaxAttachments`))
           - `SubPassFlags flags`: `enum SubPassFlags`: 主に**デプス**アタッチメントの**入出力**
             - `None`: 特になし
-            - `ReadOnly＠❰Depth❱＠❰Stencil❱`: `inputs/colorOutputs`の**デプスアタッチメント**版
+            - **ReadOnly＠❰Depth❱＠❰Stencil❱**: `RenderDoc/Pipeline State/OM/DepthState/Write`を`Read-Only DSV`(`❰Depth❱`の場合)にすると思われる。(多分`ZWrite On`不可)
             - `UseShadingRateImage`: `FoveatedRendering系`の`ShadingRateImage`の使用 (RenderDoc/Rasterizer/Shading Rate Image を設定する)
         - `ReadOnlySpan<byte> debugNameUtf8`: デバッグ用Name (RenderDocで表示される)
       - `NextSubPass()`: **次のSubPassを実行**し、**入出力のアタッチメント**(`subPasses`)を**切り替える**

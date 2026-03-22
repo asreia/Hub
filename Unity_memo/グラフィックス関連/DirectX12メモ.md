@@ -559,6 +559,12 @@
   - **struct D_CPU_DESCRIPTOR_HANDLE**[] `pRenderTargetDescriptors`: `RTV[]`を設定。`0`だと**デプス**のみ(*PS*は動く)。`2`以上だと**MRT**
   - `BOOL RTsSingleHandleToDescriptorRange`: `TRUE`:`pRenderTargetDescriptors`に**要素が一つ**の配列を設定して、`R_DescriptorHeap`の範囲を設定する。(`D_DESCRIPTOR_RANGE`とは関係ない)
   - **struct D_CPU_DESCRIPTOR_HANDLE** `pDepthStencilDescriptor`: `DSV`を設定
+  - **NRP**の1つの`Add～Pass`の**構成**は、`BeginRenderPass(..)`=>`Add～Pass`=>`EndRenderPass(..)`=>`⟪Begin¦End⟫RenderPass(..)`となっていて、
+    `Add～Pass`より前の`_BEGINNING_ACCESS`が**LoadAction**相当であり、
+    `Add～Pass`より後で中間の`_⟪BEGINN¦END⟫ING_ACCESS`が**軽量バリア**相当で、
+    最後の`_ENDING_ACCESS`が**StoreAction**相当になっている。
+    - **デプスステンシルバッファ**は、`builder.SetRenderAttachmentDepth(..)`していなくても適当な?
+      `デプスステンシルバッファ`にセットされて`_⟪BEGINN¦END⟫ING_ACCESS`が三割ぐらい**一貫性が無い**..
 
 - ☆**RenderPass**
   - メモ
