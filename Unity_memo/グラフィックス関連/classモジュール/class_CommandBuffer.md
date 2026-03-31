@@ -90,10 +90,10 @@
             - `.ctor(GraphicsFormat format, RTI target ○⟦, bool ⟪loadExistingContents『load～.Load』¦storeResult『store～.Store』¦resolve『store～.＠❰StoreAnd❱Resolve』⟫⟧)`
             - `ConfigureClear(○⟦, ┃○¦⟪Color¦float¦uint⟫ clear○¦⟪Color¦Depth¦Stencil⟫⟧)`: `loadAction.Clear`時のクリア値 を設定
             - `ConfigureTarget(RTI target, bool loadExistingContents『load～.Load』, bool storeResults『store～.Store』)`: **アタッチメント**を設定 (`bool`:`false`は`DontCare`)
-        - `int depthAttachmentIndex`: `attachments`内の**デプスアタッチメント**のIndexを指定
+        - `int depthAttachmentIndex`: `attachments`内の**デプスアタッチメント**のIndexを指定 (NRP全体で共有される、`builder.SetRenderAttachmentDepth(..)`(デプスバグ注意))
         - `NativeArray<SubPassDescriptor> subPasses`: `struct SubPassDescriptor`: **各SubPass**の**入力**と**出力**の**アタッチメント**を指定する (入出力で同じには出来ない)
-          - `AttachmentIndexArray inputs`: **カラー**アタッチメントの**入力**。(**FrameBuffer Fetch**)
-          - `AttachmentIndexArray colorOutputs`: **カラー**アタッチメントの**出力**。(**タイルレンダリング**)
+          - `AttachmentIndexArray inputs`: **カラー**アタッチメントの**入力**。(**FrameBuffer Fetch**、`builder.SetInputAttachment(..)`)
+          - `AttachmentIndexArray colorOutputs`: **カラー**アタッチメントの**出力**。(**タイルレンダリング**、`builder.SetRenderAttachment(..)`)
             - `struct AttachmentIndexArray`: 単なる`⟪int[]¦NativeArray<int>⟫ attachments`を持っているだけ(`implicit`がある)(最大`8つ`まで(`MaxAttachments`))
           - `SubPassFlags flags`: `enum SubPassFlags`: 主に**デプス**アタッチメントの**入出力**
             - `None`: 特になし
@@ -106,7 +106,7 @@
   - Property系
     - ShaderProperty系 (設定は**C#コンパイルも跨ぐ**(GPUバッファだから?)) (**Global**Property(↓多分全て)は`Properties{..}`に含まれて**いない**`ShaderProperty`を**設定**する)
       - 基本ShaderProperty_Set
-        - `SetGlobal｡⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫`
+        - `SetGlobal｡⟪⟪Float¦Vector¦Matrix⟫＠❰Array❱¦Color¦Integer¦＠❰Constant❱Buffer¦Texture⟫` (`cmd.SetGlobalBuffer(..)`を`PixelShader`{`StructuredBuffer<float4> ..`}で試したok)
           `(int nameID, ｢Type｣ ｢value｣ ＠❰, ..❱)`: `Global`ShaderPropertyを設定
           - `SetGlobalTexture(int nameID, RTI rt ＠❰, RenderTextureSubElement element❱)`: (`rt`に`RenderBuffer`を設定しても効果なし)
             - `RenderTextureSubElement element`:`enum RenderTextureSubElement`: >`RenderTexture`が内包するさまざまな種類のデータにアクセスするために使います。
@@ -135,7 +135,7 @@
           設定例: `camera.projectionMatrix`, `Matrix4x4.Perspective(60, 1.777f, 0.1f, 100f)`
         - `SetViewProjectionMatrices(Matrix4x4 view, Matrix4x4 proj)`: ビュープロジェクションMatrixを設定(**Build-inのみ**) (`unity_MatrixVP`)
       - その他
-        - `SetComputeParamsFromMaterial(ComputeShader computeShader, int kernelIndex, Material material)`: `material`から**ShaderProperty**を設定 (ShaderKeywordはできない)
+        - `SetComputeParamsFromMaterial(ComputeShader computeShader, int kernelIndex, Material material)`: `material`から**ShaderProperty**を設定 (ShaderKeywordはできない?) (`ComputeShader`の`Material`として使う?)
       - 一時RT
         - `GetTemporaryRT(int nameID, RenderTextureDescriptor desc ＠❰, FilterMode filter❱)`:
           **一時RT**を`nameID`に**C#＆Shaderバインド**する。

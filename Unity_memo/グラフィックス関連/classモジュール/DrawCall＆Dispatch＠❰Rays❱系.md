@@ -3,7 +3,7 @@
 - DrawCall＆Dispatch＠❰Rays❱系
   - DrawCall系
     - `Draw`**RendererList**`(RendererList rendererList)`: `RendererList`に含まれる可視な`Rendererコンポーネント`を描画する
-      - `struct RendererList`: (**オブジェクト**(`Rendererコンポーネント`)が**描画順にソート**され、オブジェクトに適用する`ライト`,`プローブ`を持っている?)
+      - `struct RendererList`: (**オブジェクト**(`Rendererコンポーネント`)が**描画順にソート**され、オブジェクトに適用する`ライト`,`プローブ`を持っている?)。`RendererList`は一度だけ`cmd.DrawRendererList(..)`で使用可能であり、**再利用不可**。
         - `bool isValid`: `RendererList`が無効な場合は`false`を返す
         - `static RendererList nullRendererList()`: 空の`RendererList`を返す
       - `RendererList ctx.`**CreateRendererList**`(⟪ RendererListDesc desc¦ref RendererListParams param⟫)`:
@@ -96,7 +96,7 @@
               - **パス指定**
                 - Tags{"LightMode"}の描画の指定。(`ShaderTagId[] shaderPassNames`を設定しているだけ) (`.ctor(shaderPassName,..)`⇔`shaderPassNames[0] = shaderPassName`)
                   :描画順は`SortingSettings`で決めているので`index`は**描画順に関係ない**。`LightMode`が`index`間で重複している場合は**重複して描画**される(意味は無さそう)。
-                  `.ctor(ShaderTagId.none,.)`にして後からこれで設定することも可能。
+                  `.ctor(ShaderTagId.none,.)`にして後からこれで設定することも可能。 (`new ShaderTagId("SRPDefaultUnlit")`は`Tags{"LightMode"}`が**無い**シェーダーにマッチする値)
                   - `ShaderTagId GetShaderPassName(int index)`: `shaderPassNames[index]`
                   - `SetShaderPassName(int index, ShaderTagId shaderPassName)`: `shaderPassNames[index] = shaderPassName`
                 - ⟪Material¦Shader⟫関係

@@ -175,8 +175,8 @@
 #### フレームバッファーフェッチ
 
 - フェッチ宣言: `FetchInput＠❰_MS❱⟪_HALF¦_FLOAT¦_INT¦_UINT⟫(idx)` //マクロ構想
-  - 普通: `FRAMEBUFFER_INPUT_X⟪_HALF¦_FLOAT¦_INT¦_UINT⟫｡｡｡｡｡｡｡(idx)`
-  - MS版: `FRAMEBUFFER_INPUT｡｡⟪_HALF¦_FLOAT¦_INT¦_UINT⟫_MS｡｡｡｡(idx)`
+  - 普通: `FRAMEBUFFER_INPUT＠❰_X❱⟪_HALF¦_FLOAT¦_INT¦_UINT⟫｡｡｡｡｡｡｡(idx)`
+  - MS版: `FRAMEBUFFER_INPUT＠❰_X❱⟪_HALF¦_FLOAT¦_INT¦_UINT⟫_MS｡｡｡｡(idx)`
 ```C
 //普通
 #define FRAMEBUFFER_INPUT_X_HALF(idx)      [[vk::input_attachment_index(idx)]] SubpassInput<half4> hlslcc_fbinput_##idx
@@ -189,14 +189,14 @@
 #define FRAMEBUFFER_INPUT_INT_MS(idx)      [[vk::input_attachment_index(idx)]] SubpassInputMS<int4> hlslcc_fbinput_##idx
 #define FRAMEBUFFER_INPUT_UINT_MS(idx)     [[vk::input_attachment_index(idx)]] SubpassInputMS<uint4> hlslcc_fbinput_##idx
 ```
-- フェッチ(Load): `Fetch＠❰_MS❱(idx ＠❰,sampleIdx❱, v2fname)`
-  - 普通: `LOAD_FRAMEBUFFER_X_INPUT｡｡｡｡｡｡｡(idx ｡｡｡｡｡｡｡｡｡｡｡, v2fname)`
-  - MS版: `LOAD_FRAMEBUFFER｡｡_INPUT_MS｡｡｡｡(idx, sampleIdx, v2fname)`
+- フェッチ(Load): `Fetch＠❰_MS❱(idx ＠❰,sampleIdx❱, v2fname)` //マクロ構想
+  - 普通: `LOAD_FRAMEBUFFER_INPUT＠❰_X❱｡｡｡｡｡｡｡(idx ｡｡｡｡｡｡｡｡｡｡｡, v2fname)`
+  - MS版: `LOAD_FRAMEBUFFER_INPUT＠❰_X❱_MS｡｡｡｡(idx, sampleIdx, v2fname)`
 ```C
 //普通                                   ↓使われてないが
-#define LOAD_FRAMEBUFFER_X_INPUT(idx, v2fname) hlslcc_fbinput_##idx.SubpassLoad()
+#define LOAD_FRAMEBUFFER_INPUT_X(idx, v2fname) hlslcc_fbinput_##idx.SubpassLoad()
 //MS版
-#define LOAD_FRAMEBUFFER_INPUT_MS(idx, sampleIdx, v2fname) hlslcc_fbinput_##idx.SubpassLoad(sampleIdx)
+#define LOAD_FRAMEBUFFER_INPUT_X_MS(idx, sampleIdx, v2fname) hlslcc_fbinput_##idx.SubpassLoad(sampleIdx)
 ```
 
 ## インプット

@@ -126,7 +126,7 @@ void Resize(int width, int height)
 #### 外部からテクスチャ持ち込み ⟪RT¦Tex¦RTI⟫
 
 - `RTHandle Alloc(⟪RT¦Tex¦RTI⟫ texture ＠❰, bool transferOwnership = false『RT』❱ ＠❰, string name『RTI』❱)`
-  - `rth.SetRender＠❰Texture❱(texture ＠❰, transferOwnership❱)`
+  - `rth.Set＠❰Render❱Texture(texture ＠❰, transferOwnership❱)`
     - `m_RT = ＠❰texture❱『RT』`, `m_RTHasOwnership = ＠❰transferOwnership❱『RT』`
     - `m_NameID = ⟪new RTI(texture)¦texture⟫『⟪RT,Tex¦RTI⟫』`
     - `m_ExternalTexture = ＠❰texture❱『Tex』`

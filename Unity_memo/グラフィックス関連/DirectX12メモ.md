@@ -76,7 +76,7 @@
       - `UINT Quality`: その`Count`数についての**品質レベル**。(通常は`0`が設定され、品質は**ハードウェア依存**)
     - `UINT BufferCount`: 通常は**バックバッファー**と**フロントバッファー**で`2`が設定される
     - `DXGI_FORMAT Format`: `DXGI_FORMAT_R8G8B8A8_UNORM✖❰_SRGB❱`『`_SRGB`を付けないのは、**シェーダーガンマ**してディスプレイに送ってディスプレイ逆ガンマするみたい
-      - `DXGI_FORMAT_⟪R16G16B16A16_FLOAT¦『HDR10?』R10G10B10A2_UNORM⟫`は**HDRディスプレイ**
+      - `DXGI_FORMAT_⟪『scRGB』R16G16B16A16_FLOAT¦『HDR10』R10G10B10A2_UNORM⟫`は**HDRディスプレイ**
     - `BOOL Stereo`: `TRUE`にすると**XR用**に**バッファ数が2倍**になる
     - その他: `DXGI_USAGE BufferUsage; DXGI_SCALING Scaling; DXGI_SWAP_EFFECT SwapEffect; DXGI_ALPHA_MODE AlphaMode; UINT Flags;`
   - その他の引数には、**フルスクリーンモード**や**ディスプレイの指定**ができる
@@ -559,21 +559,18 @@
   - **struct D_CPU_DESCRIPTOR_HANDLE**[] `pRenderTargetDescriptors`: `RTV[]`を設定。`0`だと**デプス**のみ(*PS*は動く)。`2`以上だと**MRT**
   - `BOOL RTsSingleHandleToDescriptorRange`: `TRUE`:`pRenderTargetDescriptors`に**要素が一つ**の配列を設定して、`R_DescriptorHeap`の範囲を設定する。(`D_DESCRIPTOR_RANGE`とは関係ない)
   - **struct D_CPU_DESCRIPTOR_HANDLE** `pDepthStencilDescriptor`: `DSV`を設定
-  - **NRP**の1つの`Add～Pass`の**構成**は、`BeginRenderPass(..)`=>`Add～Pass`=>`EndRenderPass(..)`=>`⟪Begin¦End⟫RenderPass(..)`となっていて、
-    `Add～Pass`より前の`_BEGINNING_ACCESS`が**LoadAction**相当であり、
-    `Add～Pass`より後で中間の`_⟪BEGINN¦END⟫ING_ACCESS`が**軽量バリア**相当で、
-    最後の`_ENDING_ACCESS`が**StoreAction**相当になっている。
-    - **デプスステンシルバッファ**は、`builder.SetRenderAttachmentDepth(..)`していなくても適当な?
-      `デプスステンシルバッファ`にセットされて`_⟪BEGINN¦END⟫ING_ACCESS`が三割ぐらい**一貫性が無い**..
 
 - ☆**RenderPass**
   - メモ
-    - `SV_TargetN`と`LOAD_FRAMEBUFFER_INPUT(N)`の`N`は、`RENDER_TARGET_DESC[]`の`index`と`RTVFormats[8]`の各要素が`_UNKNOWN`かどうかで決まると思われる
-      - `FBF(_UNKNOWN)`は*ディスクリプタ*をセットする必要はない?`index`のみでいいのかな?
-      - `PSO`の切り替えがサブパスの切り替えと言うのは**怪しい**
+    - **NRP**の1つの`Add～Pass`の**構成**は、`BeginRenderPass(..)`=>`Add～Pass`=>`EndRenderPass(..)`=>`⟪Begin¦End⟫RenderPass(..)`となっていて、
+      `Add～Pass`より前の`_BEGINNING_ACCESS`が**LoadAction**相当であり、
+      `Add～Pass`より後で中間の`_⟪BEGINN¦END⟫ING_ACCESS`が**軽量バリア**相当で、
+      最後の`_ENDING_ACCESS`が**StoreAction**相当になっている。
+    - `RENDER_TARGET_DESC[]`の`index`が、**SetRT**(`SV_Target##idnex`)か**FBF**(`LOAD_FRAMEBUFFER_INPUT(index)`)になるかは、`index`に対応する`RTVFormats[8]`の各要素が`_UNKNOWN`かどうかで決まる。
       - [BeginRenderPassとindex対応](images\BeginRenderPassとindex対応.png)
     - *RenderPass内*で**禁止されている命令**: `OMSetRenderTargets(..)`,`ResourceBarrier(..)`,`Clear⟪RenderTarget¦DepthStencil⟫View(..)`(Blitに変換)
     - **非モバイル**では`OMSetRenderTargets(..)`と`ResourceBarrier(..)`相当に**変換**されると思われる
+    - RenderDoc: [Blit stark](images\RenderPass_Blit_stark.png), [MRT](images\RenderPass_MRT.png)
   - `R_GraphicsCommandList->`**BeginRenderPass**`(..)`: `OMSetRenderTargets(..)`＆`Access(バリア含む)`**相当**
     - `UINT NumRenderTargets`:  バインドする↓の**RTVの数**
     - `D_RENDER_PASS_RENDER_TARGET_DESC[] pRenderTargets`
@@ -586,16 +583,17 @@
       - `D_RENDER_PASS_ENDING_ACCESS        ⟪Depth¦Stencil⟫EndingAccess`
     - `enum D_RENDER_PASS_FLAGS` **Flags**:`D_RENDER_PASS_FLAG～`: 組合せ可能 [Flags](images\Flags.png)
       - `_NONE`
-      - `_ALLOW_UAV_WRITES`: `UAV`への**書き込み**を許可 (恐らくこれが無いと`UAV`であっても読み取りのみ)
+      - `_ALLOW_UAV_WRITES`: `UAV`への**書き込み**を許可 (恐らくこれが無いと`UAV`であっても読み取りのみ) (しかし、`builder.SetRandomAccessAttachment(..)`とは**無関係**)
       - `⟪_SUSPENDING¦_RESUMING⟫_PASS`: **パス連結**のための**中断**(`_SUSPENDING`(サスペンディング))と**再開**(`_RESUMING`(リジューミング)) (タイルメモリの内容を破棄しない)
       - `_BIND_READ_ONLY⟪_DEPTH¦_STENCIL⟫`: ⟪デプス¦ステンシル⟫バッファを`READ_ONLY`にする (⟪`ZWrite`¦`STENCIL_OP_KEEP`以外⟫が不可、代わりにテクスチャサンプル可能(`SRV`と`DSV`を**同時**))
+        - UnityのNRPの`enum SubPassFlags.ReadOnly＠❰Depth❱＠❰Stencil❱`と対応していると思われる
   - `struct D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS` `＠⟪Depth¦Stencil⟫⟪Beginn¦End⟫ing`**Access**: [ACCESS_TYPE](images\ACCESS_TYPE.png)
     - `enum D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS_TYPE`: `D_RENDER_PASS_⟪BEGINN¦END⟫ING_ACCESS_TYPE～`: 組合せ不能
       - `_DISCARD`:   `.DontCare`
       - `_PRESERVE`:  ⟪BEGIN:`.Load`¦END:`.Store`⟫ (プリザーブ)
       - ⟪`_CLEAR`:    BEGIN:`.Clear`
       - ¦`_RESOLVE`⟫: END:`.＠❰StoreAnd❱Resolve`
-      - **パス連結**時の**タイルメモリ内**の**軽量バリア**の**遷移** (`ENDING`と**次のパス**の`BEGINNING`で**同じ**`ACCESS_TYPE`である必要がある)
+      - **パス連結**時の**タイルメモリ内**の**軽量バリア**の**遷移** (`ENDING`と**次のパス**の`BEGINNING`で**同じ**`ACCESS_TYPE`である必要がある。と思われる)
         - `_NO_ACCESS`: *軽量バリア*を**一切変えない**。そのパスではリソースを触らない
         - `_PRESERVE_LOCAL⟪_RENDER¦_SRV¦_UAV⟫`: それぞれの*軽量バリア*に**遷移** (`_RENDER`:ほぼ`RTV/DSV`)
     - ⟪`struct D_RENDER_PASS_`**BEGINNING**`_ACCESS_CLEAR_PARAMETERS` **Clear**
