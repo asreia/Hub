@@ -7,8 +7,9 @@
   `light.AddCommandBuffer(LightEvent evt, CommandBuffer cmd ＠❰, ShadowMapPass shadowPassMask❱)`
 - `ctx.ExecuteCommandBuffer(cmd)`: `cmd`を積むだけ。(`ctx.ExecuteCB(cmd)`は`cmd`を**キャッシュして使い回す**ことができる。`⟪Begin¦End⟫Event(｢cmdName｣)`が自動的に挿入される)
 - `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`ShaderProperty`が**反映される単位**)
-  - `Properties{..}`に**含める**と`LocalProperty`となる(`⟪material¦compute⟫.Set～(..)`,`MaterialPropertyBlock`)
-  - `Properties{..}`に**含めない**と`GlobalProperty`となる(`cmd.SetGlobal～(..)`)
+  - `Properties{..}`に**含める**と`LocalProperty`**のみ**(`.mat`に保存可能) (`⟪material¦compute⟫.Set～(..)`,`MaterialPropertyBlock`)
+  - `Properties{..}`に**含めない**と`⟪Global¦Local⟫Property`**両方可能**'(優先順位`Local`>`Global`) (`cmd.SetGlobal～(..)`)
+  - 優先順位: `MaterialPropertyBlock`>`Local`>`Global`>`Properties{..}の％値`
 - [cmdは、各Action後に設定などを自動で元に戻すことはない。設定は次のActionにも引き継がれる。必要に応じて手動で元に戻す必要がある。](https://chatgpt.com/c/68819d44-de38-8329-a5ee-e4a7fdf831d6)
 
 - CommandBuffer系
