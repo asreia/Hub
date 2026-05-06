@@ -1,0 +1,10 @@
+#pragma kernel CSMain
+
+RWStructuredBuffer<float4> data;
+static const float4 DATA_OFFSET = float4(0.1, 0.2, 0.3, 0.4);
+
+[numthreads(2,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    data[id.x] = (data[id.x] + DATA_OFFSET) * (id.x + 1);
+}

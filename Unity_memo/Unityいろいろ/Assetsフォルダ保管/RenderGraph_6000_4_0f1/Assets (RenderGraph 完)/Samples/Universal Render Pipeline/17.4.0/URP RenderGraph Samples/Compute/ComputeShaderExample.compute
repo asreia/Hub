@@ -1,0 +1,16 @@
+// 各 #kernel は、どの関数をコンパイルするかを指定します。複数の kernel を持つこともできます。
+#pragma kernel CSMain
+
+// 読み取り専用の StructuredBuffer/ComputeBuffer を作成します。
+StructuredBuffer<int> inputData;
+// 読み書き可能な StructuredBuffer/ComputeBuffer を作成します。
+RWStructuredBuffer<int> outputData;
+
+// Shader に渡される各数値に 1 つずつ対応するよう、20 個のスレッドを割り当てます。
+// CSMain は使用するエントリポイントです。エントリポイントは kernel として定義する必要があります。
+[numthreads(20,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // スレッド ID をデータのインデックスとして使います。
+    outputData[id.x] = 2 * inputData[id.x];
+}

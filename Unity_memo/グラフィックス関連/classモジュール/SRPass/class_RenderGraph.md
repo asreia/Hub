@@ -2,29 +2,10 @@
 
 - `class_CommandBuffer.md/NativeRenderPass系`,`DirectX12メモ.md/RenderPass`も参照
 
-- RenderGraphは、RenderGraph内で扱う`～Handle`を準備し、
-  `.Add～Pass(..)`で**RenderPass**を生成し、その`builder`で`～Handle`入出力と`SetRenderFunc(..)`で実行する`cmd`を記述し、
-  `BeginRecording(.)`から`EndRecordingAndExecute()`で生成された**RenderPassのグラフ**を**コンパイル**することでパスカリングなどを行い、
-  上記を`camera`の`renderer`毎に実行し、最後に`EndFrame()`を呼び、
-  最終的に最初に`RenderGraph`にセットした`cmd`に必要な全ての**RenderPass**のみを記述され、最後にその`cmd`を`ctx.Submit(cmd)`する。
-  (drawioで表現する。と思ったけどこれ見れば良いしめんどくさいからいいや)
-
-- `RenderGraph.cs`, `RenderGraphBuilders.cs`, `RenderGraphPass.cs`, `RenderGraphResourceRegistry.cs`, `RenderGraphResources.cs`
-  - Compiler: `NativePassCompiler.cs`, `CompilerContextData.cs`, `PassesData.cs`
-
-- サンプルメモ (URP RenderGraph Samples)
-  - `bool ScriptableRenderPass.requiresIntermediateTexture { get; set; }`//>URP フレーム内の**全てのパス**が**中間テクスチャ**を介してレンダリングされるようになります。(中間:`cameraColor`?)
-  - `TextureHandle UniversalResourceData.activeColorTexture { get; }` //>現在アクティブなカラーターゲットテクスチャを返します。(⟪`cameraColor`¦`backBufferColor`⟫)
-    - `_CameraTargetAttachment_1438x475_B10G11R11_UFloatPack32_Tex2D`:`DXGI_FORMAT_R11G11B10_FLOAT`
-  - `static bool RenderGraphUtils.CanAddCopyPassMSAA()` //renderGraph.AddCopyPass()で、現在の**プラットフォーム**で**MSAA版**のコピーがサポートされているかを確認する?
-  - `(拡張) IBaseRenderGraphBuilder RenderGraph.AddCopyPass(TextureHandle source, TextureHandle destination, [string passName = "Copy Pass Utility"], [bool returnBuilder = false])`
-    //`source`と`destination`のサーフェスは**ピクセルサイズ**、**MSAAサンプル数**、**配列スライス数**が**同一**である必要があります。
-
+- [Render Graph Viewer](images\RenderGraphViewer.png) [cmdの分割](images\cmdの分割.png)
 - **プラットフォーム差異**は、`UNITY_UV_STARTS_AT_TOP`(`TextureUVOrigin`で調整?), [NRPデプスバグ](images\NRPデプスバグ.png), [LOAD_FB_INPUT(_,ココ)](images\LOAD_FB_INPUT(_,ココ).png)
   - [UVOrigin＆デプスバグ](images\UVOrigin＆デプスバグ.png)
-
-- [Render Graph Viewer](images\RenderGraphViewer.png)
-- [cmdの分割](images\cmdの分割.png)
+- メモ: [BlitCancel](images\memo_BlitCancel.png), [NRP](images\memo_NRP.png)
 
 - **ResourceHandle**
   - `ResourceHandle`は**抽象ハンドル**。(**リソース**の**生存期間**(生成/破棄)などの**管理**にも使われる)
@@ -79,16 +60,6 @@
   - **Pass**: `＠❰Add❱⟪Raster＠❰Render❱¦Compute¦Unsafe⟫⟪Pass¦GraphContext⟫`
   - **リソース**: `＠⟪Create¦Import¦Use⟫⟪Texture¦Buffer¦RendererList⟫＠⟪Desc¦Handle⟫`
   - **Attachment**: `Set⟪Input¦Render¦RandomAccess⟫Attachment＠❰Depth❱`
-
-- 計画ok
-  - まずは、1つの`BeginRecording(.)`～`EndRecordingAndExecute()`内、**RasterPass**のみでテストする。ok
-    - **Create系**ok、**Import系**ok
-    - `AccessFlags`テストok、**GlobalTexture系**ok、**Use系**ok、**Attachment/NRP系**ok、**AllowPassCulling**ok
-    - cmd: *基本ShaderProperty_Set*:`SetGlobal`⟪`Texture(.,`**TextureHandle**`,.)`ok¦`Float`ok⟫、**Clear系**:`ClearRenderTarget`ok、**DrawCall系**:`DrawRendererList`ok,`DrawMesh`ok
-  - その次に、**ComputePass**ok、複数の`BeginRecording(.)`～`EndRecordingAndExecute()`でテストok(`～Handle`を複数の`Recording`間を超えて渡せるか(当然だめだったok))
-    - `EnableAsyncCompute(bool value)`ok
-  - その次に、**UnsafePass**ok
-- まずは極力中身を見ない=>gitプッシュしたら見る=>膨大すぎて無理、次からスクリプトデバッキングとクラス図描く
 
 ## RenderGraph
 
@@ -151,10 +122,10 @@
       - `RendererListHandle Create`Gizmo``     RendererList(Camera camera, GizmoSubset gizmoSubset)`
       - `RendererListHandle Create`UIOverlay`` RendererList(Camera camera, UISubset uiSubset)`
       - `RendererListHandle Create`WireOverlay`RendererList(Camera camera)`
-- **Import系** (`renderGraph`**外部**からリソースを**取り込み**、フレームを**跨ぐ**リソースを扱える。インポートマークが付く)
+- **Import系** (`renderGraph`**外部**からリソースを**取り込み**、フレームを**跨ぐ**リソースを扱える。インポートマークが付く) (恐らく基本的に、`Import系`への**出力**は**パスカリングされない**)
   - TextureHandle
     - `TextureHandle` **ImportBackbuffer**`(RenderTargetIdentifier rt ＠❰, RenderTargetInfo info, ImportResourceParams importParams = default❱)`
-      :この**Backbuffer**に**繋がらないPass**は基本的に**パスカリング**される。あと、*Render Graph Viewer*に表示される**名前**が`Backbuffer`となる
+      :この**Backbuffer**に**繋がらないPass**は基本的に**パスカリング**される。あと、*Render Graph Viewer*に表示される**名前**が`Backbuffer`となる (追記:`ImportTexture`とは違って`m_CurrentBackbuffer`に代入している。が、何も使われていない..)
       - `struct RenderTargetInfo info`: ＠❰`RTHandle rt`の中身が❱`RTI`だと不透明なため、`RenderGraph`に必要な**最小限の情報セット**を提供する。(多分NRP関係のため)
         - `GraphicsFormat format`
         - `int msaaSamples`,`bool bindMS`
@@ -167,7 +138,7 @@
         - `enum TextureUVOrigin textureUVOrigin`: >`Import`されたテクスチャで使用される**UV方向**(アクティブなグラフィックAPIとは独立)。(`RasterCtx.GetTextureUVOrigin(data.texture)`に伝搬するみたい)
           - `BottomLeft`: OpenGL
           - `TopLeft`: Vulkan, DirectX, Metal,...
-    - `TextureHandle` **ImportTexture**   `(RTHandle rt           ＠❰｡＠❰, RenderTargetInfo info❱, ImportResourceParams importParams = default｡❱)`
+    - `TextureHandle` **ImportTexture**   `(RTHandle rt           ＠❰｡＠❰, RenderTargetInfo info❱, ImportResourceParams importParams = default｡❱)` (追記:恐らく基本的に`ImportBackbuffer`と同じ挙動)
   - BufferHandle: `BufferHandle` **ImportBuffer**`(GraphicsBuffer graphicsBuffer)`
   - その他
     - `RayTracingAccelerationStructureHandle ImportRayTracingAccelerationStructure(RayTracingAccelerationStructure accelStruct, string name = null)`
@@ -189,10 +160,9 @@
     - `WriteAll`=`Write|Discard`: `renderGraph`に**未初期化**な`リソース`を`Write`することを伝える。(つまり**全データ**を`Write`する用)
       (このフラグ以前の`Pass`に書き込まれて**一度も読まれ無い**時、その`Pass`がカリングされることを確認した。(その`Pass`を`.DontCare`にさせることも確認))
     - `ReadWrite`=`Read|Write`: >`Read|Write`のショートカットです。
-  - **Use系** ()
-    (`TextureHandle`を引数にとる`cmd.～`で、`BaseCB.ValidateTextureHandle(rt)`を実行して`TextureHandle`が`Read`|`Write`|`Transient`であることを**要請**する)
+  - **Use系** (`TextureHandle`を引数にとる`cmd.～`で、`BaseCB.ValidateTextureHandle(rt)`を実行して`TextureHandle`が`Read`|`Write`|`Transient`であることを**要請**する)
     - `IBase`
-      - TextureHandle:        `void` **UseTexture**     `(TextureHandle input, AccessFlags flags = AccessFlags.Read)`
+      - TextureHandle:        `void` **UseTexture**     `(TextureHandle input, AccessFlags flags = AccessFlags.Read)`: `UnsafePass`の`cmd.SetRenderTarget(..)`では`.UseTexture(., AccessFlags.Write＠❰All❱)`を使う
       - BufferHandle: `BufferHandle` **UseBuffer**      `(BufferHandle  input, AccessFlags flags = AccessFlags.Read)`
         >戻り値:'input'に渡された値。返された値は将来削除されるため、使用しないでください。?
       - RendererListHandle:   `void` **UseRendererList**`(RendererListHandle input)`: 読み取り専用(`IRenderGraphResource`では**無い**) : 忘れると**エラーにならず**描画されない(`RendererList.nullRendererList`かな?)
@@ -218,7 +188,7 @@
     - BufferHandle:   `BufferHandle CreateTransientBuffer (⟪BufferDesc  desc¦BufferHandle  buffer⟫)`
   - **Global＠❰Texture❱系**:`IBase`
     - `void` **AllowGlobalStateModification**`(bool value)`: `true`:(`UnsafePass`**以外**の)**cmd.⟪Gloabl¦Local⟫Keyword**,**cmd.GlobalProperty**を`cmd.～(..)`で**設定**するときに**必要**(`BaseCB.ThrowIfGlobalStateNotAllowed()`で検証)
-      そして`AllowPassCulling(false)`される。(`material`の`⟪Gloabl¦Local⟫⟪Keyword¦Property⟫`経由なら問題ない。というよりRenderGraphシステムとは無関係) (`.SetGlobalTextureAfterPass(..)`,`Set～Attachment～(..)`系では**必要ではない**)
+      そして`AllowPassCulling(false)`される。(`MPB`か`material`の`⟪Gloabl¦Local⟫⟪Keyword¦Property⟫`経由なら問題ない。というよりRenderGraphシステムとは無関係) (`.SetGlobalTextureAfterPass(..)`,`Set～Attachment～(..)`系では**必要ではない**)
       (ココで**グローバルな状態を変更**し、それ以降のどの`Pass`で**影響を受けるか把握できない**ため**パスカリングできない**ということだと思う。(>このパス以降のパスは、このパスより前に**リオーダーしない**))
     - `void` **SetGlobalTextureAfterPass**`(in TextureHandle input, int propertyId)`: 現在の`Pass`の**直後**に`cmd.SetGlobalTexture(propertyId, input)`し、*Render Graph Viewer*に**地球儀のマーク**を表示する
     - `void` **UseGlobalTexture**`(int propertyId, AccessFlags flags = AccessFlags.Read)`: `SetGlobalTextureAfterPass(..)`でセットした`propertyId`を**使用**(`Use`)する。(`SetGlobalTextureAfterPass(..)`と**必ず対**である必要がある)
@@ -236,7 +206,7 @@
           - `TextureHandle ⟪black¦clear¦magenta¦white¦defaultShadow⟫＠❰UInt❱Texture＠❰＠⟪3D¦Array⟫XR❱`
         - `TextureUVOrigin GetTextureUVOrigin(TextureHandle textureHandle)`: >RenderGraphテクスチャの*TextureUVOrigin*を`textureHandle`から取得します。
   - IBase
-    - `void` **AllowPassCulling**`(bool value)`: `false`:**パスカリング**を**無効**にする
+    - `void` **AllowPassCulling**`(bool value)`: `false`:**パスカリング**を**無効**にする。(`AccessFlags`による依存関係によりこれに繋がる前の`Pass`も実行される)
     - `void` EnableAsyncCompute`(bool value)`: `true`:`⟪Compute¦Unsafe⟫Pass`で呼ぶと**非同期**Computeになる(`RasterRenderPass`で呼ぶとUnity**落ちる**)。[EnableAsyncCompute](images\EnableAsyncCompute.png)
       (非同期で`renderGraph`に渡した`cmd`とは**別**の`cmd`になっていて`ComputePass`側の`cmd`は`renderGraph`内部で`ctx.ExecuteCommandBuffer(cmd)`されている[](images\EnableAsyncCompute1.png))
       **同期ポイント**は、`AccessFlags`を見て作られると思われる。
@@ -260,7 +230,7 @@
 - **TextureHandle**
   - `struct` **TextureHandle**: `renderGraph`によって**有効期間や使用方法など**を管理され、`renderGraph`外でアクセスしてはいけない。[概要](images\TextureHandle概要.png)
     - `static TextureHandle nullHandle {get;}`
-    - `bool IsValid()`: 恐らく`～Handle`自体が**有効か確認**するもので、**リソースを保持**しているかは**分からない**。
+    - `bool IsValid()`: `TextureHandle.nullHandle`の時`false`になるぽい。なので、そうでない時、**実際のリソースを保持**しているかは**分からない**。
       (`if(data.buffer.IsValid()) {RasterCtx.cmd.SetGlobalBuffer("buffer", data.buffer);}`のように**使えない**(自前のフラグで管理する(`multiplyByIndexCSPassEnabled`など)))
     - `TextureDesc GetDescriptor(RenderGraph renderGraph)`: `renderGraph.GetTextureDesc(TextureHandle texture)`を呼ぶだけ。(本体は`renderGraph`にあるらしい)
     - `static implicit operator ⟪RTI¦RenderTexture¦RTHandle¦Texture⟫(TextureHandle texture)`: `SetRenderFunc(..)`内で**各型に変換**される
@@ -302,6 +272,7 @@
           - `bool fallBackToBlackTexture`: >テクスチャに書き込まずに読み取った場合に、テクスチャを黒のテクスチャにフォールバックするかどうかを決定します。
           - `bool disableFallBackToImportedTexture`: >テクスチャに書き込まれるすべてのパスがダイナミックレンダーパスカリングによってカリングされた場合、自動的に類似の事前割り当てテクスチャにフォールバックされます。割り当てを強制するには、これをtrueに設定します。
             - あるテクスチャ T を“生成するはず”だったけど、生成パスが全部不要判定で消えた。それでも後段が T を参照する（または外に出す）都合がある。そのとき RenderGraph が **「じゃあ同等っぽい既存（imported/preallocated）に差し替えて辻褄を合わせる」**ことがある
+            - 本当にその挙動っぽい。(参照:`Assets\Samples\Universal Render Pipeline\17.4.0\URP RenderGraph Samples\UnsafePass\UnsafePassRenderFeature.cs`)
         - `FastMemoryDesc fastMemoryDesc`: >テクスチャがそれをサポートするプラットフォーム上の高速メモリにどのように配置されるかを決定する記述子。
 - **BufferHandle**
   - `struct` **BufferHandle**:
@@ -350,6 +321,7 @@
     - `SetComputeParamsFromMaterial`,`SetRayTracingAccelerationStructure`
   - ResourceModified系:`SetBufferData`,`⟪SetBuffer¦Copy⟫CounterValue`,`BuildRayTracingAccelerationStructure`
 - **IUnsafe** : `IBase`, `IRaster`, `ICompute`===============================================
+  `static CommandBuffer CommandBufferHelpers.GetNativeCommandBuffer(UnsafeCommandBuffer baseBuffer)`で生の`CommandBuffer`を取得可能(なんでもできる)
   - **RenderTarget系**:`SetRenderTarget`,`⟪Set¦Clear⟫RandomWriteTarget` (`SetRenderTarget`は、`RIT`ではなく**TextureHandle**の場合、恐らく`implicit`が挟む時に**検証**され、`builder.UseTexture(textureHandle, AccessFlags.Write)`の設定が必要な場合がある)
   - **Copy系**:`CopyTexture`
   - *基本ShaderProperty_Set*:`SetGlobalTexture(.,`**RTI**`,.)`,`Set⟪Compute¦RayTracing⟫TextureParam(..,`**RTI**`,..)` (継承しているので`TextureHandle`版もある(両方使ったok))

@@ -48,6 +48,7 @@
   - `Tex2DArray`,`CubeArray`,`Tex3D`: `depthSlice`で指定
   - `Cube`: `cubemapFace`で指定 (`.Unknown`で`depthSlice`も可)
   - (大体、`CubemapFace`が`.Unknown`以外ならば`cubemapFace`、`.Unknown`ならば`depthSlice`が指定される(`Tex3D`は例外で`depthSlice`のみ))
+  - `depthSlice = -1『RTI.AllDepthSlices』`にすると**全てのスライスがバインド**される(Layered Rendering(`SV_RenderTargetArrayIndex`))
   - **RenderTargetIdentifier(RTI)**: (Unity.drawio/ページ32 参照)
 
 - **SetRenderTarget(..)**

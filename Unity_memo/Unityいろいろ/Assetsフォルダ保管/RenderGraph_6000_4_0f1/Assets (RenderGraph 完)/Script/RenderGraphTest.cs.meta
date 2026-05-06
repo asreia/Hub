@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 2d5a020cfa45e4942bed06022b37d159
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - drawMeshMaterial: {fileID: 2100000, guid: 3f3fd95c1d975a942936cfc996bb81b3, type: 2}
+  - drawMeshMaterial_Test: {fileID: 2100000, guid: 7a462348a051c7d42babfba3c36382f6, type: 2}
+  - drawMeshShader: {fileID: 4800000, guid: d6cf8440efd220b4e942d7c0c7ddb533, type: 3}
+  - fBBlitMaterial: {fileID: 2100000, guid: 2c80055699c0578499558943a542db1b, type: 2}
+  - multiplyByIndexCS: {fileID: 7200000, guid: 7fa5d3a90802d6f4582fbaf7ad4d88cd, type: 3}
+  - stark: {fileID: 2800000, guid: f47796c06986f0c469fb5013c307a96a, type: 3}
+  - starkDango: {fileID: 2800000, guid: a96695410b591fb45b7d8a63e610a660, type: 3}
+  - frieren: {fileID: 2800000, guid: b0a17b9b51898324c961f9456d11d3c7, type: 3}
+  - fern: {fileID: 2800000, guid: 1ded8ba3fcdb02d4e999b95560fa1d0c, type: 3}
+  - all: {fileID: 2800000, guid: a2e7fa9f75e22ac43835717e996a3165, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

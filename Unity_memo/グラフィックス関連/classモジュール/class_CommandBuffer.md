@@ -81,7 +81,7 @@
           :(`volumeDepth`はPixelシェーダで`RT[SV_RenderTargetArrayIndex]`に描画する(Layered Rendering))
         - `NativeArray<AttachmentDescriptor> attachments`: `struct AttachmentDescriptor`: このNativeRenderPassで使用する**全てのアタッチメント**
           - プロパティ
-            - `RTI` **loadStoreTarget**: このNativeRenderPassで使う**アタッチメント** (`RT`の**フォーマットは何でも良い**みたい)
+            - `RTI` **loadStoreTarget**: このNativeRenderPassで使う**アタッチメント** (`RT`の**フォーマットは何でも良い**みたい) (`RTI`で**サブリソースを指定**している(`確認 RenderGraphのサブリソース指定`:codex://threads/019d964c-81be-7881-aeea-c300219d7013))
             - `GraphicsFormat graphicsFormat`: `loadStoreTarget`の**_↑のフォーマット?**(`RTI`は不透明) (ビュー用では無いかも)
             - `RenderBufferLoadAction` **loadAction**: `enum RenderBufferLoadAction`: `⟪Load¦Clear¦DontCare⟫`
             - `○⟦, ┃○¦⟪Color¦float¦uint⟫ clear○¦⟪Color¦Depth¦Stencil⟫⟧`: `loadAction.Clear`時のクリア値
@@ -216,12 +216,14 @@
           - `depth`,`layerCount`: `depth`= `⟪『3D』depth¦『2DArray』1⟫`, `layerCount`= `⟪『3D』1¦『2DArray』depth⟫`
           - `layerDataSize`: `layerDataSize`=`width * height * depth * ⟪src.graphicsFormat¦dstFormat⟫` (総データサイズ = `layerDataSize` * `layerCount`)
         - メソッド
-          - `NativeArray<T>` **GetData<T>**`(int layer)`: `done`=true,`hasError`=false 時、`Readback`したデータにアクセスできる。`layer`で`layerCount`のレイヤーを取得する
+          - `NativeArray<T>` **GetData<T>**`(int layer = 0)`: `done`=true,`hasError`=false 時、`Readback`したデータにアクセスできる。`layer`で`layerCount`のレイヤーを取得する
           - `Update()`: **リクエストが完了したか**をチェックし完了した場合は`AsyncGPUReadbackRequest.done=true`などをするメソッド
           - `WaitForCompletion()`: `WaitAllAsyncReadbackRequests()`と同じで**完了を待機**する(CPUブロックする)
     - `WaitAllAsyncReadbackRequests()`
       :**リクエスト**した全ての`AsyncReadback`の**完了を待機**する(`AsyncGPUReadbackRequest.done`を`true`にする)
       (4oはCPUブロックしないと言っているが`ctx.Submit()`で**CPUブロック**するような気がする)
+    - 例:`ctx.cmd.RequestAsyncReadback(data.bufferHandle, (AsyncGPUReadbackRequest request) => {var result = request.GetData<int>(); Debug.Log($"出力データ: {string.Join(",", result)}");});`
+      (`Assets\Samples\Universal Render Pipeline\17.4.0\URP RenderGraph Samples\Compute\ComputeRendererFeature.cs`)
   - コールバック系
     - `InvokeOnRenderObjectCallbacks()`
       :`ctx.Submit()`時、`MonoBehaviour.OnRenderObject()`コールバックを呼び出す。(この**コマンドを追加した位置**に、`GL系`や`Graphics.ExecuteCommandBuffer(cmd)`などで**描画を差し込める**)

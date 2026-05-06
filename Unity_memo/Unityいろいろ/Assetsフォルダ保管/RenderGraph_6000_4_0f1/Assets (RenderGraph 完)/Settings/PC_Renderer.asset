@@ -1,0 +1,339 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-5792641625847429115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1593cc97174cf7a4c9c168bdf89f9d19, type: 3}
+  m_Name: TextureRefRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::TextureRefRendererFeature
+  m_Active: 0
+  displayMaterials:
+  - {fileID: 2100000, guid: 4b2c65e3b4614e879a7aa930719bf68d, type: 2}
+  - {fileID: 2100000, guid: 6d0f4f0b04e047c98c1c4cd9e9fe2f31, type: 2}
+  - {fileID: 2100000, guid: a20a9d455c98425290197d09568910e0, type: 2}
+--- !u!114 &-5284226376053837082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86e4c5363f57b435eba17d3088e4e3a7, type: 3}
+  m_Name: GlobalGbuffersRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalGbuffersRendererFeature
+  m_Active: 0
+--- !u!114 &-5069157000644986981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: febcb3ead18d97042a101999937ced2f, type: 3}
+  m_Name: ComputeRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::ComputeRendererFeature
+  m_Active: 0
+  computeShader: {fileID: 7200000, guid: e0a62cf8f93b4da439ba6c1df01269a4, type: 3}
+--- !u!114 &-2690046606298782548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064ddca45da75e1408bf925c88dd455e, type: 3}
+  m_Name: AddBlitPassPatternRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::AddBlitPassPatternRendererFeature
+  m_Active: 1
+  m_RenderPassEvent: 500
+  m_TextureSize: 64
+  m_LogLegendOnce: 1
+--- !u!114 &-2269973755789737930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0f308632a61c8247b1df9f93dc00944, type: 3}
+  m_Name: RendererListRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::RendererListRenderFeature
+  m_Active: 0
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &-1726369612910063350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ed4a568eb4f9324db09da85a07b1a18, type: 3}
+  m_Name: MrtRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::MrtRendererFeature
+  m_Active: 0
+  mrtMaterial: {fileID: 2100000, guid: 62f8602306d69ed4685fd1fd1e3d7f60, type: 2}
+  textureName: _ColorTexture
+  renderTextures:
+  - {fileID: 8400000, guid: 567cdc6776154de48b50358dcbb87468, type: 2}
+  - {fileID: 8400000, guid: 7988d77f989f4fa45b57f8029c7d67c6, type: 2}
+  - {fileID: 8400000, guid: 2b8142d6304918f4ebf2053c3a90c34a, type: 2}
+--- !u!114 &-1574961008140279971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d1e2329776926468ad438912df45f4, type: 3}
+  m_Name: CopyRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::CopyRenderFeature
+  m_Active: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de640fe3d0db1804a85f9fc8f5cadab6, type: 3}
+  m_Name: PC_Renderer
+  m_EditorClassIdentifier: 
+  debugShaders:
+    debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
+    hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
+    probeVolumeSamplingDebugComputeShader: {fileID: 7200000, guid: 53626a513ea68ce47b59dc1299fe3959, type: 3}
+  probeVolumeResources:
+    probeVolumeDebugShader: {fileID: 4800000, guid: e5c6678ed2aaa91408dd3df699057aae, type: 3}
+    probeVolumeFragmentationDebugShader: {fileID: 4800000, guid: 03cfc4915c15d504a9ed85ecc404e607, type: 3}
+    probeVolumeOffsetDebugShader: {fileID: 4800000, guid: 53a11f4ebaebf4049b3638ef78dc9664, type: 3}
+    probeVolumeSamplingDebugShader: {fileID: 4800000, guid: 8f96cd657dc40064aa21efcc7e50a2e7, type: 3}
+    probeSamplingDebugMesh: {fileID: -3555484719484374845, guid: 57d7c4c16e2765b47a4d2069b311bffe, type: 3}
+    probeSamplingDebugTexture: {fileID: 2800000, guid: 24ec0e140fb444a44ab96ee80844e18e, type: 3}
+    probeVolumeBlendStatesCS: {fileID: 7200000, guid: b9a23f869c4fd45f19c5ada54dd82176, type: 3}
+  m_RendererFeatures:
+  - {fileID: 7833122117494664109}
+  - {fileID: -1574961008140279971}
+  - {fileID: 43064651189543571}
+  - {fileID: -5792641625847429115}
+  - {fileID: 5203283473431636201}
+  - {fileID: -2269973755789737930}
+  - {fileID: 4401291262139384530}
+  - {fileID: -5069157000644986981}
+  - {fileID: 7964655302464389552}
+  - {fileID: -1726369612910063350}
+  - {fileID: 5756125257391031709}
+  - {fileID: 4382536261625191807}
+  - {fileID: -5284226376053837082}
+  - {fileID: 7316773439364329009}
+  - {fileID: 3990238935923495393}
+  - {fileID: 619367940319593553}
+  - {fileID: -2690046606298782548}
+  m_RendererFeatureMap: ad6b866f10d7b46c5d1fb5be4e9d24ea9362877412ff9800050839cc21679cafe9a88d3bc0c635483680b15ce56e7fe0d242d9781587143d9bf7dec190bca6b9b041d28dcc23886e0a9177d7fbb30ae89d4572a16cdde14f7f1d70a182e5d13ce6b28fa61ba8aab631ee525bad668a65e111a7c82b2d603751c40334dc6f9808ace45032dd08abda
+  m_UseNativeRenderPass: 1
+  xrSystemData: {fileID: 0}
+  postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
+  m_AssetVersion: 3
+  m_PrepassLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_OpaqueLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_TransparentLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_DefaultStencilState:
+    overrideStencilState: 0
+    stencilReference: 1
+    stencilCompareFunction: 3
+    passOperation: 2
+    failOperation: 0
+    zFailOperation: 0
+  m_ShadowTransparentReceive: 1
+  m_RenderingMode: 2
+  m_DepthPrimingMode: 0
+  m_CopyDepthMode: 0
+  m_DepthAttachmentFormat: 0
+  m_DepthTextureFormat: 0
+  m_AccurateGbufferNormals: 0
+  m_IntermediateTextureMode: 0
+--- !u!114 &43064651189543571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b89c4d71193d4b40b9b1532d7cc40ee, type: 3}
+  m_Name: BlitAndSwapColorRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::BlitAndSwapColorRendererFeature
+  m_Active: 0
+  material: {fileID: 0}
+  renderPassEvent: 600
+--- !u!114 &619367940319593553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3656e74905bd34b41b91ea7307e190c1, type: 3}
+  m_Name: RendererFeature Sample
+  m_EditorClassIdentifier: Assembly-CSharp::RendererFeature
+  m_Active: 0
+  active: 0
+--- !u!114 &3990238935923495393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75a4d77ab0ab06a44ae1c4e4507bafdd, type: 3}
+  m_Name: FrameBufferFetchRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::FrameBufferFetchRenderFeature
+  m_Active: 0
+  m_FBFetchMaterial: {fileID: 2100000, guid: 7e532af0922c9cb4f829b9b7bf9e7ccc, type: 2}
+--- !u!114 &4382536261625191807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e76c94290719a4f89ae960002048ebfb, type: 3}
+  m_Name: GbufferVisualizationRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::GbufferVisualizationRendererFeature
+  m_Active: 0
+  m_Material: {fileID: 2100000, guid: b822384cb53874e0ebd13dffb89844d7, type: 2}
+--- !u!114 &4401291262139384530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844a96d8ebb8a904aaa6dc603c116808, type: 3}
+  m_Name: OutputTextureRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::OutputTextureRendererFeature
+  m_Active: 0
+  m_PassEvent: 500
+  m_TextureName: _InputTexture
+  m_TextureType: 0
+  m_Material: {fileID: -876546973899608171, guid: 8f6a40d408f23e64e93e507e222c517e, type: 3}
+--- !u!114 &5203283473431636201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 653ba0c605ec5d741aba7b906b0160d0, type: 3}
+  m_Name: BlitRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::BlitRendererFeature
+  m_Active: 0
+  m_Materials: []
+--- !u!114 &5756125257391031709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449c507e86381462c8fc85c5342da54a, type: 3}
+  m_Name: CullingRenderPassRendererFeature
+  m_EditorClassIdentifier: Assembly-CSharp::CullingRenderPassRendererFeature
+  m_Active: 0
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &7316773439364329009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3bfdac9be62de0478c6aee44076cd95, type: 3}
+  m_Name: UnsafePassRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::UnsafePassRenderFeature
+  m_Active: 0
+--- !u!114 &7833122117494664109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f62c9c65cf3354c93be831c8bc075510, type: 3}
+  m_Name: ScreenSpaceAmbientOcclusion
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  m_Settings:
+    AOMethod: 0
+    Downsample: 0
+    AfterOpaque: 0
+    Source: 1
+    NormalSamples: 1
+    Intensity: 0.4
+    DirectLightingStrength: 0.25
+    Radius: 0.3
+    Samples: 1
+    BlurQuality: 0
+    Falloff: 100
+    SampleCount: -1
+--- !u!114 &7964655302464389552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbe7441e4bb16444dbfab4849addb8cf, type: 3}
+  m_Name: ComputeShaderScreenInOutRenderFeature
+  m_EditorClassIdentifier: Assembly-CSharp::ComputeShaderScreenInOutRenderFeature
+  m_Active: 0
+  HeatmapComputeShader: {fileID: 7200000, guid: 993e8c0ff3f637d458dff6aa68dd81bb, type: 3}
+  HeatmapBrightnessComputeShader: {fileID: 7200000, guid: a72b1380360a2584680d614a9a2181fb, type: 3}
