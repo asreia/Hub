@@ -130,7 +130,7 @@
             - **オーバーライド**する`ShaderTagId`を**指定**する。`tagName`の`tagValues`にマッチした`Shader`の`∮RenderingState∮`を**オーバーライド**する
               - `bool isPassTagName`: `isPassTagName`が `true`:`PassTag`,`％false`:`SubShaderTag`
               - `ShaderTagId tagName`: `tagName`は`Tags{"ココ"="tagValues"}`
-              - `Nullable<NativeArray<ShaderTagId>> tagValues`: `tagValues`は`Tags{"tagName"="ココの候補"}`
+              - `Nullable<NativeArray<ShaderTagId>> tagValues`: `tagValues`は`Tags{"tagName"="ココの候補"}` (追記:`ShaderTagId.none`であれば無条件にマッチするらしい(Codex)(RenderingUtils.cs:233))
       - `RendererList ctx.`**Create**Shadow**RendererList**`(ref ShadowDrawingSettings settings)`:
         - シャドウライト(`lightIndex`)＠❰と(`splitIndex`)❱を指定してシャドウマップを描画する。(後は`RendererListParams`より**簡易**)
       - `RendererList ctx.`**Create**Skybox**RendererList**`(Camera camera)`: `camera`と`Material RenderSettings.skybox`を使って**スカイボックス**を描画する
