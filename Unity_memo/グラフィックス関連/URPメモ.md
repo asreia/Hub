@@ -17,7 +17,9 @@
     }
     ```
 
-- `override RenderPipeline uRPA:CreatePipeline()`
+## uRPA.CreatePipeline
+
+- `override RenderPipeline uRPA.CreatePipeline()`
     ```csharp (UniversalRenderPipelineAsset.cs:790)
     protected override RenderPipeline CreatePipeline()
     {
@@ -27,7 +29,7 @@
         return pipeline;
     }
     ```
-  - `URP.ctor(this)`
+  - `uRP.ctor(uRPA this)`
     ```csharp (UniversalRenderPipeline.cs:226)
     public UniversalRenderPipeline(UniversalRenderPipelineAsset asset)
     {
@@ -69,7 +71,7 @@
         if (asset.lightProbeSystem == LightProbeSystem.ProbeVolumes){ProbeReferenceVolume.instance.Initialize(new ProbeVolumeSystemParameters{～})}        
     }
     ```
-  - `SR.ctor(sRD data)`
+  - `sR.ctor(sRD data)`
     ```csharp (ScriptableRenderer.cs:471)
     public ScriptableRenderer(ScriptableRendererData data)
     {
@@ -82,7 +84,7 @@
         m_ActiveRenderPassQueue.Clear(); //m_ARPQ.Clear()
     }
     ```
-  - `UR.ctor(uRD data)`
+  - `uR.ctor(uRD data)`
     ```csharp (UniversalRenderer.cs:211)
         public UniversalRenderer(UniversalRendererData data) : base(data)
         {
@@ -192,7 +194,9 @@
         }
     ```
 
-- `override void uRP.Render(ctx, cams)`
+## uRP.Render
+
+- `override void uRP.`**Render**`(context, cameras)`
     ```csharp  (UniversalRenderPipeline.cs:425)
     protected override void Render(ScriptableRenderContext context, List<Camera> cameras)
     {
@@ -236,8 +240,7 @@
         }
     }
     ```
-  - `static void uRP:RenderCameraStack(context, camera, isLastBaseCamera)`
-    :大体、**カメラ毎**に、`uCD`を**作成**して`RenderSingleCamera(ctx, uCD)`を呼んでいるだけ (**uCD作成**(`CreateCameraData`,`InitializeAdditionalCameraData`) と `UpdateVolumeFramework`,`VFX.VFXManager.PrepareCamera`)
+  - `static void URP:`**RenderCameraStack**`(context, camera, isLastBaseCamera)`: 大体、**カメラ毎**に、`uCD`を**作成**して`RenderSingleCamera(context, uCD)`を呼んでいるだけ (あと`UpdateVolumeFramework`,`VFX.VFXManager.PrepareCamera`)
     ```csharp  (UniversalRenderPipeline.cs:907)
     static void RenderCameraStack(ScriptableRenderContext context, Camera baseCamera, bool isLastBaseCamera)
     {
@@ -338,7 +341,7 @@
         XRSystem.EndLayout();
     }
     ```
-    - `static void uRP:RenderSingleCameraInternal(context, camera, isLastBaseCamera)`
+    - `static void URP:RenderSingleCameraInternal(context, camera, isLastBaseCamera)`
         ```csharp (UniversalRenderPipeline.cs:686)
         internal static void RenderSingleCameraInternal(ScriptableRenderContext context, Camera camera, ., bool isLastBaseCamera = true)
         {
@@ -349,7 +352,7 @@
             RenderSingleCamera(context, cameraData);
         }
         ```
-  - `static void uRP:RenderSingleCamera(context, ＠⟪base¦overlay⟫CameraData)`
+  - `static void URP:`**RenderSingleCamera**`(context, ＠⟪base¦overlay⟫CameraData)`
     ```csharp (UniversalRenderPipeline.cs:734)
     static void RenderSingleCamera(ScriptableRenderContext context, UniversalCameraData cameraData)
     {
@@ -417,131 +420,175 @@
         }
         ```
 
-- `CreateCameraData`
-  :Overlay は「出力先や解像度は Base と共有し、描画カメラとしての個別設定だけ後で Overlay のものにする」という流れです。
-```csharp
-static UniversalCameraData CreateCameraData(ContextContainer frameData, Camera camera, UniversalAdditionalCameraData additionalCameraData)
-{
-    using var profScope = new ProfilingScope(Profiling.Pipeline.initializeCameraData);
+## frameData 作成
 
-    UniversalCameraData cameraData = frameData.Create<UniversalCameraData>();
-
-    InitializeStackedCameraData(camera, additionalCameraData, cameraData);
-    cameraData.camera = camera; //『baseCamera => overlayCamera (あとで上書きされる)
-    cameraData.historyManager = additionalCameraData?.historyManager; // 履歴を生成できる挿入済みユーザーレンダーパスがアクセスできるよう、書き込み可能なカメラ履歴への参照を追加します。
-
-    //`cameraTargetDescriptor`設定=============
-    cameraData.scaled⟪Width¦Height⟫ = camera.pixel⟪Width¦Height⟫ * cameraData.renderScale;
-    int msaaSamples = 1; if (camera.allowMSAA && asset.msaaSampleCount > 1) msaaSamples = (camera.targetTexture != null) ? camera.targetTexture.antiAliasing : asset.msaaSampleCount;
-    cameraData.hdrColorBufferPrecision = asset ? asset.hdrColorBufferPrecision : HDRColorBufferPrecision._32Bits;
-    cameraData.cameraTargetDescriptor = CreateRenderTextureDescriptor(camera, cameraData, cameraData.isHdrEnabled, cameraData.hdrColorBufferPrecision, msaaSamples, Graphics.preserveFramebufferAlpha);
-    cameraData.isAlphaOutputEnabled = GraphicsFormatUtility.HasAlphaChannel(cameraData.cameraTargetDescriptor.graphicsFormat);
-
-    return cameraData;
-}
-```
-
-```csharp
-static void InitializeStackedCameraData(Camera baseCamera, UniversalAdditionalCameraData baseAdditionalCameraData, UniversalCameraData cameraData)
-{
-    using var profScope = new ProfilingScope(Profiling.Pipeline.initializeStackedCameraData);
-
-    cameraData.targetTexture = baseCamera.targetTexture;
-    cameraData.cameraType = baseCamera.cameraType;
-
-    // 環境とポストプロセス設定////////////////////
-    if (baseAdditionalCameraData != null)
+- `Universal`**Camera**`Data`作成 (呼び出し元:`RenderCameraStack(context, camera, isLastBaseCamera)`)
+  - `static UCD CreateCameraData(＠❰overlay❱FrameData, baseCamera, baseCameraAdditionalData)`: `overlayCamera`時も`baseCamera`で設定する
+    ```csharp (UniversalRenderPipeline.cs:1338)
+    static UniversalCameraData CreateCameraData(ContextContainer frameData, Camera camera, UniversalAdditionalCameraData additionalCameraData)
     {
-        cameraData.volumeLayerMask = baseAdditionalCameraData.volumeLayerMask;
-        cameraData.volumeTrigger = baseAdditionalCameraData.volumeTrigger == null ? baseCamera.transform : baseAdditionalCameraData.volumeTrigger;
-        cameraData.isStopNaNEnabled = baseAdditionalCameraData.stopNaN && SystemInfo.graphicsShaderLevel >= 35;
-        cameraData.isDitheringEnabled = baseAdditionalCameraData.dithering;
-        cameraData.antialiasing = baseAdditionalCameraData.antialiasing;
-        cameraData.antialiasingQuality = baseAdditionalCameraData.antialiasingQuality;
-        cameraData.xrRendering = baseAdditionalCameraData.allowXRRendering && XRSystem.displayActive;
-        cameraData.allowHDROutput = baseAdditionalCameraData.allowHDROutput;
+        using var profScope = new ProfilingScope(Profiling.Pipeline.initializeCameraData);
+
+        UniversalCameraData cameraData = frameData.Create<UniversalCameraData>();
+
+        InitializeStackedCameraData(camera, additionalCameraData, cameraData);
+        cameraData.camera = camera; //『baseCamera => overlayCamera (あとで上書きされる)
+        cameraData.historyManager = additionalCameraData?.historyManager; // 履歴を生成できる挿入済みユーザーレンダーパスがアクセスできるよう、書き込み可能なカメラ履歴への参照を追加します。
+
+        //`cameraTargetDescriptor`設定=============
+        cameraData.scaled⟪Width¦Height⟫ = camera.pixel⟪Width¦Height⟫ * cameraData.renderScale;
+        int msaaSamples = 1; if (camera.allowMSAA && asset.msaaSampleCount > 1) msaaSamples = (camera.targetTexture != null) ? camera.targetTexture.antiAliasing : asset.msaaSampleCount;
+        cameraData.hdrColorBufferPrecision = asset ? asset.hdrColorBufferPrecision : HDRColorBufferPrecision._32Bits;
+        cameraData.cameraTargetDescriptor = CreateRenderTextureDescriptor(camera, cameraData, cameraData.isHdrEnabled, cameraData.hdrColorBufferPrecision, msaaSamples, Graphics.preserveFramebufferAlpha);
+        cameraData.isAlphaOutputEnabled = GraphicsFormatUtility.HasAlphaChannel(cameraData.cameraTargetDescriptor.graphicsFormat);
+
+        return cameraData;
     }
-
-    // カメラの出力を制御する設定////////////////////
-    //HDR
-    cameraData.isHdrEnabled = baseCamera.allowHDR && asset.supportsHDR;
-    cameraData.allowHDROutput &= asset.supportsHDR;
-
-    //解像度関係
-    cameraData.pixel⟪Width¦Height⟫ = baseCamera.pixel⟪Width¦Height⟫;
-    cameraData.aspectRatio = (float)cameraData.pixelWidth / (float)cameraData.pixelHeight;
-    cameraData.renderScale = cameraData.cameraType == CameraType.Game ? asset.renderScale : 1.0f;
-    cameraData.isDefaultViewport = !(Math.Abs(baseCamera.rect.x) > 0.0f || Math.Abs(baseCamera.rect.y) > 0.0f || Math.Abs(baseCamera.rect.width) < 1.0f || Math.Abs(baseCamera.rect.height) < 1.0f);
-    cameraData.pixelRect = baseCamera.pixelRect; //『シザー?
-
-    //『デフォルト不透明`SortingCriteria`
-    var commonOpaqueFlags = SortingCriteria.CommonOpaque;
-    var noFrontToBackOpaqueFlags = SortingCriteria.SortingLayer | SortingCriteria.RenderQueue | SortingCriteria.OptimizeStateChanges | SortingCriteria.CanvasOrder;
-    bool canSkipFrontToBackSorting = (baseCamera.opaqueSortMode == OpaqueSortMode.Default && SystemInfo.hasHiddenSurfaceRemovalOnGPU) || baseCamera.opaqueSortMode == OpaqueSortMode.NoDistanceSort;
-    cameraData.defaultOpaqueSortFlags = canSkipFrontToBackSorting ? noFrontToBackOpaqueFlags : commonOpaqueFlags;
-
-    // パイプラインアセットのアップスケーリングフィルター選択を画像アップスケーリングフィルターに変換します 『(ImageUpscalingFilter <= UpscalingFilterSelection)
-    cameraData.upscalingFilter = ResolveUpscalingFilterSelection(new Vector2(cameraData.pixelWidth, cameraData.pixelHeight), cameraData.renderScale, asset.upscalingFilter);
-    cameraData.imageScalingMode = ｢ImageScalingMode.⟪None¦Upscaling¦Downscaling⟫:`cameraData.⟪renderScale¦cameraType¦upscalingFilter⟫`で決められる｣
-    //『FSR
-    cameraData.fsrOverrideSharpness = asset.fsrOverrideSharpness;
-    cameraData.fsrSharpness = asset.fsrSharpness;
-    //『xr
-    cameraData.xr = XRSystem.emptyPass;
-    //『キャプチャー
-    cameraData.captureActions = Unity.RenderPipelines.Core.Runtime.Shared.CameraCaptureBridge.GetCachedCaptureActionsEnumerator(baseCamera);
-}
-```
-
-```csharp
-internal static RenderTextureDescriptor CreateRenderTextureDescriptor(Camera camera, UniversalCameraData cameraData, bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, int msaaSamples, bool needsAlpha)
-{
-    RenderTextureDescriptor desc;
-
-    if (camera.targetTexture == null)
-    {
-        desc = new RenderTextureDescriptor(cameraData.scaledWidth, cameraData.scaledHeight); //『scaled
-
-        static GraphicsFormat MakeRenderTextureGraphicsFormat(bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, bool needsAlpha) //理解のためにインナー化した
+    ```
+    - `static void InitializeStackedCameraData(camera, additionalCameraData, 『out』cameraData)`
+        ```csharp (UniversalRenderPipeline.cs:1344)
+        static void InitializeStackedCameraData(Camera baseCamera, UniversalAdditionalCameraData baseAdditionalCameraData, UniversalCameraData cameraData)
         {
-            if (isHdrEnabled)
+            using var profScope = new ProfilingScope(Profiling.Pipeline.initializeStackedCameraData);
+
+            cameraData.targetTexture = baseCamera.targetTexture;
+            cameraData.cameraType = baseCamera.cameraType;
+
+            // 環境とポストプロセス設定////////////////////
+            if (baseAdditionalCameraData != null)
             {
-                if (!needsAlpha && requestHDRColorBufferPrecision != HDRColorBufferPrecision._64Bits && SystemInfo.IsFormatSupported(GraphicsFormat.B10G11R11_UFloatPack32, GraphicsFormatUsage.Blend))
-                    return GraphicsFormat.B10G11R11_UFloatPack32;
-                if (SystemInfo.IsFormatSupported(GraphicsFormat.R16G16B16A16_SFloat, GraphicsFormatUsage.Blend)) //『指定された用途`GraphicsFormatUsage`に対して、指定された`GraphicsFormat`がサポートされているか検証します。
-                    return GraphicsFormat.R16G16B16A16_SFloat; //『ほぼこれになると思われる
-                return SystemInfo.GetGraphicsFormat(DefaultFormat.HDR);
+                cameraData.volumeLayerMask = baseAdditionalCameraData.volumeLayerMask;
+                cameraData.volumeTrigger = baseAdditionalCameraData.volumeTrigger == null ? baseCamera.transform : baseAdditionalCameraData.volumeTrigger;
+                cameraData.isStopNaNEnabled = baseAdditionalCameraData.stopNaN && SystemInfo.graphicsShaderLevel >= 35;
+                cameraData.isDitheringEnabled = baseAdditionalCameraData.dithering;
+                cameraData.antialiasing = baseAdditionalCameraData.antialiasing;
+                cameraData.antialiasingQuality = baseAdditionalCameraData.antialiasingQuality;
+                cameraData.xrRendering = baseAdditionalCameraData.allowXRRendering && XRSystem.displayActive;
+                cameraData.allowHDROutput = baseAdditionalCameraData.allowHDROutput;
             }
-            return SystemInfo.GetGraphicsFormat(DefaultFormat.LDR);
+
+            // カメラの出力を制御する設定////////////////////
+            //HDR
+            cameraData.isHdrEnabled = baseCamera.allowHDR && asset.supportsHDR;
+            cameraData.allowHDROutput &= asset.supportsHDR;
+
+            //解像度関係
+            cameraData.pixel⟪Width¦Height⟫ = baseCamera.pixel⟪Width¦Height⟫;
+            cameraData.aspectRatio = (float)cameraData.pixelWidth / (float)cameraData.pixelHeight;
+            cameraData.renderScale = cameraData.cameraType == CameraType.Game ? asset.renderScale : 1.0f;
+            cameraData.isDefaultViewport = !(Math.Abs(baseCamera.rect.x) > 0.0f || Math.Abs(baseCamera.rect.y) > 0.0f || Math.Abs(baseCamera.rect.width) < 1.0f || Math.Abs(baseCamera.rect.height) < 1.0f);
+            cameraData.pixelRect = baseCamera.pixelRect; //『シザー?
+
+            //『デフォルト不透明`SortingCriteria`
+            var commonOpaqueFlags = SortingCriteria.CommonOpaque;
+            var noFrontToBackOpaqueFlags = SortingCriteria.SortingLayer | SortingCriteria.RenderQueue | SortingCriteria.OptimizeStateChanges | SortingCriteria.CanvasOrder;
+            bool canSkipFrontToBackSorting = (baseCamera.opaqueSortMode == OpaqueSortMode.Default && SystemInfo.hasHiddenSurfaceRemovalOnGPU) || baseCamera.opaqueSortMode == OpaqueSortMode.NoDistanceSort;
+            cameraData.defaultOpaqueSortFlags = canSkipFrontToBackSorting ? noFrontToBackOpaqueFlags : commonOpaqueFlags;
+
+            // パイプラインアセットのアップスケーリングフィルター選択を画像アップスケーリングフィルターに変換します 『(ImageUpscalingFilter <= UpscalingFilterSelection)
+            cameraData.upscalingFilter = ResolveUpscalingFilterSelection(new Vector2(cameraData.pixelWidth, cameraData.pixelHeight), cameraData.renderScale, asset.upscalingFilter);
+            cameraData.imageScalingMode = ｢ImageScalingMode.⟪None¦Upscaling¦Downscaling⟫:`cameraData.⟪renderScale¦cameraType¦upscalingFilter⟫`で決められる｣
+            //『FSR
+            cameraData.fsrOverrideSharpness = asset.fsrOverrideSharpness;
+            cameraData.fsrSharpness = asset.fsrSharpness;
+            //『xr
+            cameraData.xr = XRSystem.emptyPass;
+            //『キャプチャー
+            cameraData.captureActions = Unity.RenderPipelines.Core.Runtime.Shared.CameraCaptureBridge.GetCachedCaptureActionsEnumerator(baseCamera);
         }
-        //『基本的に、`.depthBufferBits`も`.sRGB`も`.⟪depthStencil¦graphics⟫Format`に整合する値にはなっていて、`new RenderTexture(desc)`でRTを作成しても、URP内部RTとの差異は基本的に無く、大丈夫なようにはなっている。
-            //『Codex:`.depthBufferBits`,`.sRGB`は、旧APIや`RenderTextureDescriptor`互換のためにも埋めている補助情報です。(codex://threads/019e4af7-5842-77b1-b4b4-8f39e075e4d5)
-        /*color*/   desc.graphicsFormat = MakeRenderTextureGraphicsFormat(isHdrEnabled, requestHDRColorBufferPrecision, needsAlpha);
-        /*depth*/   desc.depthStencilFormat = SystemInfo.GetGraphicsFormat(DefaultFormat.DepthStencil);
-        /*補助情報*/ desc.depthBufferBits = (int)CoreUtils.GetDefaultDepthBufferBits(); desc.sRGB = QualitySettings.activeColorSpace == ColorSpace.Linear;
-    }
-    else
+        ```
+    - `static RTDesc CreateRenderTextureDescriptor(camera, cameraData, cameraData.isHdrEnabled, cameraData.hdrColorBufferPrecision, msaaSamples, Graphics.preserveFramebufferAlpha)`
+        ```csharp (UniversalRenderPipelineCore.cs:1532)
+        internal static RenderTextureDescriptor CreateRenderTextureDescriptor(Camera camera, UniversalCameraData cameraData, bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, int msaaSamples, bool needsAlpha)
+        {
+            RenderTextureDescriptor desc;
+
+            if (camera.targetTexture == null)
+            {
+                desc = new RenderTextureDescriptor(cameraData.scaledWidth, cameraData.scaledHeight); //『scaled
+
+                static GraphicsFormat MakeRenderTextureGraphicsFormat(bool isHdrEnabled, HDRColorBufferPrecision requestHDRColorBufferPrecision, bool needsAlpha) //理解のためにインナー化した
+                {
+                    if (isHdrEnabled)
+                    {
+                        if (!needsAlpha && requestHDRColorBufferPrecision != HDRColorBufferPrecision._64Bits && SystemInfo.IsFormatSupported(GraphicsFormat.B10G11R11_UFloatPack32, GraphicsFormatUsage.Blend))
+                            return GraphicsFormat.B10G11R11_UFloatPack32;
+                        if (SystemInfo.IsFormatSupported(GraphicsFormat.R16G16B16A16_SFloat, GraphicsFormatUsage.Blend)) //『指定された用途`GraphicsFormatUsage`に対して、指定された`GraphicsFormat`がサポートされているか検証します。
+                            return GraphicsFormat.R16G16B16A16_SFloat; //『ほぼこれになると思われる
+                        return SystemInfo.GetGraphicsFormat(DefaultFormat.HDR);
+                    }
+                    return SystemInfo.GetGraphicsFormat(DefaultFormat.LDR);
+                }
+                //『基本的に、`.depthBufferBits`も`.sRGB`も`.⟪depthStencil¦graphics⟫Format`に整合する値にはなっていて、`new RenderTexture(desc)`でRTを作成しても、URP内部RTとの差異は基本的に無く、大丈夫なようにはなっている。
+                    //『Codex:`.depthBufferBits`,`.sRGB`は、旧APIや`RenderTextureDescriptor`互換のためにも埋めている補助情報です。(codex://threads/019e4af7-5842-77b1-b4b4-8f39e075e4d5)
+                /*color*/   desc.graphicsFormat = MakeRenderTextureGraphicsFormat(isHdrEnabled, requestHDRColorBufferPrecision, needsAlpha);
+                /*depth*/   desc.depthStencilFormat = SystemInfo.GetGraphicsFormat(DefaultFormat.DepthStencil);
+                /*補助情報*/ desc.depthBufferBits = (int)CoreUtils.GetDefaultDepthBufferBits(); desc.sRGB = QualitySettings.activeColorSpace == ColorSpace.Linear;
+            }
+            else
+            {
+                // 注:`camera.targetTexture`は最終的な出力先ですが、`cameraTargetDescriptor`は`targetTexture.descriptor`の生コピーではありません。 //後でコメント消去予定
+                // これは URP がこのフレームで描画する領域や、必要に応じて作る中間テクスチャのための作業用`descriptor`です。
+                //`targetTexture`がある場合は、色形式などの外部テクスチャ固有の設定を引き継ぐため、まず`targetTexture.descriptor`を土台にします。
+                // その後、renderScale、カメラ viewport、アップスケーラー、MSAA など URP 側の現在の描画条件に合わせてサイズなどを上書きします。
+                    //URPは直接`camera.targetTexture`に描画しているわけではなく、`中間RT`を自動的に生成して、`中間RT`=Blitなど=>`camera.targetTexture`のようにレンダリングしているわけですね？
+                    //その`中間RT`(`cameraData.cameraTargetDescriptor`)を`camera.targetTexture.descriptor`を土台にして作っているわけですね？
+                    //`backBufferColor`<=`camera.targetTexture`, `cameraColor`<=`cameraData.cameraTargetDescriptor` だったらしい
+                desc = camera.targetTexture.descriptor; //『`color`,`depth`などは`targetTexture`から継承
+                desc.⟪width¦height⟫ = cameraData.scaled⟪Width¦Height⟫; //『scaled
+            }
+
+            desc.msaaSamples = msaaSamples;
+            desc.enableRandomWrite = false;
+            desc.bindMS = false;
+            desc.useDynamicScale = camera.allowDynamicResolution;
+
+            return desc;
+        }
+        ```
+  - `static void InitializeAdditionalCameraData(⟪base¦overlay⟫Camera, ⟪base¦overlay⟫AdditionalCameraData, isLastBaseCamera, ⟪!isStackedRendering¦isLastOverlayCamera⟫, 『out』⟪base¦overlay⟫CameraData)`
+    ```csharp (UniversalRenderPipeline.cs:1548)
+    static void InitializeAdditionalCameraData(Camera camera, UniversalAdditionalCameraData additionalCameraData, bool isLastBaseCamera, bool isLastOverlayCamera, UniversalCameraData cameraData)
     {
-        // 注:`camera.targetTexture`は最終的な出力先ですが、`cameraTargetDescriptor`は`targetTexture.descriptor`の生コピーではありません。 //後でコメント消去予定
-        // これは URP がこのフレームで描画する領域や、必要に応じて作る中間テクスチャのための作業用`descriptor`です。
-        //`targetTexture`がある場合は、色形式などの外部テクスチャ固有の設定を引き継ぐため、まず`targetTexture.descriptor`を土台にします。
-        // その後、renderScale、カメラ viewport、アップスケーラー、MSAA など URP 側の現在の描画条件に合わせてサイズなどを上書きします。
-            //URPは直接`camera.targetTexture`に描画しているわけではなく、`中間RT`を自動的に生成して、`中間RT`=Blitなど=>`camera.targetTexture`のようにレンダリングしているわけですね？
-            //その`中間RT`(`cameraData.cameraTargetDescriptor`)を`camera.targetTexture.descriptor`を土台にして作っているわけですね？
-            //`backBufferColor`<=`camera.targetTexture`, `cameraColor`<=`cameraData.cameraTargetDescriptor` だったらしい
-        desc = camera.targetTexture.descriptor; //『`color`,`depth`などは`targetTexture`から継承
-        desc.⟪width¦height⟫ = cameraData.scaled⟪Width¦Height⟫; //『scaled
+        using var profScope = new ProfilingScope(Profiling.Pipeline.initializeAdditionalCameraData);
+
+        cameraData.isLastBaseCamera = isLastBaseCamera;
+        cameraData.resolveFinalTarget = isLastOverlayCamera;
+        cameraData.renderer = GetRenderer(camera, additionalCameraData);
+        cameraData.useGPUOcclusionCulling = GPUResidentDrawer.IsInstanceOcclusionCullingEnabled() && cameraData.renderer.supportsGPUOcclusion;
+
+        if (additionalCameraData != null)
+        {
+            cameraData.renderType = additionalCameraData.renderType;
+            cameraData.postProcessEnabled = additionalCameraData.renderPostProcessing;
+
+            cameraData.clearDepth = additionalCameraData.renderType == CameraRenderType.Base ? true : additionalCameraData.clearDepth;
+            cameraData.requiresOpaqueTexture = cameraData.renderType == CameraRenderType.Overlay ? false : additionalCameraData.requiresColorTexture;
+            cameraData.requiresDepthTexture = additionalCameraData.requiresDepthTexture | cameraData.useGPUOcclusionCulling;
+            cameraData.postProcessingRequiresDepthTexture = cameraData.postProcessEnabled && VolumeManager.instance.stack.GetComponent<⟪DepthOfField¦MotionBlur⟫>().IsActive() ? true : false;
+
+            cameraData.useScreenCoordOverride = additionalCameraData.useScreenCoordOverride;
+            cameraData.screenSizeOverride = additionalCameraData.screenSizeOverride;
+            cameraData.screenCoordScaleBias = additionalCameraData.screenCoordScaleBias;
+        }
+
+        float dist = Mathf.Min(asset.shadowDistance, camera.farClipPlane);
+        cameraData.maxShadowDistance = additionalCameraData.renderShadows && asset.supports⟪Main¦Additional⟫LightShadows && dist >= camera.nearClipPlane ? dist : 0.0f;
+
+        UpdateTemporalAAData(cameraData, additionalCameraData); //『`cameraData.⟪taa¦stp⟫⟪History¦Settings⟫ = additionalCameraData.～`
+
+        Matrix4x4 projectionMatrix = camera.projectionMatrix;
+        // Overlay カメラは Base から viewport を継承します。両者の viewport が異なる場合、Overlay カメラでオブジェクトをレンダリングしたときにつぶれるのを防ぐため、アスペクト比行列を調整するように projection へパッチを当てる必要がある場合があります。
+        if (cameraData.renderType == CameraRenderType.Overlay && !camera.orthographic && cameraData.pixelRect != camera.pixelRect)
+            projectionMatrix.m00 *= camera.aspect / cameraData.aspectRatio; //m00. = (cotangent / .aspect=>.aspectRatio)
+        Matrix4x4 jitterMatrix = TemporalAA.CalculateJitterMatrix(cameraData, cameraData.IsSTPEnabled() ? StpUtils.s_JitterFunc : TemporalAA.s_JitterFunc);
+        cameraData.SetViewProjectionAndJitterMatrix(viewMatrix:camera.worldToCameraMatrix, projectionMatrix, jitterMatrix);
+            //『cameraData.m_ViewMatrix = viewMatrix;
+            //『cameraData.m_ProjectionMatrix = projectionMatrix;
+            //『cameraData.m_JitterMatrix = jitterMatrix;
+        cameraData.worldSpaceCameraPos = camera.transform.position;
+
+        cameraData.backgroundColor = CoreUtils.ConvertSRGBToActiveColorSpace(camera.backgroundColor); //『return (QualitySettings.activeColorSpace == ColorSpace.Linear) ? color.linear : color;
+        cameraData.isAlphaOutputEnabled &= !cameraData.postProcessEnabled || (cameraData.postProcessEnabled && asset.allowPostProcessAlphaOutput);
     }
-
-    desc.msaaSamples = msaaSamples;
-    desc.enableRandomWrite = false;
-    desc.bindMS = false;
-    desc.useDynamicScale = camera.allowDynamicResolution;
-
-    return desc;
-}
-```
-
-```csharp
-InitializeAdditionalCameraData
-```
+    ```
