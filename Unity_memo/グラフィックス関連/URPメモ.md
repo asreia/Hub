@@ -378,11 +378,11 @@
             RTHandles.SetReferenceSize(cameraData.cameraTargetDescriptor.width, cameraData.cameraTargetDescriptor.height);
 
             //`frameData`を初期化する====
-            UniversalLightData lightData; UniversalShadowData shadowData; CullContextData cullData;
+            UniversalLightData lightData; UniversalShadowData shadowData;
             // cullResults のコピーを避けるため、UniversalRenderingData はここで作成する必要があります。
             var data = frameData.Create<UniversalRenderingData>();
             data.cullResults = context.Cull(ref cullingParameters);
-            RenderingMode? renderingMode = (cameraData.renderer as UniversalRenderer)?.renderingModeActual;
+            RenderingMode? renderingMode = (cameraData.renderer as UniversalRenderer)?.renderingModeActual; //Forward Plus しか想定してないから消していいかも
             using (new ProfilingScope(Profiling.Pipeline.initializeRenderingData))
             {
                 CreateUniversalResourceData(frameData);
@@ -390,7 +390,7 @@
                 shadowData = CreateShadowData(frameData, asset, renderingMode);
                 CreatePostProcessingData(frameData, asset);
                 CreateRenderingData(frameData, asset, cmd, renderingMode, cameraData.renderer);
-                cullData = CreateCullContextData(frameData, context);
+                CreateCullContextData(frameData, context);
             }
             CreateShadowAtlasAndCullShadowCasters(lightData, shadowData, cameraData, ref data.cullResults, ref context);
 
@@ -422,7 +422,7 @@
 
 ## frameData 作成
 
-- `Universal`**Camera**`Data`作成 (呼び出し元:`RenderCameraStack(context, camera, isLastBaseCamera)`)
+- `Universal`**Camera**`Data`作成 (呼び出し元:`RenderCameraStack`)
   - `static UCD CreateCameraData(＠❰overlay❱FrameData, baseCamera, baseCameraAdditionalData)`: `overlayCamera`時も`baseCamera`で設定する
     ```csharp (UniversalRenderPipeline.cs:1338)
     static UniversalCameraData CreateCameraData(ContextContainer frameData, Camera camera, UniversalAdditionalCameraData additionalCameraData)
@@ -592,3 +592,15 @@
         cameraData.isAlphaOutputEnabled &= !cameraData.postProcessEnabled || (cameraData.postProcessEnabled && asset.allowPostProcessAlphaOutput);
     }
     ```
+- `Universal`**Resource**`Data`作成 (呼び出し元:`RenderSingleCamera`)
+  - `static URD CreateUniversalResourceData(frameData)`
+    ```csharp  (UniversalRenderPipeline.cs:1904)
+    static UniversalResourceData CreateUniversalResourceData(ContextContainer frameData)
+    {
+        return frameData.Create<UniversalResourceData>();
+    }
+    ```
+- `Universal`**Light**`Data`作成 (呼び出し元:`RenderSingleCamera`)
+  - `static ULD CreateLightData(frameData, asset, data.cullResults.visibleLights, renderingMode)`
+```csharp
+```
