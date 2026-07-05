@@ -25,6 +25,21 @@
   - [⟪｡⟪カラー¦デプス⟫バッファ｡¦｡プラットフォーム｡⟫でフォーマットがサポートされない場合はエラー](images\Format選定.png)
 - `rt`の生成
   - 基本的には`rt.Create()`は実際は何も**作っていない**！。`rt.Create()`関係なく`SetRenderTarget(..)`など必要時に**必要な⟪デプス¦カラー⟫バッファのみ生成**される。
+- `RenderTextureFormat rt.format`との比較時の挙動
+  ```csharp
+  public RenderTextureFormat format
+  {
+      get
+      {
+          if (graphicsFormat != GraphicsFormat.None)
+              return GraphicsFormatUtility.GetRenderTextureFormat(graphicsFormat);
+          else //確か、`⟦ && ┃rt.⟪graphics¦depthStencil⟫Format == GraphicsFormat.None⟧`の場合は`rt.depthStencilFormat`が自動的に作られる
+              return GetDescriptor().shadowSamplingMode != ShadowSamplingMode.None
+                  ? RenderTextureFormat.Shadowmap
+                  : RenderTextureFormat.Depth; //`rt.graphicsFormat == GraphicsFormat.None && rt.descriptor.shadowSamplingMode == ShadowSamplingMode.None`
+      }
+  }
+  ```
 
 ## ClearRenderTarget
 
