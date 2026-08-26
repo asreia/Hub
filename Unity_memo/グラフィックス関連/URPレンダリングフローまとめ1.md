@@ -12,7 +12,7 @@
         useRenderPassEnabled = renderGraph.nativeRenderPassesEnabled;
         MotionVectorRenderPass.SetRenderGraphMotionVectorGlobalMatrices(renderGraph, cameraData); //『保留
 
-        SetupRenderGraphLights(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>());
+        m_ForwardLights.SetupRenderGraphLights(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>());
 
         RequireResults requireResults = CreateCameraRenderTargets(renderGraph, cameraData, frameData.Get<UniversalPostProcessingData>().isEnabled);
 
@@ -31,7 +31,457 @@
         OnAfterRendering(renderGraph, requireResults.applyPostProcessing);
     }
     ```
+  - `void m_ForwardLights.`**SetupRenderGraphLights**`(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>())`
+    ```csharp (images\ForwardLights\SetupLights.png)
+    void SetupRenderGraphLights(RenderGraph renderGraph, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+    {
+        using (var builder = renderGraph.AddUnsafePass<SetupLightPassData>(s_SetupForwardLights.name, out var passData, s_SetupForwardLights))
+        {
+            passData.renderingData = renderingData;
+            passData.cameraData = cameraData;
+            passData.lightData = lightData;
 
+            builder.AllowPassCulling(false);
+
+            builder.SetRenderFunc((SetupLightPassData data, UnsafeGraphContext rgContext) =>
+            {
+                SetupLights(rgContext.cmd, data.renderingData, data.cameraData, data.lightData);
+                void SetupLights(UnsafeCommandBuffer cmd, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+                {
+                    using (new ProfilingScope(m_ProfilingSampler))
+                    {
+                        //『Forward+機構 と ReflectionProbeの`.UpdateGpuData`
+                        if (m_UseForwardPlus)
+                        {
+                            if (lightData.reflectionProbeAtlas)
+                            {
+                                m_ReflectionProbeManager.UpdateGpuData(CommandBufferHelpers.GetNativeCommandBuffer(cmd), ref renderingData.cullResults);
+                            }
+
+                            using (new ProfilingScope(m_ProfilingSamplerFPComplete))
+                            {
+                                m_CullingHandle.Complete();
+                            }
+
+                            using (new ProfilingScope(m_ProfilingSamplerFPUpload))
+                            {
+                                //『画像参照
+                                m_ZBinsBuffer.SetData(m_ZBins.Reinterpret<float4>(UnsafeUtility.SizeOf<uint>()));
+                                m_TileMasksBuffer.SetData(m_TileMasks.Reinterpret<float4>(UnsafeUtility.SizeOf<uint>()));
+                                cmd.SetGlobalConstantBuffer(m_ZBinsBuffer, "urp_ZBinBuffer", 0, UniversalRenderPipeline.maxZBinWords * 4);
+                                cmd.SetGlobalConstantBuffer(m_TileMasksBuffer, "urp_TileBuffer", 0, UniversalRenderPipeline.maxTileWords * 4);
+                            }
+
+                            //『viewZ=dot(ViewForward, PosWS - CameraPositionWS), ZBinIndex=(Perspective ? log2(viewZ) : viewZ) * x + y, z=ProbeBegin
+                            cmd.SetGlobalVector("_FPParams0", math.float4(m_ZBinScale, m_ZBinOffset, m_LightCount, m_DirectionalLightCount));
+                            //『TileXY=uint2(ScreenUV * xy),  TileIndex=TileY * z + TileX,  TileWordsOffset=TileIndex * w
+                            cmd.SetGlobalVector("_FPParams1", math.float4(cameraData.pixelRect.size / m_ActualTileWidth, m_TileResolution.x, m_WordsPerTile));
+                            //『ZBinOffset=min(ZBinIndex, x - 1) * (WordsPerTile + 2❰header❱),  y=TotalTileCount
+                            cmd.SetGlobalVector("_FPParams2", math.float4(m_BinCount, m_TileResolution.x * m_TileResolution.y, 0, 0));
+                            //『ClusterInit(ScreenUV, PosWS, h)EntityIndex=⟪h=0:0❰Light❱¦h=1:ProbeBegin⟫, WordInMask=EntityIndex/32, BitInWord=EntityIndex%32
+                            //『wordIndex=⟪TileWordsOffset¦ZBinOffset + 2❰header❱⟫+WordInMask   (直感的にはこんな感じ)
+                            //『urp_⟪ZBin ∩ Tile⟫Buffer[wordIndex/4][wordIndex%4]>>BitInWord ～ ⟪<<ProbeBegin¦<<(WordsPerTile*32 - ProbeBegin)⟫
+                        }
+                        cmd.SetKeyword(ShaderGlobalKeywords.ClusterLightLoop, m_UseForwardPlus);
+                        //『`lightData.visibleLights`から`cmd`で`._MainLight～`と`_AdditionalLights～[]`を設定
+                        SetupShaderLightConstants(cmd, ref renderingData.cullResults, lightData);
+                        //『AdditionalLightsPixel
+                        bool lightCountCheck = (cameraData.renderer.stripAdditionalLightOffVariants/*`％true`*/ && lightData.supportsAdditionalLights) || lightData.additionalLightsCount > 0;
+                        cmd.SetKeyword(ShaderGlobalKeywords.AdditionalLightsPixel, lightCountCheck);//『`.～Vertex`はcullした
+
+                        //『Mixed Lighting
+                        bool isShadowMask = lightData.supportsMixedLighting && m_MixedLightingSetup == MixedLightingSetup.ShadowMask;
+                        bool isShadowMaskAlways = isShadowMask && QualitySettings.shadowmaskMode == ShadowmaskMode.Shadowmask;
+                        bool isSubtractive = lightData.supportsMixedLighting && m_MixedLightingSetup == MixedLightingSetup.Subtractive;
+                        cmd.SetKeyword(ShaderGlobalKeywords.LightmapShadowMixing, isSubtractive || isShadowMaskAlways);
+                        cmd.SetKeyword(ShaderGlobalKeywords.ShadowsShadowMask, isShadowMask);
+                        cmd.SetKeyword(ShaderGlobalKeywords.MixedLightingSubtractive, isSubtractive); // 後方互換性のため。
+
+                        //『Reflection Probe
+                        cmd.SetKeyword(ShaderGlobalKeywords.ReflectionProbeBlending, lightData.reflectionProbeBlending);
+                        cmd.SetKeyword(ShaderGlobalKeywords.ReflectionProbeBoxProjection, lightData.reflectionProbeBoxProjection);
+                        cmd.SetKeyword(ShaderGlobalKeywords.ReflectionProbeAtlas, lightData.reflectionProbeAtlas && m_UseForwardPlus && lightData.reflectionProbeBlending); // シェーダーストリッピングの条件と一致させる必要があります。
+                        if (GraphicsSettings.TryGetRenderPipelineSettings<URPReflectionProbeSettings>(out var reflectionProbeSettings))
+                            cmd.SetKeyword(ShaderGlobalKeywords.ReflectionProbeRotation, reflectionProbeSettings.UseReflectionProbeRotation);
+                        else
+                            cmd.SetKeyword(ShaderGlobalKeywords.ReflectionProbeRotation, false);
+
+                        //『Light Layers
+                        cmd.SetKeyword(ShaderGlobalKeywords.LightLayers, lightData.supportsLightLayers);
+
+
+                        //『APV
+                        var asset = UniversalRenderPipeline.asset;
+                        bool apvIsEnabled = asset != null && asset.lightProbeSystem == LightProbeSystem.ProbeVolumes;
+                        ProbeVolumeSHBands probeVolumeSHBands = asset.probeVolumeSHBands; //『`[SerializeField]`初期値は`.SphericalHarmonicsL1`
+                        cmd.SetKeyword(ShaderGlobalKeywords.ProbeVolumeL1, apvIsEnabled && probeVolumeSHBands == ProbeVolumeSHBands.SphericalHarmonicsL1);
+                        cmd.SetKeyword(ShaderGlobalKeywords.ProbeVolumeL2, apvIsEnabled && probeVolumeSHBands == ProbeVolumeSHBands.SphericalHarmonicsL2);
+                        var shMode = PlatformAutoDetect.ShAutoDetect(asset.shEvalMode); //『`ShAutoDetect(..)`:`％.Auto`のとき、モバイル:`.PerVertex`,非モバイル:`.PerPixel`
+                        cmd.SetKeyword(ShaderGlobalKeywords.EVALUATE_SH_MIXED, shMode == ShEvalMode.Mixed);
+                        cmd.SetKeyword(ShaderGlobalKeywords.EVALUATE_SH_VERTEX, shMode == ShEvalMode.PerVertex);
+                        var stack = VolumeManager.instance.stack;
+                        bool enableProbeVolumes = ProbeReferenceVolume.instance.UpdateShaderVariablesProbeVolumes( //『これもAPVっぽい
+                            CommandBufferHelpers.GetNativeCommandBuffer(cmd),
+                            stack.GetComponent<ProbeVolumesOptions>(),
+                            cameraData.IsTemporalAAEnabled() ? Time.frameCount : 0,
+                            lightData.supportsLightLayers);
+                        cmd.SetGlobalInt("_EnableProbeVolumes", enableProbeVolumes ? 1 : 0);
+
+                        //『Cookie
+                        if (m_LightCookieManager != null)
+                            m_LightCookieManager.Setup(CommandBufferHelpers.GetNativeCommandBuffer(cmd), lightData);
+                        else
+                            cmd.SetKeyword(ShaderGlobalKeywords.LightCookies, false);
+
+                        //『Light Map
+                        if (GraphicsSettings.TryGetRenderPipelineSettings<LightmapSamplingSettings>(out var lightmapSamplingSettings))
+                            cmd.SetKeyword(ShaderGlobalKeywords.LIGHTMAP_BICUBIC_SAMPLING, lightmapSamplingSettings.useBicubicLightmapSampling);
+                        else
+                            cmd.SetKeyword(ShaderGlobalKeywords.LIGHTMAP_BICUBIC_SAMPLING, false);
+                    }
+                }
+            });
+        }
+    }
+    ```
+    - `void m_ReflectionProbeManager.UpdateGpuData(CommandBufferHelpers.GetNativeCommandBuffer(cmd), ref renderingData.cullResults)`
+        ```csharp (images\ForwardLights\ReflectionProbeManager\UpdateGpuData.png)
+        struct ReflectionProbeManager : IDisposable
+        {
+            int2 m_Resolution; //『現在のAtlasテクスチャの解像度
+            RenderTexture m_AtlasTexture0; //『`probe.texture`を八面体で詰めるAtlasテクスチャ
+            RenderTexture m_AtlasTexture1; //『一時的にAtlasテクスチャ(`m_AtlasTexture0`)の拡張時に使われるswap用変数
+            BuddyAllocator m_AtlasAllocator; //『Atlasテクスチャの領域管理に使用する住所システム。(`level`は区画の大きさ(MipLvと相対的), `index`はその`level`内のindex)
+            Dictionary<EntityId, CachedProbe> m_Cache; //『これに含まれてるならば、Atlasテクスチャにその`cachedProbe`は含まれている
+            List<EntityId> m_NeedsUpdate; //『Atlasテクスチャの更新に使用する`probe`(`id = probe.reflectionProbe.GetEntityId()`)
+            List<EntityId> m_NeedsRemove;
+
+            // 定数バッファへ値を設定(`cmd`)する際に使用する、事前確保済みの配列 //『恐らく事前確保のためにフィールドに出してるだけ
+            Vector4[] m_～;
+
+            const int k_MaxMipCount = 7;
+            const string k_ReflectionProbeAtlasName = "URP Reflection Probe Atlas";
+
+            unsafe struct CachedProbe //『Atlasテクスチャ(`m_AtlasTexture0`)の更新を管理するための`probe`のキャッシュ
+            {
+                public uint updateCount; //『`probe.texture.updateCount`
+                public int size; //『`probe.texture.width`
+                public int mipCount; //『`math.min(math.ceillog2(probe.texture.width * 4) + 1, k_MaxMipCount)`
+                //『`m_AtlasAllocator.TryAllocate(mipLevel, out var allocation)`。(`BuddyAllocation allocation`構造体を各フィールドに分けて格納する)
+                public fixed int dataIndices[k_MaxMipCount];
+                public fixed int levels[k_MaxMipCount];
+                public Texture texture; //『`probe.texture`
+                public int lastUsed;
+                public Vector4 hdrData;
+            }
+
+            public static ReflectionProbeManager Create()
+            {
+                var instance = new ReflectionProbeManager();
+                instance.Init();
+                return instance;
+            }
+
+            void Init()
+            {
+                var maxProbes = UniversalRenderPipeline.maxVisibleReflectionProbes;
+                m_Resolution = 1;
+                var format = GraphicsFormat.B10G11R11_UFloatPack32;
+                if (!SystemInfo.IsFormatSupported(format, GraphicsFormatUsage.Render)) { format = GraphicsFormat.R16G16B16A16_SFloat; }
+                m_AtlasTexture0 = new RenderTexture(new RenderTextureDescriptor
+                {
+                    width = m_Resolution.x,
+                    height = m_Resolution.y,
+                    volumeDepth = 1,
+                    dimension = TextureDimension.Tex2D,
+                    graphicsFormat = format,
+                    useMipMap = false,
+                    msaaSamples = 1
+                })
+                {
+                    name = k_ReflectionProbeAtlasName, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave
+                };
+                m_AtlasTexture0.Create();
+
+                m_AtlasTexture1 = new RenderTexture(m_AtlasTexture0.descriptor)
+                {
+                    name = k_ReflectionProbeAtlasName, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave
+                };
+
+                // 確保可能な最小解像度は4x4とする。レベル数は次の式で計算する。
+                // log2(最大値) - log2(4) = log2(最大値) - 2
+                m_AtlasAllocator = new BuddyAllocator(math.floorlog2(SystemInfo.maxTextureSize) - 2, 2);
+                m_Cache = new Dictionary<EntityId, CachedProbe>(maxProbes);
+                m_Needs～ = new List<EntityId>(maxProbes);
+                m_～ = new Vector4[maxProbes];
+            }
+
+            //『`m_Cache`に含まれる`probe = cullResults.visibleReflectionProbes[～]`の`probe.texture`を八面体にしてAtlasテクスチャ(`m_AtlasTexture0`)に詰め、`probe`の情報とAtlasテクスチャを`cmd`でシェーダーに送る。
+            public unsafe void UpdateGpuData(CommandBuffer cmd, ref CullingResults cullResults)
+            {
+                var probes = cullResults.visibleReflectionProbes;
+                var probeCount = math.min(probes.Length, UniversalRenderPipeline.maxVisibleReflectionProbes/*64*/);
+                var frameIndex = Time.renderedFrameCount;
+
+                //『変更または古い`cachedProbe`の区画解放＆`m_Cache`から削除
+                foreach (var (id, cachedProbe) in m_Cache)
+                {
+                    // 1フレームを超えて使用されていない、テクスチャが存在しなくなった、またはサイズが変わったプローブをキャッシュから破棄する。
+                    if (Math.Abs(cachedProbe.lastUsed - frameIndex) > 1 || //『最後に使用したフレームから2フレーム後に破棄される
+                        !cachedProbe.texture ||
+                        cachedProbe.size != cachedProbe.texture.width)
+                    {
+                        m_NeedsRemove.Add(id);
+                        for (var i = 0; i < k_MaxMipCount; i++)
+                        {
+                            if (cachedProbe.dataIndices[i] != -1) m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                        }
+                    }
+                }
+                foreach (var probeIndex in m_NeedsRemove)
+                {
+                    m_Cache.Remove(probeIndex);
+                }
+                m_NeedsRemove.Clear();
+
+                var requiredAtlasSize = math.int2(0, 0);
+
+                //『`probes[]`(`probe`)を素に`m_Cache[]`(`cachedProbe`)を更新する
+                for (var probeIndex = 0; probeIndex < probeCount; probeIndex++)
+                {
+                    var probe = probes[probeIndex];
+                    var texture = probe.texture;
+                    var id = probe.reflectionProbe.GetEntityId();
+                    var wasCached = m_Cache.TryGetValue(id, out var cachedProbe);
+
+                    if (!texture) continue;
+
+                    if (!wasCached) //『`m_Cache`に登録されていない`probe`情報を`cachedProbe`に設定する。(後で`m_Cache[id] = cachedProbe`される)
+                    {
+                        cachedProbe.size = texture.width;
+                        var mipCount = math.ceillog2(cachedProbe.size * 4) + 1; //『←↓`*4`とか`+2`とか深く考えない
+                        var level = m_AtlasAllocator.levelCount + 2 - mipCount;
+                        cachedProbe.mipCount = math.min(mipCount, k_MaxMipCount);
+                        cachedProbe.texture = texture;
+
+                        var mip = 0;
+                        for (; mip < cachedProbe.mipCount; mip++)
+                        {
+                            // 最大レベルに制限する。これは64x64以下の場合に関係し、その場合は1x1ミップにも有効な内容が存在する。
+                            // 八面体のサイズは面サイズの2倍なので、最終的に2x2となる。境界を考慮すると、八面体用に2x2テクセルを
+                            // 残すため、最終ミップは4x4でなければならない。
+                            var mipLevel = math.min(level + mip, m_AtlasAllocator.levelCount - 1);
+                            if (!m_AtlasAllocator.TryAllocate(mipLevel, out var allocation)) break;
+                            // C#では構造体型の固定長配列を使用できないため、allocation構造体を各フィールドに分けて格納する :(
+                            cachedProbe.levels[mip] = allocation.level;
+                            cachedProbe.dataIndices[mip] = allocation.index;
+                            //『`.level`と`index`から`ScaleOffset(UV空間0～1)`を算出し、そこにAtlas解像度(`m_Resolution.xyxy`)を乗算して、AtlasテクスチャPixel空間(`scaleOffset`)にする
+                            var scaleOffset = (int4)(GetScaleOffset(mipLevel, allocation.index, true, false) * m_Resolution.xyxy); //『`mipLevel == allocation.level`
+                            requiredAtlasSize = math.max(requiredAtlasSize, scaleOffset.zw + scaleOffset.xy); //『Atlasテクスチャに詰め込む八面体の右上(.zw + .xy)の最大位置
+                        }
+
+                        // アトラスの空き領域が不足したか確認する。//『`.TryAllocate(..)`で`break`したか?
+                        if (mip < cachedProbe.mipCount)
+                        {
+                            for (var i = 0; i < mip; i++) m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                            for (var i = 0; i < k_MaxMipCount; i++) cachedProbe.dataIndices[i] = -1; //『←↑全ての`mip`が`.TryAllocate(..)`できないならば全て解放する
+                            continue;
+                        }
+
+                        for (; mip < k_MaxMipCount; mip++)
+                        {
+                            cachedProbe.dataIndices[mip] = -1; //『`cachedProbe.mipCount`を超える残りの`mip`範囲(`k_MaxMipCount`まで)を未使用(`-1`)にする
+                        }
+                    }
+
+                    var needsUpdate = !wasCached || cachedProbe.updateCount != texture.updateCount || cachedProbe.hdrData != probe.hdrData;
+
+                    if (needsUpdate)
+                    {
+                        cachedProbe.updateCount = texture.updateCount;
+                        m_NeedsUpdate.Add(id);
+                    }
+
+                    // プローブが毎フレーム更新に設定されている場合、次のフレームで破棄されるよう最終使用フレームを-1にする。
+                    if (probe.reflectionProbe.mode == ReflectionProbeMode.Realtime && probe.reflectionProbe.refreshMode == ReflectionProbeRefreshMode.EveryFrame)
+                        cachedProbe.lastUsed = -1;
+                    else
+                        cachedProbe.lastUsed = frameIndex;
+
+                    cachedProbe.hdrData = probe.hdrData;
+                    m_Cache[id] = cachedProbe;
+                }
+
+                // 現在の割り当てを収容できる大きさがなければ、アトラスを拡張する。
+                if (math.any(m_Resolution < requiredAtlasSize)) //『`int2.xy`の片方が`true`なら`true`
+                {
+                    requiredAtlasSize = math.max(m_Resolution, math.ceilpow2(requiredAtlasSize)); //『`int2.xy`のどちらかの最大値をとるので`max(..)`を使う
+                    m_AtlasTexture1.width = requiredAtlasSize.x; m_AtlasTexture1.height = requiredAtlasSize.y;
+                    m_AtlasTexture1.Create();
+
+                    if (m_AtlasTexture0.width != 1)
+                    {
+                        Graphics.CopyTexture(m_AtlasTexture0, 0, 0, 0, 0, m_Resolution.x, m_Resolution.y, m_AtlasTexture1, 0, 0, 0, 0);
+                    }
+
+                    m_AtlasTexture0.Release();
+                    (m_AtlasTexture0, m_AtlasTexture1) = (m_AtlasTexture1, m_AtlasTexture0); //『0⇆1 swap
+                    m_Resolution = requiredAtlasSize;
+                }
+
+                var skipCount = 0;
+                //『`probes[probeIndex]`から`cmd`設定用の`m_～[dataIndex]`へセットする
+                for (var probeIndex = 0; probeIndex < probeCount; probeIndex++)
+                {
+                    var probe = probes[probeIndex];
+                    var id = probe.reflectionProbe.GetEntityId();
+                    var dataIndex = probeIndex - skipCount;
+                        //『Q:シェーダー側でprobeIndexとdataIndexが異なっても正しく参照できるのか?
+                        //『A:基本的にForward+機構の並べ替えによって合わせられるが、`.TryAllocate`失敗時は不整合になり得る。つまりindexがForward+機構側と連携できていない。
+                            //『`probes[probeIndex - skipCount] = probe;`をクラスタ構築前に行う必要がある(ムリ)
+                    if (!m_Cache.TryGetValue(id, out var cachedProbe) || !probe.texture)
+                    {
+                        skipCount++;
+                        continue;
+                    }
+                    m_BoxMax[dataIndex] = new Vector4(probe.bounds.max.x, probe.bounds.max.y, probe.bounds.max.z, probe.blendDistance); //『Blend Distance
+                    m_BoxMin[dataIndex] = new Vector4(probe.bounds.min.x, probe.bounds.min.y, probe.bounds.min.z, probe.importance); //『Importance
+                    m_ProbePosition[dataIndex] = new Vector4(probe.localToWorldMatrix.m03, probe.localToWorldMatrix.m13, probe.localToWorldMatrix.m23, (probe.isBoxProjection ? 1 : -1) * (cachedProbe.mipCount));//『Box Projection有無 + ミップ数
+                    //『`atlasUV = probeUV(八面体) * scaleOffset.xy + scaleOffset.zw;`: Probe内のUVをAtlas全体のUVへ変換します。
+                    for (var i = 0; i < cachedProbe.mipCount; i++) m_MipScaleOffset[dataIndex * k_MaxMipCount + i] = GetScaleOffset(cachedProbe.levels[i], cachedProbe.dataIndices[i], false, false);
+                    var rot = Quaternion.Inverse(probe.reflectionProbe.transform.rotation);
+                    m_Rotations[dataIndex] = new Vector4(rot.x, rot.y, rot.z, rot.w);
+                }
+
+                //『`m_NeedsUpdate`の`cachedProbe`を八面体にしてAtlasテクスチャ(`m_AtlasTexture0`)へ描画し、`m_～[dataIndex]`にセットされた値を`cmd`に設定しシェーダーへ送る
+                using (new ProfilingScope(cmd, ProfilingSampler.Get(URPProfileId.UpdateReflectionProbeAtlas)))
+                {
+                    cmd.SetRenderTarget(m_AtlasTexture0);
+
+                    foreach (var probeId in m_NeedsUpdate)
+                    {
+                        var cachedProbe = m_Cache[probeId];
+                        for (var mip = 0; mip < cachedProbe.mipCount; mip++)
+                        {
+                            var level = cachedProbe.levels[mip];
+                            var dataIndex = cachedProbe.dataIndices[mip];
+                            // Y反転が必要な場合は、更新頻度の低いアトラス側を反転する。これにより参照座標が正しくなる。
+                            // そのため、シェーダーコードで参照座標をY反転する必要がなくなる。
+                            var scaleBias = GetScaleOffset(level, dataIndex, true, !SystemInfo.graphicsUVStartsAtTop); //『`.level`と`index`から`ScaleOffset(UV空間0～1)`を算出 (多分VertexShaderでクワッド範囲(`positionCS`)に使用)
+                            var sizeWithoutPadding = (1 << (m_AtlasAllocator.levelCount + 1 - level)) - 2; //『多分PixelShaderで`cachedProbe.texture`サンプリング時に使用
+                            //『`cachedProbe.texture`を八面体にして`m_AtlasTexture0`へ描画
+                            Blitter.BlitCubeToOctahedral2DQuadWithPadding(cmd, cachedProbe.texture, new Vector2(sizeWithoutPadding, sizeWithoutPadding), scaleBias, mip, true, 2, cachedProbe.hdrData);
+                        }
+                    }
+                    //『`m_～[dataIndex]`にセットされた値を`cmd`に設定しシェーダーへ送る
+                    cmd.SetGlobalVectorArray(Shader.PropertyToID("urp_ReflProbes_BoxMin"), m_BoxMin);
+                    cmd.SetGlobalVectorArray(Shader.PropertyToID("urp_ReflProbes_BoxMax"), m_BoxMax);
+                    cmd.SetGlobalVectorArray(Shader.PropertyToID("urp_ReflProbes_ProbePosition"), m_ProbePosition);
+                    cmd.SetGlobalVectorArray(Shader.PropertyToID("urp_ReflProbes_MipScaleOffset"), m_MipScaleOffset);
+                    cmd.SetGlobalVectorArray(Shader.PropertyToID("urp_ReflProbes_Rotation"), m_Rotations);
+                    cmd.SetGlobalFloat(Shader.PropertyToID("urp_ReflProbes_Count"), probeCount - skipCount); //『シェーダーで使われていない
+                    cmd.SetGlobalTexture(Shader.PropertyToID("urp_ReflProbes_Atlas"), m_AtlasTexture0);
+                }
+
+                m_NeedsUpdate.Clear();
+            }
+
+            float4 GetScaleOffset(int level, int dataIndex, bool includePadding, bool yflip) //『`.level`と`index`から`ScaleOffset(UV空間0～1)`を算出
+            {
+                // level = m_AtlasAllocator.levelCount + 2 - (log2(size) + 1) <=>
+                // log2(size) + 1 = m_AtlasAllocator.levelCount + 2 - level <=>
+                // log2(size) = m_AtlasAllocator.levelCount + 1 - level <=>
+                // size = 2^(m_AtlasAllocator.levelCount + 1 - level)
+                var size = (1 << (m_AtlasAllocator.levelCount + 1 - level));
+                var coordinate = SpaceFillingCurves.DecodeMorton2D((uint)dataIndex);
+                var scale = (size - (includePadding ? 0 : 2)) / ((float2)m_Resolution);
+                var bias = ((float2) coordinate * size + (includePadding ? 0 : 1)) / (m_Resolution);
+                if (yflip) bias.y = 1.0f - bias.y - scale.y;
+                return math.float4(scale, bias);
+            }
+
+            public void Dispose(){～}
+        }
+        ```
+    - `void SetupShaderLightConstants(cmd, ref renderingData.cullResults, lightData)`
+        ```csharp (images\ForwardLights\SetupShaderLightConstants\SetupShaderLightConstants.png)
+        void SetupShaderLightConstants(UnsafeCommandBuffer cmd, ref CullingResults cullResults, UniversalLightData lightData)
+        {
+            m_MixedLightingSetup = MixedLightingSetup.None;
+
+            SetupMainLightConstants(cmd, lightData);
+            SetupAdditionalLightConstants(cmd, lightData);
+        }
+        ```
+      - `void SetupMainLightConstants(cmd, lightData)`
+        ```csharp
+        void SetupMainLightConstants(UnsafeCommandBuffer cmd, UniversalLightData lightData)
+        {
+            InitializeLightConstants
+            (
+                lightData.visibleLights,
+                lightData.mainLightIndex,
+                lightData.supportsLightLayers,
+                out Vector4 lightPos,
+                out Vector4 lightColor, out Vector4 _, out Vector4 _,
+                out Vector4 lightOcclusionChannel,
+                out uint lightLayerMask,
+                out bool isSubtractive
+            );
+            lightColor.w = isSubtractive ? 0f : 1f;
+
+            cmd.SetGlobalVector(LightConstantBuffer._MainLightPosition, lightPos);
+            cmd.SetGlobalVector(LightConstantBuffer._MainLightColor, lightColor);
+            cmd.SetGlobalVector(LightConstantBuffer._MainLightOcclusionProbesChannel, lightOcclusionChannel);
+            if (lightData.supportsLightLayers) cmd.SetGlobalInt(LightConstantBuffer._MainLightLayerMask, (int)lightLayerMask);
+        }
+        ```
+      - `void SetupAdditionalLightConstants(cmd, lightData)`
+        ```csharp
+        void SetupAdditionalLightConstants(UnsafeCommandBuffer cmd, UniversalLightData lightData)
+        {
+            if (lightData.additionalLightsCount > 0)
+            {
+                if (m_UseStructuredBuffer)
+                {
+                    //『現在は`false`なので中身cull。codex→5.6Sol:「StructuredBuffer 自体に対応しているかどうか」ではなく、
+                        //『プラットフォームごとの性能・Vulkan のバインディング問題・D3D のシェーダー分岐問題があるので、今は一律 false にして UBO 系の経路を使っている
+                }
+                else
+                {
+                    for (int i = 0, lightIter = 0; i < lightData.visibleLights.Length && lightIter < UniversalRenderPipeline.maxVisibleAdditionalLights/*256*/; ++i)
+                    {
+                        if (lightData.mainLightIndex != i)
+                        {
+                            InitializeLightConstants //『中身はcull。見たかったらその時に参照すれば良い
+                            (
+                                lightData.visibleLights,
+                                i,
+                                lightData.supportsLightLayers,
+                                out m_AdditionalLightPositions[lightIter], //『配列も`UniversalRenderPipeline.maxVisibleAdditionalLights/*256*/`で確保されている
+                                out m_AdditionalLightColors[lightIter],
+                                out m_AdditionalLightAttenuations[lightIter],
+                                out m_AdditionalLightSpotDirections[lightIter],
+                                out m_AdditionalLightOcclusionProbeChannels[lightIter],
+                                out uint lightLayerMask,
+                                out var isSubtractive
+                            );
+                            if (lightData.supportsLightLayers) m_AdditionalLightsLayerMasks[lightIter] = math.asfloat(lightLayerMask);
+                            m_AdditionalLightColors[lightIter].w = isSubtractive ? 1f : 0f;
+                            lightIter++;
+                        }
+                    }
+
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsPosition, m_AdditionalLightPositions);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsColor, m_AdditionalLightColors);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsAttenuation, m_AdditionalLightAttenuations);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightsSpotDir, m_AdditionalLightSpotDirections);
+                    cmd.SetGlobalVectorArray(LightConstantBuffer._AdditionalLightOcclusionProbeChannel, m_AdditionalLightOcclusionProbeChannels);
+                    if (lightData.supportsLightLayers) cmd.SetGlobalFloatArray(LightConstantBuffer._AdditionalLightsLayerMasks, m_AdditionalLightsLayerMasks);
+                }
+            }
+        }
+        ```
   - `RequireResults` **CreateCameraRenderTargets**`(renderGraph, cameraData, frameData.Get<UniversalPostProcessingData>().isEnabled)`: 自作の外部関数化コード
     ```csharp (UniversalRendererRenderGraph.cs)
     RequireResults CreateCameraRenderTargets(RenderGraph renderGraph, UniversalCameraData cameraData, bool postProcessingEnabled)
@@ -600,3 +1050,277 @@
                     }
                 }
                 ```
+  - `void OnBeforeRendering(renderGraph)`
+    - `void m_ForwardLights.`**PreSetup**`(renderingData, cameraData, lightData)`
+        ```csharp
+        void PreSetup(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
+        {
+            //『`NativeArray`と`GraphicsBuffer`を初期化、cameraの○⟦と ┃⟪`View¦`Projection⟫Matrix`⟧を設定して`ScheduleClusteringJobs(..)`を呼ぶだけ
+            if (m_UseForwardPlus)
+            {
+                using var _ = new ProfilingScope(m_ProfilingSamplerFPSetup);
+
+                if (!m_CullingHandle.IsCompleted)
+                {
+                    throw new InvalidOperationException("Forward+ のジョブがまだ完了していません。");
+                }
+
+                if (m_TileMasks.Length != UniversalRenderPipeline.maxTileWords)
+                {
+                    m_ZBins.Dispose();
+                    m_ZBinsBuffer.Dispose();
+                    m_TileMasks.Dispose();
+                    m_TileMasksBuffer.Dispose();
+                    //『CreateForwardPlusBuffers();
+                    m_ZBins = new NativeArray<uint>(UniversalRenderPipeline.maxZBinWords, Allocator.Persistent);
+                    m_ZBinsBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Constant, UniversalRenderPipeline.maxZBinWords / 4, UnsafeUtility.SizeOf<float4>());
+                    m_ZBinsBuffer.name = "URP Z-Bin Buffer";
+                    m_TileMasks = new NativeArray<uint>(UniversalRenderPipeline.maxTileWords, Allocator.Persistent);
+                    m_TileMasksBuffer = new GraphicsBuffer(GraphicsBuffer.Target.Constant, UniversalRenderPipeline.maxTileWords / 4, UnsafeUtility.SizeOf<float4>());
+                    m_TileMasksBuffer.name = "URP Tile Buffer";
+                }
+                else
+                {
+                    unsafe
+                    {
+                        //『`NativeArray`をゼロ初期化
+                        UnsafeUtility.MemClear(m_ZBins.GetUnsafePtr(), m_ZBins.Length * sizeof(uint));
+                        UnsafeUtility.MemClear(m_TileMasks.GetUnsafePtr(), m_TileMasks.Length * sizeof(uint));
+                    }
+                }
+
+                var viewCount = 1;
+                var worldToViews = new Fixed2<float4x4>(cameraData.GetViewMatrix(0), cameraData.GetViewMatrix(0)); //『←↓`[0]`しか参照しない
+                var viewToClips = new Fixed2<float4x4>(cameraData.GetProjectionMatrix(0), cameraData.GetProjectionMatrix(0));
+
+                m_CullingHandle = ScheduleClusteringJobs(
+                    lightData.mainLightIndex != -1,
+                    lightData.supportsAdditionalLights,
+                    lightData.visibleLights,
+                    renderingData.cullResults.visibleReflectionProbes,
+                    m_ZBins,
+                    m_TileMasks,
+                    worldToViews,
+                    viewToClips,
+                    viewCount,
+                    math.int2(cameraData.pixelWidth, cameraData.pixelHeight),
+                    cameraData.camera.nearClipPlane,
+                    cameraData.camera.farClipPlane,
+                    cameraData.camera.orthographic,
+                    out m_LightCount,
+                    out m_DirectionalLightCount,
+                    out m_BinCount,
+                    out m_ZBinScale,
+                    out m_ZBinOffset,
+                    out m_TileResolution,
+                    out m_ActualTileWidth,
+                    out m_WordsPerTile
+                );
+
+                JobHandle.ScheduleBatchedJobs();
+            }
+        }
+        ```
+      - `static JobHandle ScheduleClusteringJobs(lightData.mainLightIndex != -1, lightData.supportsAdditionalLights, lightData.visibleLights, renderingData.cullResults.visibleReflectionProbes, m_ZBins, m_TileMasks, worldToViews, viewToClips, viewCount, math.int2(cameraData.pixelWidth, cameraData.pixelHeight), cameraData.camera.nearClipPlane, cameraData.camera.farClipPlane, cameraData.camera.orthographic, out m_LightCount, out m_DirectionalLightCount, out m_BinCount, out m_ZBinScale, out m_ZBinOffset, out m_TileResolution, out m_ActualTileWidth, out m_WordsPerTile);`
+        ```csharp (images\ForwardLights\Forward+機構\Forward+機構0.png)
+        static JobHandle ScheduleClusteringJobs(
+            bool hasMainLight,
+            bool supportsAdditionalLights,
+            NativeArray<VisibleLight> lights,
+            NativeArray<VisibleReflectionProbe> probes,
+            NativeArray<uint> zBins,
+            NativeArray<uint> tileMasks,
+            Fixed2<float4x4> worldToViews,
+            Fixed2<float4x4> viewToClips,
+            int viewCount,
+            int2 screenResolution,
+            float nearClipPlane,
+            float farClipPlane,
+            bool isOrthographic,
+            out int localLightCount,
+            out int directionalLightCount,
+            out int binCount,
+            out float zBinScale,
+            out float zBinOffset,
+            out int2 tileResolution,
+            out int actualTileWidth,
+            out int wordsPerTile
+        )
+        {
+            localLightCount = supportsAdditionalLights ? lights.Length: 0;
+            // lights 配列には、最初に Directional Light、その後にローカルライトが格納されています。
+            // リストを走査して、最初のローカルライトのインデックスを探します。//『(`Forward+機構1.png`参照)
+            var firstLocalLightIdx = 0;
+            while (firstLocalLightIdx < localLightCount && lights[firstLocalLightIdx].lightType == LightType.Directional)
+            {
+                firstLocalLightIdx++;
+            }
+            localLightCount -= firstLocalLightIdx;
+
+            // Directional Light が 1 つ以上ある場合、そのうちの 1 つがメインライトである可能性があります。
+            if (firstLocalLightIdx > 0)
+            {
+
+                directionalLightCount = firstLocalLightIdx;
+                if (hasMainLight)
+                    directionalLightCount -= 1;
+            }
+            else
+            {
+                directionalLightCount = 0;
+            }
+
+            var localLights = lights.GetSubArray(firstLocalLightIdx, localLightCount); //『directionalを除いた`NativeArray<VisibleLight>`
+
+            var reflectionProbeCount = math.min(probes.Length, UniversalRenderPipeline.maxVisibleReflectionProbes);
+            // テクスチャのない Reflection Probe が使用されないようにします。
+            for (var i = 0; i < probes.Length; i++)
+            {
+                if (!probes[i].texture)
+                    reflectionProbeCount--;
+            }
+
+            var itemsPerTile = localLights.Length + reflectionProbeCount; //『⟪1Tile¦1bin⟫の`localLights + probes`数(全ての⟪1Tile¦1bin⟫に全てのitemを入れる)
+            wordsPerTile = (itemsPerTile + 31) / 32; //『⟪1Tile¦1bin⟫のuint(32,words)数
+
+            actualTileWidth = 8 >> 1;
+            do //『`.maxTileWords`に収まるようにTileサイズ(`actualTileWidth`)を2の累乗で大きくしていき`screenResolution`から`tileResolution`を決定する
+            {
+                actualTileWidth <<= 1;
+                tileResolution = (screenResolution + actualTileWidth - 1) / actualTileWidth;
+            }
+            while ((tileResolution.x * tileResolution.y * wordsPerTile * viewCount) > UniversalRenderPipeline.maxTileWords);
+
+            if (!isOrthographic) //『シェーダーのビュー空間で`log2(viewZ)`から`binIndex`を計算するための係数群。(`Forward+機構2.png`参照)
+            {
+                //『`float viewZ = dot(GetViewForwardDir(), positionWS - GetCameraPositionWS())`: ビューベクトルからカメラフォワードへの射影
+                // binIndex = log2(viewZ) * zBinScale + zBinOffset の計算に使用します。
+                zBinScale = (UniversalRenderPipeline.maxZBinWords / viewCount) / ((math.log2(farClipPlane) - math.log2(nearClipPlane)) * (2 + wordsPerTile));
+                zBinOffset = -math.log2(nearClipPlane) * zBinScale;
+                binCount = (int)(math.log2(farClipPlane) * zBinScale + zBinOffset);
+            }
+            else
+            {
+                // binIndex = z * zBinScale + zBinOffset の計算に使用します。
+                zBinScale = (UniversalRenderPipeline.maxZBinWords / viewCount) / ((farClipPlane - nearClipPlane) * (2 + wordsPerTile));
+                zBinOffset = -nearClipPlane * zBinScale;
+                binCount = (int)(farClipPlane * zBinScale + zBinOffset);
+            }
+
+            // エディターで farClipPlane が Infinity に設定されたとき、ビン数が負になるのを防ぐために必要です。
+            binCount = Math.Max(binCount, 0);
+
+            // probe を otherProbe より後に配置すべきか判定します。
+            static bool IsProbeGreater(VisibleReflectionProbe probe, VisibleReflectionProbe otherProbe)
+            {
+                return otherProbe.texture != null && (probe.texture == null || probe.importance < otherProbe.importance ||
+                    (probe.importance == otherProbe.importance && probe.bounds.extents.sqrMagnitude > otherProbe.bounds.extents.sqrMagnitude));
+            }
+
+            // 関連度の高いプローブが使用されるよう、probes.Length を使って確認します。//『優先順位順に並び替えるだけ
+            for (var i = 1; i < probes.Length; i++)
+            {
+                var probe = probes[i];
+                var j = i - 1;
+                while (j >= 0 && IsProbeGreater(probes[j], probe))
+                {
+                    probes[j + 1] = probes[j];
+                    j--;
+                }
+
+                probes[j + 1] = probe;
+            }
+
+            var minMaxZs = new NativeArray<float2>(itemsPerTile * viewCount, Allocator.TempJob);
+
+            //『Codex: 各 item がどの range に入るかを決める幾何学的な判定は、ビュー空間またはビュー空間から投影した座標を基準にしています。
+
+            //『各`localLight`のz軸方向の最小(min)と最大(max)を記録する(float2)。(`Forward+機構3.png`参照)
+            var lightMinMaxZJob = new LightMinMaxZJob
+            {
+                worldToViews = worldToViews,
+                lights = localLights,
+                minMaxZs = minMaxZs.GetSubArray(0, localLightCount * viewCount)
+            };
+            // 内部ループのバッチ数 32 に特別な意味はありません。スケジューリングのオーバーヘッドが大きくなりすぎず、並列度も低くなりすぎないようにした、おおよその値です。
+            var lightMinMaxZHandle = lightMinMaxZJob.ScheduleParallel(localLightCount * viewCount, 32, new JobHandle());
+
+            var reflectionProbeRotation = GraphicsSettings.TryGetRenderPipelineSettings<URPReflectionProbeSettings>(out var reflectionProbeSettings) ? reflectionProbeSettings.UseReflectionProbeRotation : true;
+
+            //『各`reflectionProbe`のz軸方向の最小(min)と最大(max)を記録する(float2)。(`Forward+機構3.png`参照)
+            var reflectionProbeMinMaxZJob = new ReflectionProbeMinMaxZJob
+            {
+                worldToViews = worldToViews,
+                reflectionProbes = probes,
+                reflectionProbeRotation = reflectionProbeRotation,
+                minMaxZs = minMaxZs.GetSubArray(localLightCount * viewCount, reflectionProbeCount * viewCount)
+            };
+            var reflectionProbeMinMaxZHandle = reflectionProbeMinMaxZJob.ScheduleParallel(reflectionProbeCount * viewCount, 32, lightMinMaxZHandle);
+
+
+            var zBinningBatchCount = (binCount + ZBinningJob.batchSize - 1) / ZBinningJob.batchSize;
+            //『記録した`minMaxZs`から係数(`zBin⟪Scale¦Offset⟫`)を使ってindexを算出して`bins`にそのitemのビットを立てる。(`Forward+機構4.png`参照)
+            var zBinningJob = new ZBinningJob
+            {
+                bins = zBins,
+                minMaxZs = minMaxZs,
+                zBinScale = zBinScale,
+                zBinOffset = zBinOffset,
+                binCount = binCount,
+                wordsPerTile = wordsPerTile,
+                lightCount = localLightCount,
+                reflectionProbeCount = reflectionProbeCount,
+                batchCount = zBinningBatchCount,
+                viewCount = viewCount,
+                isOrthographic = isOrthographic
+            };
+            var zBinningHandle = zBinningJob.ScheduleParallel(zBinningBatchCount * viewCount, 1, reflectionProbeMinMaxZHandle);
+
+            reflectionProbeMinMaxZHandle.Complete(); //『なぜかz軸方向(`minMaxZs`)だけ先に`.Complete()`される。(`items`を変更されたくないなら`TilingJob`(`tileRanges`)も同じなはず)
+
+            GetViewParams(isOrthographic, viewToClips[0], out float viewPlaneBottom0, out float viewPlaneTop0, out float4 viewToViewportScaleBias0);
+            GetViewParams(isOrthographic, viewToClips[1], out float viewPlaneBottom1, out float viewPlaneTop1, out float4 viewToViewportScaleBias1);
+
+            // 各ライトには Y 用の範囲が 1 つと、行ごとの範囲が必要です。偽共有を避けるため、128 バイト境界に揃えます。
+            var rangesPerItem = AlignByteCount((1 + tileResolution.y) * UnsafeUtility.SizeOf<InclusiveRange>(), 128) / UnsafeUtility.SizeOf<InclusiveRange>();
+            var tileRanges = new NativeArray<InclusiveRange>(rangesPerItem * itemsPerTile * viewCount, Allocator.TempJob);
+            //『各itemからタイルx影響範囲をタイルy毎に`tileRanges`に記録する。(`Forward+機構5.png`参照)
+            var tilingJob = new TilingJob
+            {
+                lights = localLights,
+                reflectionProbes = probes,
+                reflectionProbeRotation = reflectionProbeRotation,
+                tileRanges = tileRanges,
+                itemsPerTile = itemsPerTile,
+                rangesPerItem = rangesPerItem,
+                worldToViews = worldToViews,
+                tileScale = (float2)screenResolution / actualTileWidth,
+                tileScaleInv = actualTileWidth / (float2)screenResolution,
+                viewPlaneBottoms = new Fixed2<float>(viewPlaneBottom0, viewPlaneBottom1),
+                viewPlaneTops = new Fixed2<float>(viewPlaneTop0, viewPlaneTop1),
+                viewToViewportScaleBiases = new Fixed2<float4>(viewToViewportScaleBias0, viewToViewportScaleBias1),
+                tileCount = tileResolution,
+                near = nearClipPlane,
+                isOrthographic = isOrthographic
+            };
+
+            var tileRangeHandle = tilingJob.ScheduleParallel(itemsPerTile * viewCount, 1, reflectionProbeMinMaxZHandle);
+
+            //『記録した`tileRanges`からタイル毎にそのitemのビットを`tileMasks`に立てる。(`Forward+機構6.png`参照)
+            var expansionJob = new TileRangeExpansionJob
+            {
+                tileRanges = tileRanges,
+                tileMasks = tileMasks,
+                rangesPerItem = rangesPerItem,
+                itemsPerTile = itemsPerTile,
+                wordsPerTile = wordsPerTile,
+                tileResolution = tileResolution,
+            };
+
+            var tilingHandle = expansionJob.ScheduleParallel(tileResolution.y * viewCount, 1, tileRangeHandle);
+            JobHandle cullingHandle = JobHandle.CombineDependencies(
+                minMaxZs.Dispose(zBinningHandle),
+                tileRanges.Dispose(tilingHandle));
+            return cullingHandle;
+        }
+        ```

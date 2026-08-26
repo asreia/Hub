@@ -12,7 +12,7 @@
           - `static RendererListParams Invalid`: 空の`RendererListParams`を返す
           - `.ctor(CullingResults cullingResults, DrawingSettings drawSettings, FilteringSettings filteringSettings)`
             :*Culling*{camera.cullingMask,Occlu⟪der¦dee⟫,CPUの**AABBフラスタムカリング**,`オブジェクト`(index)との`ライト`/`プローブ`(value)衝突 の配列} => *Filtering* => *Drawing*
-            - **CullingResults** `cullingResults`: `struct CullingResults`: 描画対象となる**可視{オブジェクト,ライト,プローブ}セット** (`buffer={obj{Light{..},Probe{..}}..}`)
+            - **CullingResults** `cullingResults`: `struct CullingResults`: 描画対象となる**可視{オブジェクト,ライト,プローブ}セット**
               - メモ: `ctx.Cull(ref ScriptableCullingParameters『カメラ』)`を設定。
                       `Rendererコンポーネント`(オブジェクト)はフラスタムカリングされているが、**公開されていない** (恐らく`CreateRendererList(..)`の内部で使われるのみ)
                       カメラ ⊃ {オブジェクト}, オブジェクト ⊃ {カメラ,ライト,プローブ}, ライト ⊃ {オブジェクト}
@@ -21,22 +21,23 @@
                   メモ:`Visible⟪Light¦ReflectionProbe⟫`は、**C#JobSystem**のために良く使うメンバを持った**struct**になっている。(`⟪Light¦ReflectionProbe⟫`そのものへの参照(class)もある)
                   - `NativeArray<VisibleLight> visibleLights`: フラスタムカリングされた`VisibleLight`の配列。(`Lightインデックス`で参照)
                   - `NativeArray<VisibleReflectionProbe> visibleReflectionProbes`: フラスタムカリングされた`VisibleReflectionProbe`の配列。(`Probeインデックス`で参照)
-                - ストライド
-                  - `int lightIndexCount`: `SetLightIndexMap(.)`で使う`Lightストライド`
-                  - `int reflectionProbeIndexCount`: `SetReflectionProbeIndexMap(.)`で使う`Probeストライド`
-                  - `int lightAndReflectionProbeIndexCount`: `FillLightAndReflectionProbeIndices(.)`で使う`LightAndProbeストライド`
-                - 再マップ
-                  メモ: **Forward+**では`objN`が`タイル毎`?と思ったが、**ComputeShader**で計算し設定され`CullingResults`とは関係ないらしい。が、**C#JobSystem**で計算してた気がする..
-                  - `NativeArray<int> GetLightIndexMap(Allocator allocator)`: 以前に設定された`lightIndexMap`を取得
-                    - `SetLightIndexMap(NativeArray<int> lightIndexMap)`: `オブジェクト毎`に使う`Lightインデックス`を`Lightストライド`で進めながら設定する
-                      - 例: `lightIndexCount = 4; lightIndexMap = {obj0_Light{0,1,2,-1}, obj1_Light{1,2,4,5}, obj2_Light{3,1,-1,-1}};`(-1は無効の要素)
-                  - `NativeArray<int> GetReflectionProbeIndexMap(Allocator allocator)`: 以前に設定された`probeIndexMap`を取得
-                    - `SetReflectionProbeIndexMap(NativeArray<int> probeIndexMap)`: `オブジェクト毎`に使う`Probeインデックス`を`Probeストライド`で進めながら設定する
-                - SetData (`GraphicsBuffer`)
-                  - `FillLightAndReflectionProbeIndices(GraphicsBuffer buffer)`: ライト+プローブのIndexBuffer作成 (メモ: **Forward+**はこの`buffer`を`ComputeShader`で設定している?)
-                    `オブジェクト毎`に使う`Lightインデックス`+`Probeインデックス`を`LightAndProbeストライド`で進めながら`buffer`に**SetData**する
-                    - 例: `lightIndexCount = 4; reflectionProbeIndexCount = 2; lightAndReflectionProbeIndexCount = lightIndexCount + reflectionProbeIndexCount;`
-                          `buffer = {obj0{Light{0,1,2,-1},Probe{2,1}}, obj1{Light{1,2,4,5},Probe{-1,-1}}, obj2{Light{3,1,-1,-1},Probe{2,4}}};`
+                - 以下、過去のチャッ君に化かされたゴミカス [CullingResults訂正(↑は合ってる)](\images\CullingResults訂正.png)
+                  - ストライド
+                    - `int lightIndexCount`: `SetLightIndexMap(.)`で使う`Lightストライド`
+                    - `int reflectionProbeIndexCount`: `SetReflectionProbeIndexMap(.)`で使う`Probeストライド`
+                    - `int lightAndReflectionProbeIndexCount`: `FillLightAndReflectionProbeIndices(.)`で使う`LightAndProbeストライド`
+                  - 再マップ
+                    メモ: **Forward+**では`objN`が`タイル毎`?と思ったが、**ComputeShader**で計算し設定され`CullingResults`とは関係ないらしい。が、**C#JobSystem**で計算してた気がする..
+                    - `NativeArray<int> GetLightIndexMap(Allocator allocator)`: 以前に設定された`lightIndexMap`を取得
+                      - `SetLightIndexMap(NativeArray<int> lightIndexMap)`: `オブジェクト毎`に使う`Lightインデックス`を`Lightストライド`で進めながら設定する
+                        - 例: `lightIndexCount = 4; lightIndexMap = {obj0_Light{0,1,2,-1}, obj1_Light{1,2,4,5}, obj2_Light{3,1,-1,-1}};`(-1は無効の要素)
+                    - `NativeArray<int> GetReflectionProbeIndexMap(Allocator allocator)`: 以前に設定された`probeIndexMap`を取得
+                      - `SetReflectionProbeIndexMap(NativeArray<int> probeIndexMap)`: `オブジェクト毎`に使う`Probeインデックス`を`Probeストライド`で進めながら設定する
+                  - SetData (`GraphicsBuffer`)
+                    - `FillLightAndReflectionProbeIndices(GraphicsBuffer buffer)`: ライト+プローブのIndexBuffer作成 (メモ: **Forward+**はこの`buffer`を`ComputeShader`で設定している?)
+                      `オブジェクト毎`に使う`Lightインデックス`+`Probeインデックス`を`LightAndProbeストライド`で進めながら`buffer`に**SetData**する
+                      - 例: `lightIndexCount = 4; reflectionProbeIndexCount = 2; lightAndReflectionProbeIndexCount = lightIndexCount + reflectionProbeIndexCount;`
+                            `buffer = {obj0{Light{0,1,2,-1},Probe{2,1}}, obj1{Light{1,2,4,5},Probe{-1,-1}}, obj2{Light{3,1,-1,-1},Probe{2,4}}};`
               - `bool GetShadowCasterBounds(int lightIndex, out Bounds outBounds)`:
                 :「その`Lightインデックス`(`lightIndex`)に照らされて影を落とすオブジェクト(*ShadowCaster*)たちを全て囲う**AABB**」を`outBounds`に返す
                   (*ShadowCaster*が一つもない時、`false`を返す)
