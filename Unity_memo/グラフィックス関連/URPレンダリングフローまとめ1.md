@@ -12,9 +12,9 @@
         useRenderPassEnabled = renderGraph.nativeRenderPassesEnabled;
         MotionVectorRenderPass.SetRenderGraphMotionVectorGlobalMatrices(renderGraph, cameraData); //『保留
 
-        m_ForwardLights.SetupRenderGraphLights(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>());
+        /*☆*/m_ForwardLights.SetupRenderGraphLights(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>());
 
-        RequireResults requireResults = CreateCameraRenderTargets(renderGraph, cameraData, frameData.Get<UniversalPostProcessingData>().isEnabled);
+        /*☆*/RequireResults requireResults = CreateCameraRenderTargets(renderGraph, cameraData, frameData.Get<UniversalPostProcessingData>().isEnabled);
 
         RecordCustomRenderGraphPasses(renderGraph, RenderPassEvent.BeforeRendering);
 
@@ -32,7 +32,7 @@
     }
     ```
   - `void m_ForwardLights.`**SetupRenderGraphLights**`(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>())`
-    ```csharp (images\ForwardLights\SetupLights.png)
+    ```csharp (images\URPレンダリングフローまとめ\まとめ1\ForwardLights\SetupLights.png)
     void SetupRenderGraphLights(RenderGraph renderGraph, UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)
     {
         using (var builder = renderGraph.AddUnsafePass<SetupLightPassData>(s_SetupForwardLights.name, out var passData, s_SetupForwardLights))
@@ -72,15 +72,15 @@
                                 cmd.SetGlobalConstantBuffer(m_TileMasksBuffer, "urp_TileBuffer", 0, UniversalRenderPipeline.maxTileWords * 4);
                             }
 
-                            //『viewZ=dot(ViewForward, PosWS - CameraPositionWS), ZBinIndex=(Perspective ? log2(viewZ) : viewZ) * x + y, z=ProbeBegin
+                            //『 viewZ=dot(ViewForward, PosWS - CameraPositionWS), ZBinIndex=(Perspective ? log2(viewZ) : viewZ) * x + y, z=ProbeBegin
                             cmd.SetGlobalVector("_FPParams0", math.float4(m_ZBinScale, m_ZBinOffset, m_LightCount, m_DirectionalLightCount));
-                            //『TileXY=uint2(ScreenUV * xy),  TileIndex=TileY * z + TileX,  TileWordsOffset=TileIndex * w
+                            //『 TileXY=uint2(ScreenUV * xy),  TileIndex=TileY * z + TileX,  TileWordsOffset=TileIndex * w
                             cmd.SetGlobalVector("_FPParams1", math.float4(cameraData.pixelRect.size / m_ActualTileWidth, m_TileResolution.x, m_WordsPerTile));
-                            //『ZBinOffset=min(ZBinIndex, x - 1) * (WordsPerTile + 2❰header❱),  y=TotalTileCount
+                            //『 ZBinOffset=min(ZBinIndex, x - 1) * (WordsPerTile + 2❰header❱),  y=TotalTileCount
                             cmd.SetGlobalVector("_FPParams2", math.float4(m_BinCount, m_TileResolution.x * m_TileResolution.y, 0, 0));
-                            //『ClusterInit(ScreenUV, PosWS, h)EntityIndex=⟪h=0:0❰Light❱¦h=1:ProbeBegin⟫, WordInMask=EntityIndex/32, BitInWord=EntityIndex%32
-                            //『wordIndex=⟪TileWordsOffset¦ZBinOffset + 2❰header❱⟫+WordInMask   (直感的にはこんな感じ)
-                            //『urp_⟪ZBin ∩ Tile⟫Buffer[wordIndex/4][wordIndex%4]>>BitInWord ～ ⟪<<ProbeBegin¦<<(WordsPerTile*32 - ProbeBegin)⟫
+                            //『 ClusterInit(ScreenUV, PosWS, h)EntityIndex=⟪h=0:0❰Light❱¦h=1:ProbeBegin⟫, WordInMask=EntityIndex/32, BitInWord=EntityIndex%32
+                            //『 wordIndex=⟪TileWordsOffset¦ZBinOffset + 2❰header❱⟫+WordInMask   (直感的にはこんな感じ)
+                            //『 urp_⟪ZBin ∩ Tile⟫Buffer[wordIndex/4][wordIndex%4]>>BitInWord ～ ⟪<<ProbeBegin¦<<(WordsPerTile*32 - ProbeBegin)⟫
                         }
                         cmd.SetKeyword(ShaderGlobalKeywords.ClusterLightLoop, m_UseForwardPlus);
                         //『`lightData.visibleLights`から`cmd`で`._MainLight～`と`_AdditionalLights～[]`を設定
@@ -145,7 +145,7 @@
     }
     ```
     - `void m_ReflectionProbeManager.UpdateGpuData(CommandBufferHelpers.GetNativeCommandBuffer(cmd), ref renderingData.cullResults)`
-        ```csharp (images\ForwardLights\ReflectionProbeManager\UpdateGpuData.png)
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\ForwardLights\ReflectionProbeManager\UpdateGpuData.png)
         struct ReflectionProbeManager : IDisposable
         {
             int2 m_Resolution; //『現在のAtlasテクスチャの解像度
@@ -249,10 +249,10 @@
                 //『`probes[]`(`probe`)を素に`m_Cache[]`(`cachedProbe`)を更新する
                 for (var probeIndex = 0; probeIndex < probeCount; probeIndex++)
                 {
-                    var probe = probes[probeIndex];
-                    var texture = probe.texture;
-                    var id = probe.reflectionProbe.GetEntityId();
-                    var wasCached = m_Cache.TryGetValue(id, out var cachedProbe);
+                    VisibleReflectionProbe probe = probes[probeIndex];
+                    Texture texture = probe.texture;
+                    EntityId id = probe.reflectionProbe.GetEntityId();
+                    bool wasCached = m_Cache.TryGetValue(id, out var cachedProbe);
 
                     if (!texture) continue;
 
@@ -333,10 +333,10 @@
                 //『`probes[probeIndex]`から`cmd`設定用の`m_～[dataIndex]`へセットする
                 for (var probeIndex = 0; probeIndex < probeCount; probeIndex++)
                 {
-                    var probe = probes[probeIndex];
-                    var id = probe.reflectionProbe.GetEntityId();
-                    var dataIndex = probeIndex - skipCount;
-                        //『Q:シェーダー側でprobeIndexとdataIndexが異なっても正しく参照できるのか?
+                    VisibleReflectionProbe probe = probes[probeIndex];
+                    EntityId id = probe.reflectionProbe.GetEntityId();
+                    int dataIndex = probeIndex - skipCount;
+                        //『Q:シェーダー側で`probeIndex`と`dataIndex`が異なっても正しく参照できるのか?
                         //『A:基本的にForward+機構の並べ替えによって合わせられるが、`.TryAllocate`失敗時は不整合になり得る。つまりindexがForward+機構側と連携できていない。
                             //『`probes[probeIndex - skipCount] = probe;`をクラスタ構築前に行う必要がある(ムリ)
                     if (!m_Cache.TryGetValue(id, out var cachedProbe) || !probe.texture)
@@ -404,7 +404,7 @@
         }
         ```
     - `void SetupShaderLightConstants(cmd, ref renderingData.cullResults, lightData)`
-        ```csharp (images\ForwardLights\SetupShaderLightConstants\SetupShaderLightConstants.png)
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\ForwardLights\SetupShaderLightConstants\SetupShaderLightConstants.png)
         void SetupShaderLightConstants(UnsafeCommandBuffer cmd, ref CullingResults cullResults, UniversalLightData lightData)
         {
             m_MixedLightingSetup = MixedLightingSetup.None;
@@ -483,18 +483,17 @@
         }
         ```
   - `RequireResults` **CreateCameraRenderTargets**`(renderGraph, cameraData, frameData.Get<UniversalPostProcessingData>().isEnabled)`: 自作の外部関数化コード
-    ```csharp (UniversalRendererRenderGraph.cs)
+    ```csharp (UniversalRendererRenderGraph.cs) (images\URPレンダリングフローまとめ\まとめ1\CreateCameraRenderTargets\CreateCameraRenderTargets.png)
     RequireResults CreateCameraRenderTargets(RenderGraph renderGraph, UniversalCameraData cameraData, bool postProcessingEnabled)
     {
         SetupRenderingLayers(cameraData.cameraTargetDescriptor.msaaSamples);
         bool isCameraTargetOffscreenDepth = IsOffscreenDepthTexture(cameraData.camera.targetTexture);
 
         RenderPassInputSummary renderPassInputs = GetRenderPassInputs(cameraData.IsTemporalAAEnabled(), postProcessingEnabled, m_RenderingLayerProvidesByDepthNormalPass, activeRenderPassQueue, m_MotionVectorPass);
-
         bool applyPostProcessing = cameraData.postProcessEnabled && m_PostProcess != null;
+
         bool requireDepthTexture = RequireDepthTexture(cameraData, in renderPassInputs, applyPostProcessing);
         bool requirePrepassForTextures = RequirePrepassForTextures(cameraData, renderPassInputs);
-
         /*cameraData.renderer.*/useDepthPriming = IsDepthPrimingEnabledRenderGraph(cameraData, m_DepthPrimingMode);
 
         bool requirePrepass = requirePrepassForTextures || useDepthPriming;
@@ -599,7 +598,7 @@
             return inputSummary;
         }
         ```
-      - `static bool RequireDepthTexture(cameraData, in renderPassInputs, applyPostProcessing)`: `⟪uRD¦ARPQ⟫`または`uRD.postProcessingRequiresDepthTexture`によって`_CameraDepthTexture`が必要かのフラグ
+    - `static bool RequireDepthTexture(cameraData, in renderPassInputs, applyPostProcessing)`: `⟪uRD¦ARPQ⟫`または`uRD.postProcessingRequiresDepthTexture`によって`_CameraDepthTexture`が必要かのフラグ
         ```csharp
         static bool RequireDepthTexture(UniversalCameraData cameraData, in RenderPassInputSummary renderPassInputs, bool applyPostProcessing)
         {
@@ -609,7 +608,7 @@
             return requiresDepthTexture || cameraHasPostProcessingWithDepth;
         }
         ```
-      - `bool RequirePrepassForTextures(cameraData, renderPassInputs)`: `Depth/Normals/RenderingLayers`テクスチャを生成するために`⟪Depth¦DepthNormal⟫Prepass`が必要かのフラグ
+    - `bool RequirePrepassForTextures(cameraData, renderPassInputs)`: `Depth/Normals/RenderingLayers`テクスチャを生成するために`⟪Depth¦DepthNormal⟫Prepass`が必要かのフラグ
         ```csharp
         bool RequirePrepassForTextures(UniversalCameraData cameraData, in RenderPassInputSummary renderPassInputs)
         {
@@ -623,7 +622,7 @@
         ```csharp
         static bool IsDepthPrimingEnabledRenderGraph(UniversalCameraData cameraData, DepthPrimingMode depthPrimingMode)
         {
-            bool isNotMSAA = cameraData.cameraTargetDescriptor.msaaSamples == 1;
+            bool isNotMSAA = cameraData.cameraTargetDescriptor.msaaSamples == 1; //『この条件を外したい。問題ない気がする..
             return depthPrimingMode == DepthPrimingMode.⟪Auto¦Forced⟫ && cameraData.clearDepth && isNotMSAA && !IsOffscreenDepthTexture(cameraData.targetTexture/*(baseCamera)*/);
         }
         ```
@@ -656,7 +655,7 @@
         }
         ```
     - `void` **CreateRenderGraphCameraRenderTargets**`(renderGraph, isCameraTargetOffscreenDepth, s_RequiresIntermediateAttachments, prepassToCameraDepthTexture)`: ココまでの結果を素に`uRD`の`TextureHandle`を作る
-        ```csharp (UniversalRendererRenderGraph.cs)
+        ```csharp (UniversalRendererRenderGraph.cs) (images\URPレンダリングフローまとめ\まとめ1\CreateCameraRenderTargets\CreateRenderGraphCameraRenderTargets.png)
         void CreateRenderGraphCameraRenderTargets(RenderGraph renderGraph, bool isCameraTargetOffscreenDepth, bool requireIntermediateAttachments, bool prepassToCameraDepthTexture)
         {
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
@@ -685,7 +684,7 @@
             }
             else
             {
-                frameData.Get<UniversalResourceData>().SwitchActiveTexturesToBackbuffer(); //『active⟪Color¦Depth⟫ID = UniversalResourceData.ActiveID.BackBuffer;
+                frameData.Get<UniversalResourceData>().SwitchActiveTexturesToBackbuffer(); //『active⟪Color¦Depth⟫ID = UniversalResourceData.ActiveID.BackBuffer; (`TextureHandle active⟪Color¦Depth⟫Texture`の`switch(.active～ID)`で使用)
             }
             //『`Create～Texture(..)` (大体`format`を変えてるだけ)
             CreateCameraDepthCopyTexture(renderGraph, cameraDescriptor, prepassToCameraDepthTexture, clearCameraParams.clearValue); //『`.cameraDepthTexture`へ`cameraDescriptor`を素に`Create～()`(⟪レンダリング先(デプス)¦コピー先(R32)⟫)
@@ -695,6 +694,26 @@
             if (cameraData.isHDROutputActive && cameraData.rendersOverlayUI) CreateOffscreenUITexture(renderGraph, cameraDescriptor);
         }
         ```
+      - 構成:`resourceData.active⟪Color¦Depth⟫Texture`
+        - `resourceData.activeColorTexture` (`.SwitchActiveTexturesToBackbuffer()`で`BackBuffer`切替)
+          - `resourceData.backBufferColor` (`.activeColorID = URD.ActiveID.BackBuffer`)
+            - `cameraData.targetTexture`
+            - `BRTT.CameraTarget` (↑`null`時)
+          - `resourceData.cameraColor` (`.activeColorID = URD.ActiveID.Camera`)
+            - シングルカメラ
+              - `CreateRenderGraphTexture(.., _SingleCameraTargetAttachmentName, ..)`
+            - カメラスタッキング
+              - `RenderingUtils.ReAllocateHandleIfNeeded(.., _CameraTargetAttachmentAName)`
+              - `RenderingUtils.ReAllocateHandleIfNeeded(.., _CameraTargetAttachmentBName)`
+        - `resourceData.activeDepthTexture`
+          - `resourceData.backBufferDepth` (`.activeDepthID = URD.ActiveID.BackBuffer`)
+            - `cameraData.targetTexture`
+            - `BRTT.Depth` (↑`null`時)
+          - `resourceData.cameraDepth` (`.activeDepthID = URD.ActiveID.Camera`)
+            - シングルカメラ
+              - `CreateRenderGraphTexture(.., _CameraDepthAttachmentName, ..)`
+            - カメラスタッキング
+              - `RenderingUtils.ReAllocateHandleIfNeeded(.., _CameraDepthAttachmentName)`
       - **ユーティリティー**
         - `static TextureHandle CreateRenderGraphTexture(RenderGraph renderGraph, in TextureDesc desc,..)`
             ```csharp (UniversalRendererRenderGraph.cs)
@@ -888,7 +907,7 @@
                 }
                 else //カメラスタッキング
                 {
-                    //『`static RTHandle[] s_RenderGraphCameraColorHandles = new RTHandle[]{null, null};`
+                    //『`static RTHandle[] s_RenderGraphCameraColorHandles = new RTHandle[]{null, null};`。(>Post Processing などで同じターゲットを読み書きできない場合に`nextRenderGraphCameraColorHandle`が呼ばれ、A/B が切り替わります)
                     RenderingUtils.ReAllocateHandleIfNeeded(ref s_RenderGraphCameraColorHandles[0], desc, _CameraTargetAttachmentAName); //『`desc`は`baseCamera`から来てるのでスタックレンダリング中は再Allocateされないことを確信している？
                     RenderingUtils.ReAllocateHandleIfNeeded(ref s_RenderGraphCameraColorHandles[1], desc, _CameraTargetAttachmentBName);
                     ImportResourceParams importColorParams = new ImportResourceParams
@@ -959,7 +978,7 @@
                 frameData.Get<UniversalResourceData>().cameraDepthTexture = CreateRenderGraphTexture(renderGraph, desc, "_CameraDepthTexture", desc.clearBuffer, clearColor);
             }
             ```
-          - `CreateMotionVectorTextures(renderGraph, cameraDescriptor)`: `.cameraNormalsTexture`へ`cameraDescriptor`から`Create～()`
+          - `CreateCameraNormalsTexture(renderGraph, cameraDescriptor)`: `.cameraNormalsTexture`へ`cameraDescriptor`から`Create～()`
             ```csharp (UniversalRendererRenderGraph.cs)
             void CreateCameraNormalsTexture(RenderGraph renderGraph, TextureDesc desc)
             {
@@ -1122,7 +1141,7 @@
         }
         ```
       - `static JobHandle ScheduleClusteringJobs(lightData.mainLightIndex != -1, lightData.supportsAdditionalLights, lightData.visibleLights, renderingData.cullResults.visibleReflectionProbes, m_ZBins, m_TileMasks, worldToViews, viewToClips, viewCount, math.int2(cameraData.pixelWidth, cameraData.pixelHeight), cameraData.camera.nearClipPlane, cameraData.camera.farClipPlane, cameraData.camera.orthographic, out m_LightCount, out m_DirectionalLightCount, out m_BinCount, out m_ZBinScale, out m_ZBinOffset, out m_TileResolution, out m_ActualTileWidth, out m_WordsPerTile);`
-        ```csharp (images\ForwardLights\Forward+機構\Forward+機構0.png)
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\ForwardLights\Forward+機構\Forward+機構0.png)
         static JobHandle ScheduleClusteringJobs(
             bool hasMainLight,
             bool supportsAdditionalLights,
