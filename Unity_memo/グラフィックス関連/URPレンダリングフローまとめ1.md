@@ -10,7 +10,7 @@
         UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
         useRenderPassEnabled = renderGraph.nativeRenderPassesEnabled;
-        MotionVectorRenderPass.SetRenderGraphMotionVectorGlobalMatrices(renderGraph, cameraData); //『保留
+        MotionVectorRenderPass.SetRenderGraphMotionVectorGlobalMatrices(renderGraph, cameraData);
 
         /*☆*/m_ForwardLights.SetupRenderGraphLights(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>());
 
@@ -18,17 +18,43 @@
 
         RecordCustomRenderGraphPasses(renderGraph, RenderPassEvent.BeforeRendering);
 
-        TextureHandle target = resourceData.activeColorTexture.IsValid() ? resourceData.activeColorTexture : resourceData.activeDepthTexture;
-        SetupRenderGraphCameraProperties(renderGraph, target);
+        TextureHandle activeTargetForIsYFlipped = resourceData.activeColorTexture.IsValid() ? resourceData.activeColorTexture : resourceData.activeDepthTexture;
+        /*☆*/SetupRenderGraphCameraProperties(renderGraph, activeTargetForIsYFlipped);
 
-    #if VISUAL_EFFECT_GRAPH_0_0_1_OR_NEWER
-        ProcessVFXCameraCommand(renderGraph);
-    #endif
+        #if VISUAL_EFFECT_GRAPH_0_0_1_OR_NEWER //『↓コードが有効でない(灰色)なのは、このUnityプロジェクトに`Visual Effect Graph パッケージ`が入っていない
+                    ProcessVFXCameraCommand(renderGraph); //『AddUnsafePass =>
+                        //『CommandBufferHelpers.VFXManager_ProcessCameraCommand(cmd, camera, cullResults) =>extern
+        #endif
 
         if (requireResults.isCameraTargetOffscreenDepth){OnOffscreenDepthTextureRendering(renderGraph, context, resourceData, cameraData); return;}
         OnBeforeRendering(renderGraph);
         OnMainRendering(renderGraph, context, requireResults.renderPassInputs, requireResults.requirePrepass, requireResults.requireDepthTexture);
         OnAfterRendering(renderGraph, requireResults.applyPostProcessing);
+    }
+    ```
+  - `void MotionVectorRenderPass.SetRenderGraphMotionVectorGlobalMatrices(renderGraph, cameraData)`
+    ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetRenderGraphMotionVectorGlobalMatrices.png)
+    static void SetRenderGraphMotionVectorGlobalMatrices(RenderGraph renderGraph, UniversalCameraData cameraData)
+    {
+        if (cameraData.camera.TryGetComponent<UniversalAdditionalCameraData>(out var additionalCameraData))
+        {
+            using (var builder = renderGraph.AddRasterRenderPass<MotionMatrixPassData>(s_SetMotionMatrixProfilingSampler.name, out var passData, s_SetMotionMatrixProfilingSampler))
+            {
+                passData.motionData = additionalCameraData.motionVectorsPersistentData;
+                passData.xr = cameraData.xr;
+
+                builder.AllowGlobalStateModification(true);
+                builder.SetRenderFunc(static (MotionMatrixPassData data, RasterGraphContext context) =>
+                {
+                    data.motionData.SetGlobalMotionMatrices(context.cmd, data.xr);
+                        //『class MotionVectorsPersistentData
+                            //『var passID/*`0`*/ = GetXRMultiPassId(xr); //『`xr.enabled==false`なので`0`が返る
+                            //『cmd.SetGlobalMatrix(ShaderPropertyId.previousViewProjectionNoJitter/*_PrevViewProjMatrix*/, previousViewProjectionStereo[passID]);
+                            //『cmd.SetGlobalMatrix(ShaderPropertyId.viewProjectionNoJitter/*_NonJitteredViewProjMatrix*/, viewProjectionStereo[passID]);
+
+                });
+            }
+        }
     }
     ```
   - `void m_ForwardLights.`**SetupRenderGraphLights**`(renderGraph, frameData.Get<UniversalRenderingData>(), cameraData, frameData.Get<UniversalLightData>())`
@@ -812,7 +838,8 @@
                 bool clearBackbufferOnFirstUse = (cameraData.renderType == CameraRenderType.Base) && !s_RequiresIntermediateAttachments; //『`中間RT`が全画面より小さい`Viewport`の可能性があるためクリアできない
                 clearBackbufferOnFirstUse |= isCameraTargetOffscreenDepth; // オフスクリーン深度テクスチャへレンダリングしている場合はクリアを強制します。
                 bool noStoreOnlyResolveBBColor = !s_RequiresIntermediateAttachments && (cameraData.cameraTargetDescriptor.msaaSamples > 1); //『>MSAA の生データを最後まで store しなくても、 resolve 済み結果だけ残せばいい。
-                TextureUVOrigin backbufferTextureUVOrigin = cameraData.targetTexture == null ? TextureUVOrigin.TopLeft : TextureUVOrigin.BottomLeft;//『`.TopLeft`は反転するという意思表示?
+                //『環境がDirectX系であるとき、`.TopLeft`(BRTT.⟪CameraTarget¦Depth⟫)は標準の座標系であり、スクリーンに映しても反転していない`textureHandle`。に対して`.BottomLeft`(アセットのテクスチャ,中間RT)はDirectX系では反転した`textureHandle`。
+                TextureUVOrigin backbufferTextureUVOrigin = cameraData.targetTexture == null ? TextureUVOrigin.TopLeft : TextureUVOrigin.BottomLeft;
                 ImportResourceParams importBackbufferColorParams = new ImportResourceParams
                 {
                     clearOnFirstUse = clearBackbufferOnFirstUse,
@@ -1069,7 +1096,207 @@
                     }
                 }
                 ```
-  - `void OnBeforeRendering(renderGraph)`
+  - `void` **RecordCustomRenderGraphPasses**`(renderGraph, RenderPassEvent.BeforeRendering)`
+    ```csharp (関数圧縮:https://chatgpt.com/c/6a94ec55-3984-83ee-bb66-9a9bc2fb3209) (images\URPレンダリングフローまとめ\まとめ1\RecordCustomRenderGraphPasses.png)
+    internal void RecordCustomRenderGraphPasses(
+        RenderGraph renderGraph,
+        RenderPassEvent startInjectionPoint,
+        RenderPassEvent? endInjectionPoint = null)
+    {
+        RenderPassEvent end = endInjectionPoint ?? startInjectionPoint;
+        int range = ScriptableRenderPass.GetRenderPassEventRange(end);
+        RenderPassEvent eventEnd = end + range;
+
+        foreach (ScriptableRenderPass pass in m_ActiveRenderPassQueue)
+        {
+            if (pass.renderPassEvent >= startInjectionPoint &&
+                pass.renderPassEvent < eventEnd)
+            {
+                pass.RecordRenderGraph(renderGraph, m_frameData);
+            }
+        }
+    }
+    ```
+  - `void` **SetupRenderGraphCameraProperties**`(renderGraph, activeTargetForIsYFlipped)`
+    ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\Input_hlsl.png)
+    internal void SetupRenderGraphCameraProperties(RenderGraph renderGraph, TextureHandle targetForIsYFlipped)
+    {
+        using (var builder = renderGraph.AddRasterRenderPass<PassData>(Profiling.setupCamera.name, out var passData,
+            Profiling.setupCamera))
+        {
+            passData.renderer = this;
+            passData.cameraData = frameData.Get<UniversalCameraData>();
+            passData.cameraTargetSizeCopy = new Vector2Int(passData.cameraData.cameraTargetDescriptor.width, passData.cameraData.cameraTargetDescriptor.height);
+            passData.targetForIsYFlipped = targetForIsYFlipped;
+
+            builder.AllowGlobalStateModification(true);
+
+            builder.SetRenderFunc(static (PassData data, RasterGraphContext context) =>
+            {
+                bool isTargetYFlipped = SystemInfo.graphicsUVStartsAtTop && RenderingUtils.IsHandleYFlipped(context, in data.targetForIsYFlipped);
+
+                if (data.cameraData.renderType == CameraRenderType.Base)
+                {
+                    context.cmd.SetupCameraProperties(data.cameraData.camera);
+                    data.renderer.SetPerCameraShaderVariables(context.cmd, data.cameraData, data.cameraTargetSizeCopy, isTargetYFlipped);
+                }
+                else //『`overlayCamera`は、`cmd.SetupCameraProperties(..)`を使わずに設定可能。
+                {
+                    data.renderer.SetPerCameraShaderVariables(context.cmd, data.cameraData, data.cameraTargetSizeCopy, isTargetYFlipped);
+                    data.renderer.SetPerCameraClippingPlaneProperties(context.cmd, in data.cameraData, isTargetYFlipped);
+                    data.renderer.SetPerCameraBillboardProperties(context.cmd, data.cameraData);
+                }
+
+                // `SetupCameraProperties(..)`で上書きされたシェーダー時間変数をリセットします。これを行わないと、シャドウとメインレンダリングの間で不一致が発生する可能性があります。
+                SetShaderTimeValues(context.cmd, Time.time, Time.deltaTime, Time.smoothDeltaTime); //『`Time.time`は、エディターで`Application.isPlaying==false`ならば`Time.realtimeSinceStartup`を使う
+            });
+        }
+    }
+    ```
+  - `void ProcessVFXCameraCommand(renderGraph)`: (images\URPレンダリングフローまとめ\まとめ1\ProcessVFXCameraCommand.png) (実際のエフェクト描画は`OnMainRendering(..)`の`cmd.DrawRendererList(rendererList)`)
+    - `void context.cmd.SetupCameraProperties(data.cameraData.camera)`: (classモジュール\images\SetupCameraProperties.png)
+    - `void data.renderer.`**SetPerCameraShaderVariables**`(context.cmd, data.cameraData, data.cameraTargetSizeCopy, isTargetYFlipped)`
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\SetPerCameraShaderVariables.png)
+        void SetPerCameraShaderVariables(RasterCommandBuffer cmd, UniversalCameraData cameraData, Vector2Int cameraTargetSizeCopy, bool isTargetYFlipped)
+        {
+            using var profScope = new ProfilingScope(Profiling.setPerCameraShaderVariables);
+
+            Camera camera = cameraData.camera;
+
+            //『カメラターゲットサイズ-------------(`cameraTargetSizeCopy.x = cameraData.scaledWidth = baseCamera.pixelWidth * cameraData.renderScale`)
+            float scaledCameraTargetWidth = (float)cameraTargetSizeCopy.x * (camera.allowDynamicResolution ? ScalableBufferManager.widthScaleFactor : 1.0f);
+            float scaledCameraTargetHeight = (float)cameraTargetSizeCopy.y * (camera.allowDynamicResolution ? ScalableBufferManager.heightScaleFactor : 1.0f);
+            // オーバーレイカメラはビューポートを持ちません。カメラのビューポートではなく、計算済み/継承されたビューポートを使用する必要があります。
+                //『分岐削除(`overlayCamera`も`baseCamera`の値を使う)
+            float cameraWidth = (float)cameraData.pixelWidth; //『(`baseCamera.pixelWidth`)
+            float cameraHeight = (float)cameraData.pixelHeight;
+
+            //『`camera`パラメータ---------------------------------------------------------------------------------
+            float near = camera.nearClipPlane;
+            float far = camera.farClipPlane;
+            float invNear = Mathf.Approximately(near, 0.0f) ? 0.0f : 1.0f / near;
+            float invFar = Mathf.Approximately(far, 0.0f) ? 0.0f : 1.0f / far;
+            float isOrthographic = camera.orthographic ? 1.0f : 0.0f;
+
+            //『各種GlobalPropertyを設定================================================================================
+            //『Cameraパラメータ===============----------------------------------
+            if (cameraData.renderType == CameraRenderType.Overlay)
+            {
+                // `projectionFlipSign`は GfxDevice::SetInvertProjectionMatrix の深部にあり、これは`overlayCamera`のゲームビュー向け。それ以外は`cmd.SetupCameraProperties(..)`で正しく設定される。
+                float projectionFlipSign = isTargetYFlipped ? -1.0f : 1.0f;
+                Vector4 projectionParams = new Vector4(projectionFlipSign, near, far, 1.0f * invFar);
+                /*☆*/cmd.SetGlobalVector(ShaderPropertyId.projectionParams, projectionParams);
+            }
+            // https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html に記載されているCameraとScreenの変数 (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\UnityShaderVariables.png)
+            cmd.SetGlobalVector(ShaderPropertyId.worldSpaceCameraPos, cameraData.worldSpaceCameraPos);
+            cmd.SetGlobalVector(ShaderPropertyId.zBufferParams, GetZBufferParams(far, invNear, invFar));
+            cmd.SetGlobalVector(ShaderPropertyId.orthoParams, new Vector4(camera.orthographicSize * cameraData.aspectRatio, camera.orthographicSize, 0.0f, isOrthographic));
+
+            //『Screenサイズ===============----------------------------------
+            cmd.SetGlobalVector(ShaderPropertyId.screenParams, new Vector4(cameraWidth, cameraHeight, 1.0f + 1.0f / cameraWidth, 1.0f + 1.0f / cameraHeight));
+            //『`_ScaledScreenParams`,`_ScreenSize`は、`cameraData.cameraTargetDescriptor.width/height`を使用。(`camera.allowDynamicResolution==true`の場合に`ScalableBufferManager.width/heightScaleFactor`を乗算)
+            cmd.SetGlobalVector(ShaderPropertyId.scaledScreenParams, new Vector4(scaledCameraTargetWidth, scaledCameraTargetHeight, 1.0f + 1.0f / scaledCameraTargetWidth, 1.0f + 1.0f / scaledCameraTargetHeight));
+            /*☆*/cmd.SetGlobalVector(ShaderPropertyId.screenSize, new Vector4(scaledCameraTargetWidth, scaledCameraTargetHeight, 1.0f / scaledCameraTargetWidth, 1.0f / scaledCameraTargetHeight));
+            //『ScreenCoordOverride----------------------------------
+            cmd.SetKeyword(ShaderGlobalKeywords.SCREEN_COORD_OVERRIDE, cameraData.useScreenCoordOverride); //『(images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\SCREEN_COORD_OVERRIDE.png)
+            cmd.SetGlobalVector(ShaderPropertyId.screenSizeOverride, cameraData.screenSizeOverride);
+            cmd.SetGlobalVector(ShaderPropertyId.screenCoordScaleBias, cameraData.screenCoordScaleBias);
+            //『_RTHandleScale----------------------------------
+            //『現状この箇所では固定値 // TODO(@sandy-carter): 動的スケーリングの準備ができたら RTHandles.rtHandleProperties.rtHandleScale に設定する
+            cmd.SetGlobalVector(ShaderPropertyId.rtHandleScale, Vector4.one);
+
+            //『☆_GlobalMipBias===============----------------------------------
+            //『5.6Sol:現在のレンダリング解像度ではなく、最終的な画像解像度に基づいてmipLvを補正する (`scaledCameraTargetWidth / cameraWidth`は単位変換)
+            // ダウンサンプリング時に画像のディテールを減らしてしまわないよう、この値を 0.0 以下にクランプ(Math.Min(., 0.0f))します。
+            float mipBias = Math.Min((float)Math.Log(scaledCameraTargetWidth / cameraWidth, 2.0f), 0.0f);
+            float taaMipBias = Math.Min(cameraData.taaSettings.mipBias, 0.0f); mipBias = Math.Min(mipBias, taaMipBias); // Temporal Anti-aliasing (気にしなくてよい)
+            cmd.SetGlobalVector(ShaderPropertyId.globalMipBias, new Vector2(mipBias, Mathf.Pow(2.0f, mipBias)));
+
+            //『SetCameraMatrices===============----------------------------------
+            SetCameraMatrices(cmd, cameraData, isTargetYFlipped);
+        }
+        //『(images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\ZBufferParams.png)
+        static Vector4 GetZBufferParams(float far, float invNear, float invFar)
+        {
+            float zc0 = 1.0f - far * invNear;
+            float zc1 = far * invNear;
+            Vector4 zBufferParams = new Vector4(zc0, zc1, zc0 * invFar, zc1 * invFar);
+            if (SystemInfo.usesReversedZBuffer)
+            {
+                zBufferParams.y += zBufferParams.x;
+                zBufferParams.x = -zBufferParams.x;
+                zBufferParams.w += zBufferParams.z;
+                zBufferParams.z = -zBufferParams.z;
+            }
+            return zBufferParams;
+        }
+        ```
+      - `static void` **SetCameraMatrices**`(cmd, cameraData, isTargetYFlipped)`
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\SetCameraMatrices.png)
+        static void SetCameraMatrices(RasterCommandBuffer cmd, UniversalCameraData cameraData, bool isTargetYFlipped)
+        {
+            //『⟪V¦P¦VP⟫------------------------
+            // 注意: URP のデフォルトのメイン ビュー/プロジェクション 行列は CameraData のビュー/プロジェクション行列です。
+            Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
+            Matrix4x4 projectionMatrix = cameraData.GetProjectionMatrix(); // ジッター適用済み、非 GPU
+            // デフォルトのビュー/プロジェクションを設定します。注意: projectionMatrix はレンダリング用に GPU プロジェクション (gfx API 調整済み) として設定されます。
+            cmd.SetViewProjectionMatrices(viewMatrix, projectionMatrix); //『**全ての順方向Matrix**を設定 (`glstate_matrix_projection`,`unity_Matrix⟪V¦VP⟫`)
+
+            //InverseMatrices====================================================
+
+            //『Camera版はZ反転を適用している------------------------
+            Matrix4x4 worldToCameraMatrix = Matrix4x4.Scale(new Vector3(1.0f, 1.0f, -1.0f)) * viewMatrix;
+            Matrix4x4 cameraToWorldMatrix = worldToCameraMatrix.inverse;
+            cmd.SetGlobalMatrix(ShaderPropertyId.worldToCameraMatrix, worldToCameraMatrix);
+            cmd.SetGlobalMatrix(ShaderPropertyId.cameraToWorldMatrix, cameraToWorldMatrix);
+            //『❰Inv❱⟪V¦P¦VP⟫------------------------
+            // TODO: ターゲット反転ロジックの分岐が異なるため、`inverseProjectionMatrix`は、実際のPの`glstate_matrix_projection`のInverseではない。つまり、`invP*P==I`と一致しない可能性があります。
+            Matrix4x4 gpuProjectionMatrix = cameraData.GetGPUProjectionMatrix(isTargetYFlipped);
+            Matrix4x4 inverseViewMatrix = Matrix4x4.Inverse(viewMatrix);
+            Matrix4x4 inverseProjectionMatrix = Matrix4x4.Inverse(gpuProjectionMatrix);
+            Matrix4x4 inverseViewProjection = inverseViewMatrix * inverseProjectionMatrix; //『これらを↓に移動
+            cmd.SetGlobalMatrix(ShaderPropertyId.inverseViewMatrix, inverseViewMatrix);
+            cmd.SetGlobalMatrix(ShaderPropertyId.inverseProjectionMatrix, inverseProjectionMatrix);
+            cmd.SetGlobalMatrix(ShaderPropertyId.inverseViewAndProjectionMatrix, inverseViewProjection);
+
+            // TODO: SetViewAndProjectionMatrices が y 反転 / ワインディング順の問題を引き起こす理由を調査する。当面は cmd.SetViewProjectionMatrices を使用する
+            //SetViewAndProjectionMatrices(cmd, viewMatrix, cameraData.GetDeviceProjectionMatrix()); //『将来的にこれ一括で＠❰Inv❱⟪V¦P¦VP⟫を設定する予定?
+            // TODO: オーバーレイカメラでしばらく正しく動作することを確認できたら、ここに SetPerCameraClippingPlaneProperties を追加する
+        }
+        ```
+    - `void data.renderer.SetPerCameraClippingPlaneProperties(context.cmd, in data.cameraData, isTargetYFlipped)`
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\SetPerCameraClippingPlaneProperties.png)
+        private void SetPerCameraClippingPlaneProperties(RasterCommandBuffer cmd, in UniversalCameraData cameraData, bool isTargetYFlipped)
+        {
+            Matrix4x4 projectionMatrix = cameraData.GetGPUProjectionMatrix(isTargetYFlipped);
+            Matrix4x4 viewMatrix = cameraData.GetViewMatrix();
+
+            Matrix4x4 viewProj = CoreMatrixUtils.MultiplyProjectionMatrix(projectionMatrix, viewMatrix, cameraData.camera.orthographic);
+            Plane[] planes = s_Planes;
+            GeometryUtility.CalculateFrustumPlanes(viewProj, planes); //『=>extern
+
+            Vector4[] cameraWorldClipPlanes = s_VectorPlanes;
+            for (int i = 0; i < planes.Length; ++i) //『6面分
+                cameraWorldClipPlanes[i] = new Vector4(planes[i].normal.x, planes[i].normal.y, planes[i].normal.z, planes[i].distance);
+
+            cmd.SetGlobalVectorArray(ShaderPropertyId.cameraWorldClipPlanes, cameraWorldClipPlanes);
+        }
+        ```
+    - `void data.renderer.SetPerCameraBillboardProperties(context.cmd, data.cameraData)`
+        ```csharp (images\URPレンダリングフローまとめ\まとめ1\SetupRenderGraphCameraProperties\SetPerCameraBillboardProperties.png)
+        void SetPerCameraBillboardProperties(RasterCommandBuffer cmd, UniversalCameraData cameraData)
+        {
+            cmd.SetKeyword(ShaderGlobalKeywords.BillboardFaceCameraPos, QualitySettings.billboardsFaceCameraPosition);
+
+            CalculateBillboardProperties(cameraData.GetViewMatrix(), out Vector3 billboardTangent, out Vector3 billboardNormal, out float cameraXZAngle); //『C#実装あり
+
+            cmd.SetGlobalVector(ShaderPropertyId.billboardNormal, new Vector4(billboardNormal.x, billboardNormal.y, billboardNormal.z, 0.0f));
+            cmd.SetGlobalVector(ShaderPropertyId.billboardTangent, new Vector4(billboardTangent.x, billboardTangent.y, billboardTangent.z, 0.0f)); //『多分TBN行列のようなものを作る
+            Vector3 cameraPos = cameraData.worldSpaceCameraPos;
+            cmd.SetGlobalVector(ShaderPropertyId.billboardCameraParams, new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, cameraXZAngle)); //『`cameraXZAngle`によって画像を差し替える
+        }
+        ```
+  - `void OnBeforeRendering(renderGraph)`: (images\URPレンダリングフローまとめ\まとめ1\OnBeforeRendering.png)
     - `void m_ForwardLights.`**PreSetup**`(renderingData, cameraData, lightData)`
         ```csharp
         void PreSetup(UniversalRenderingData renderingData, UniversalCameraData cameraData, UniversalLightData lightData)

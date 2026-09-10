@@ -271,8 +271,8 @@ float4x4 OptimizeProjectionMatrix(float4x4 M)
 // >例えば、シャドウをレンダリングしている間、以下の行列は依然として元のカメラの射影となります。
 float4x4 unity_CameraProjection; //=>元のカメラの OptimizeProjectionMatrix(❰float4x4❱ glstate_matrix_projection) ?
 float4x4 unity_CameraInvProjection; //=>元のカメラの unity_MatrixInvP
-float4x4 unity_WorldToCamera; //=>元のカメラの unity_MatrixV
-float4x4 unity_CameraToWorld; //=>元のカメラの unity_MatrixInvV
+float4x4 unity_WorldToCamera; //=>元のカメラの (Z反転) * unity_MatrixV
+float4x4 unity_CameraToWorld; //=>元のカメラの unity_MatrixInvV * (Z反転)
 ```
 
 #### Temporal Anti-aliasing用Matrix
@@ -481,7 +481,8 @@ float2 _GlobalMipBias; // Mipmapのバイアスを指定するパラメータ (#
 // スクリーン座標の編集系? //以下の上２つは ScreenCoordOverride.hlsl で使われていた
 float4 _ScreenCoordScaleBias; // ((positionCS.xy*0.5+0.5) * _ScreenCoordScaleBias.xy) + _ScreenCoordScaleBias.zw するもの?
 float4 _ScreenSizeOverride; // 「スクリーン座標オーバーライド」がアクティブな場合に使用されるスクリーンサイズを指定するためのパラメータ
-float4 _ScaledScreenParams; // スクリーンパラメータ（スケーリングされたスクリーンの解像度やアスペクト比に関する情報）//`_ScreenParams`のRTHandle版らしい?
+
+float4 _ScaledScreenParams; // スクリーンパラメータ（スケーリングされたスクリーンの解像度やアスペクト比に関する情報）//`_ScreenParams`の❰* `.renderScale`＠❰* DynamicRes❱❱版
 
 float _AlphaToMaskAvailable; // Alpha-to-coverageモード: Pass{AlphaToMask On 『MSAAで使用することを目的』} の時、1.0になる?
   //AlphaToCoverageEnable(DirectX12メモ.md/G:421)と、SharpenAlpha(..)(Common.hlsl/G:1773)を使っている?<https://youtu.be/htzYbOZ-an0?t=321>
@@ -543,7 +544,7 @@ float4 unity_OrthoParams;
 // y = height
 // z = 1 + 1.0/width //1倍 + テクセル ?
 // w = 1 + 1.0/height
-float4 _ScreenParams; //`cmd.SetupCameraProperties(camera)`で設定される事を確認した(`camera`が描画する`rt`のサイズ) (`cmd.SetRednerTarget(..)`では設定されない)
+float4 _ScreenParams; //`cmd.SetupCameraProperties(camera)`で設定される事を確認した(`camera`が描画する`rt`のサイズ(`baseCamera.pixelWidth/Height`)) (`cmd.SetRednerTarget(..)`では設定されない)
 
 // Zバッファーのリニアライズに使用される値 (http://www.humus.name/temp/Linearize%20depth.txt)
   //グラフィックス関連/images/_ZBufferParams_Zバッファーのリニアライズに使用される値.png を参照

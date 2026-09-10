@@ -6,7 +6,7 @@
   `camera.AddCommandBuffer(CameraEvent evt, CommandBuffer cmd)`,
   `light.AddCommandBuffer(LightEvent evt, CommandBuffer cmd ＠❰, ShadowMapPass shadowPassMask❱)`
 - `ctx.ExecuteCommandBuffer(cmd)`: `cmd`を積むだけ。(`ctx.ExecuteCB(cmd)`は`cmd`を**キャッシュして使い回す**ことができる。`⟪Begin¦End⟫Event(｢cmdName｣)`が自動的に挿入される)
-- `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`ShaderProperty`が**反映される単位**)
+- `ctx.Submit()`: 積まれた`cmd群`の全ての処理が開始。(`LocalProperty`が**反映される単位**)
   - `Properties{..}`に**含める**と`LocalProperty`**のみ**(`.mat`に保存可能) (`⟪material¦compute⟫.Set～(..)`,`MaterialPropertyBlock`)
   - `Properties{..}`に**含めない**と`⟪Global¦Local⟫Property`**両方可能**'(優先順位`Local`>`Global`) (`cmd.SetGlobal～(..)`)
   - 優先順位: `MaterialPropertyBlock`>`Local`>`Global`>`Properties{..}の％値`
@@ -128,13 +128,13 @@
           :`Compute`Shaderで`⟪Buffer¦Texture⟫`を設定する場合は`int kernelIndex`が必要。
           後は大体`SetGlobal`と同じ。
       - VP_Matrix,クリッププレーン (**Draw～(..)系**の描画前に設定する)
-        - `SetupCameraProperties(Camera camera)`: `camera`から*VP_Matrix*と*クリッププレーン*を設定
-          :↓,↓↓の **ビューMatrix**,**プロジェクションMatrix** と **クリッププレーン**(`float4 unity_CameraWorldClipPlanes[6]`) と `float4 _ScreenParams` を設定
+        - `SetupCameraProperties(Camera camera)`: [SetupCameraProperties](images\SetupCameraProperties.png)
+          :**全てのMatrix**と**クリッププレーン**(`float4 unity_CameraWorldClipPlanes[6]`)と`float4 _ScreenParams`とその他色々..
+        - `SetViewProjectionMatrices(Matrix4x4 view, Matrix4x4 proj)`: **全ての順方向Matrix**を設定 (`glstate_matrix_projection`,`unity_Matrix⟪V¦VP⟫`)
         - `SetViewMatrix(Matrix4x4 view)`: ビューMatrix を設定 (`unity_MatrixV`)
           >Unityの`View`空間はOpenGLの規約と一致していて、カメラの前方方向が **-Z方向** なのです。
         - `SetProjectionMatrix(Matrix4x4 proj)`: プロジェクションMatrix を設定 (`glstate_matrix_projection`)
           設定例: `camera.projectionMatrix`, `Matrix4x4.Perspective(60, 1.777f, 0.1f, 100f)`
-        - `SetViewProjectionMatrices(Matrix4x4 view, Matrix4x4 proj)`: ビュープロジェクションMatrixを設定(**Build-inのみ**) (`unity_MatrixVP`)
       - その他
         - `SetComputeParamsFromMaterial(ComputeShader computeShader, int kernelIndex, Material material)`: `material`から**ShaderProperty**を設定 (ShaderKeywordはできない?) (`ComputeShader`の`Material`として使う?)
       - 一時RT

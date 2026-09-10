@@ -77,9 +77,9 @@
     - `int eventMask`: `Camera`のイベントを発動できるレイヤーを選択するためのマスク。(分からん)
 
 - **カメラとテクスチャに関する情報**
-  - **描画位置(ViewPort?)**
+  - **描画位置(ViewPort)**[Cameraサイズ](images\Cameraサイズ.png)
     - `Rect ＠❰pixel❱Rect`: 画面上の **⟪正規(0～1)¦ピクセル(解像度)⟫座標**でどこに`Camera`が描画されるか。
-    - `int ＠❰scaled❱pixel⟪Width¦Height⟫`: `Camera`の解像度の`⟪Width¦Height⟫`幅。(`ViewPort.⟪x¦y⟫`) (`❰scaled❱`は、**ダイナミック解像度**のスケーリングを**考慮する**) (Read-Only)
+    - `int ＠❰scaled❱pixel⟪Width¦Height⟫`: `Camera`の解像度の`⟪Width¦Height⟫`幅。(`(int)pixelRect.⟪width¦height⟫`) (`❰scaled❱`は、**ダイナミック解像度**のスケーリングを**考慮する**) (Read-Only)
   - ●`Vector3` **velocity**: `Camera`のワールド空間での速度を取得します（読み取り専用）。
 
 - **テクスチャ設定**

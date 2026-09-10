@@ -603,11 +603,11 @@
             cameraData.allowHDROutput<:bool> &= asset.supportsHDR;
 
             //解像度関係
+            cameraData.pixelRect<:Rect> = baseCamera.pixelRect;
             cameraData.pixel⟪Width¦Height⟫<:int> = baseCamera.pixel⟪Width¦Height⟫;
             cameraData.aspectRatio<:float> = (float)cameraData.pixelWidth / (float)cameraData.pixelHeight;
             cameraData.renderScale<:float> = cameraData.cameraType == CameraType.Game ? asset.renderScale : 1.0f;
             cameraData.isDefaultViewport<:bool> = !(Math.Abs(baseCamera.rect.x) > 0.0f || Math.Abs(baseCamera.rect.y) > 0.0f || Math.Abs(baseCamera.rect.width) < 1.0f || Math.Abs(baseCamera.rect.height) < 1.0f);
-            cameraData.pixelRect<:Rect> = baseCamera.pixelRect; //『シザー?
 
             //『デフォルト不透明`SortingCriteria`
             var commonOpaqueFlags = SortingCriteria.CommonOpaque;
