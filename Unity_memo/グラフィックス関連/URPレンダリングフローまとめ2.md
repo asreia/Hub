@@ -46,3 +46,58 @@ if (requiresPrepass)
     }
 }
 ```
+```csharp
+if (requiresPrepass)
+{
+    TextureHandle depthTarget = useDepthPriming ? resourceData.activeDepthTexture : resourceData.cameraDepthTexture;
+
+    // 深度法線プリパス内のステンシルベースのクロスフェード LOD 用にステンシルバッファを準備します。深度プリパスはステンシルテストを使用しません (シャドウと同じ)。
+    if (renderingData.stencilLodCrossFadeEnabled && renderPassInputs.requiresNormalsTexture && depthTarget == resourceData.cameraDepthTexture)
+        m_StencilCrossFadeRenderPass.Render(renderGraph, context, resourceData.cameraDepthTexture);
+
+    uint batchLayerMask = uint.MaxValue; //『`GPUOcclusionCulling`省略
+    if (renderPassInputs.requiresNormalsTexture)
+        DepthNormalPrepassRender(renderGraph, renderPassInputs, depthTarget, batchLayerMask, depthTarget == resourceData.cameraDepthTexture, true, false);
+    else
+        m_DepthPrepass.Render(renderGraph, frameData, in depthTarget, batchLayerMask, depthTarget == resourceData.cameraDepthTexture);
+}
+```
+```csharp
+// TextureCopySchedules copySchedules = CalculateTextureCopySchedules(requireDepthTexture, requiresPrepass, renderPassInputs.requiresDepthTextureEarliestEvent, renderPassInputs.requiresColorTexture, cameraData.requiresOpaqueTexture);
+private TextureCopySchedules CalculateTextureCopySchedules(
+    bool requireDepthTexture,
+    bool requiresPrepass,
+    RenderPassEvent requiresDepthTextureEarliestEvent,
+    bool requiresColorTexture,
+    bool requiresOpaqueTexture
+    )
+{
+    return new TextureCopySchedules
+    {
+        depth =
+            !requireDepthTexture?
+                DepthCopySchedule.None
+
+            : (requiresPrepass && !useDepthPriming)?
+                DepthCopySchedule.DuringPrepass //『プリパス中。デューリング プリパス
+
+            : (requiresDepthTextureEarliestEvent < RenderPassEvent.AfterRenderingOpaques || m_CopyDepthMode == CopyDepthMode.ForcePrepass)?
+                DepthCopySchedule.AfterPrepass
+
+            : (requiresDepthTextureEarliestEvent < RenderPassEvent.AfterRenderingTransparents || m_CopyDepthMode == CopyDepthMode.AfterOpaques)?
+                requiresDepthTextureEarliestEvent < RenderPassEvent.AfterRenderingSkybox?
+                    DepthCopySchedule.AfterOpaques
+                    : DepthCopySchedule.AfterSkybox
+
+            : (requiresDepthTextureEarliestEvent < RenderPassEvent.BeforeRenderingPostProcessing || m_CopyDepthMode == CopyDepthMode.AfterTransparents)?
+                DepthCopySchedule.AfterTransparents
+
+            : DepthCopySchedule.None,
+
+        color =
+            (requiresColorTexture || requiresOpaqueTexture)
+                ? ColorCopySchedule.AfterSkybox
+                : ColorCopySchedule.None
+    };
+}
+```

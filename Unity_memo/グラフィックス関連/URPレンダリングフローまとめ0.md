@@ -1,5 +1,7 @@
 # URPレンダリングフローまとめ0
 
+- 6000.4.5f1
+
 ```csharp
 && baseCamera.targetTexture == null && //カメラスタッキングは`baseCamera`の`targetTexture`(nullの場合はバックバッファ)をスタック内で共通して使う？
 ```
@@ -605,9 +607,9 @@
             //解像度関係
             cameraData.pixelRect<:Rect> = baseCamera.pixelRect;
             cameraData.pixel⟪Width¦Height⟫<:int> = baseCamera.pixel⟪Width¦Height⟫;
-            cameraData.aspectRatio<:float> = (float)cameraData.pixelWidth / (float)cameraData.pixelHeight;
-            cameraData.renderScale<:float> = cameraData.cameraType == CameraType.Game ? asset.renderScale : 1.0f;
-            cameraData.isDefaultViewport<:bool> = !(Math.Abs(baseCamera.rect.x) > 0.0f || Math.Abs(baseCamera.rect.y) > 0.0f || Math.Abs(baseCamera.rect.width) < 1.0f || Math.Abs(baseCamera.rect.height) < 1.0f);
+            cameraData.aspectRatio<:float> = (float)baseCamera.pixelWidth / (float)baseCamera.pixelHeight;
+            cameraData.renderScale<:float> = baseCamera.cameraType == CameraType.Game ? asset.renderScale : 1.0f;
+            cameraData.isDefaultViewport<:bool> = Math.Abs(baseCamera.rect.x) == 0.0f && Math.Abs(baseCamera.rect.y) == 0.0f && Math.Abs(baseCamera.rect.width) >= 1.0f && Math.Abs(baseCamera.rect.height) >= 1.0f;
 
             //『デフォルト不透明`SortingCriteria`
             var commonOpaqueFlags = SortingCriteria.CommonOpaque;
@@ -616,7 +618,7 @@
             cameraData.defaultOpaqueSortFlags<:SortingCriteria> = canSkipFrontToBackSorting ? noFrontToBackOpaqueFlags : commonOpaqueFlags;
 
             // パイプラインアセットのアップスケーリングフィルター選択を画像アップスケーリングフィルターに変換します 『(ImageUpscalingFilter <= UpscalingFilterSelection)
-            cameraData.upscalingFilter<:ImageUpscalingFilter> = ResolveUpscalingFilterSelection(new Vector2(cameraData.pixelWidth, cameraData.pixelHeight), cameraData.renderScale, asset.upscalingFilter);
+            cameraData.upscalingFilter<:ImageUpscalingFilter> = ResolveUpscalingFilterSelection(new Vector2(baseCamera.pixelWidth, baseCamera.pixelHeight), cameraData.renderScale, asset.upscalingFilter);
             cameraData.imageScalingMode<:ImageScalingMode> = ｢ImageScalingMode.⟪None¦Upscaling¦Downscaling⟫:`cameraData.⟪renderScale¦cameraType¦upscalingFilter⟫`で決められる｣
             //『FSR
             cameraData.fsrOverrideSharpness<:bool> = asset.fsrOverrideSharpness;

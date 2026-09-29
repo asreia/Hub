@@ -522,7 +522,7 @@
         bool requirePrepassForTextures = RequirePrepassForTextures(cameraData, renderPassInputs);
         /*cameraData.renderer.*/useDepthPriming = IsDepthPrimingEnabledRenderGraph(cameraData, m_DepthPrimingMode);
 
-        bool requirePrepass = requirePrepassForTextures || useDepthPriming;
+        bool requirePrepass/*`OnMainRendering(..)`で利用*/ = requirePrepassForTextures || useDepthPriming;
 
         // cameraDepthTexture に直接プリパスを行う場合にのみ深度フォーマットを使用します。深度プライミング (つまり activeCameraDepth へのプリパス) を行う場合は、テクスチャへのプリパスは行いません。代わりに、プライミング済みアタッチメントからコピーします。
         bool prepassToCameraDepthTexture = requirePrepassForTextures && !useDepthPriming;
@@ -584,7 +584,7 @@
         {
             RenderPassInputSummary inputSummary = new RenderPassInputSummary
             {
-                requiresDepthTextureEarliestEvent = RenderPassEvent.BeforeRenderingPostProcessing //『`DepthTexture`が使われる場所?
+                requiresDepthTextureEarliestEvent = RenderPassEvent.BeforeRenderingPostProcessing //『`DepthTexture`が使われる場所
                 requiresDepthNormalAtEvent = RenderPassEvent.BeforeRenderingOpaques,              //『`DepthNormal`が描画される場所?
             };
             for (int i = 0; i < activeRenderPassQueue.Count; ++i)
